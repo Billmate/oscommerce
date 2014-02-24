@@ -32,16 +32,17 @@
 @include_once(DIR_FS_CATALOG . DIR_WS_CLASSES . 'billmate/billmate_lang.php');
 if(!class_exists('Encoding',false)){
     require_once DIR_FS_CATALOG . DIR_WS_CLASSES.'billmate/utf8.php';
+    require_once DIR_FS_CATALOG . DIR_WS_CLASSES.'billmate/commonfunctions.php';
 }
 
-class billmate {
+class billmate_invoice {
     var $code, $title, $description, $enabled, $billmate_livemode, $billmate_testmode, $jQuery;
 
     // class constructor
-    function billmate() {
+    function billmate_invoice() {
         global $order, $currency, $currencies, $customer_id, $customer_country_id, $billmate_livemode, $billmate_testmode;
         $this->jQuery = true;
-        $this->code = 'billmate';
+        $this->code = 'billmate_invoice';
 
         if(strpos($_SERVER['SCRIPT_FILENAME'],'admin')) {
             $this->title = MODULE_PAYMENT_BILLMATE_TEXT_TITLE;
@@ -219,14 +220,6 @@ class billmate {
         else
             $billmate_fee = 0;
 
-
-        $paymeny_charge_link = "<a href=\"javascript:void();\" onclick=\"window." .
-                "open('https://online.billmate.com/villkor.yaws?eid=" .
-                MODULE_PAYMENT_BILLMATE_EID."&charge=" .
-                $billmate_fee."'," .
-                "'villkor','width=300,height=300,scrollbars=no');\">" .
-                MODULE_PAYMENT_BILLMATE_PAYMENT."</a>";
-
         $user_billing = $_SESSION['user_billing'];
 		
         empty($user_billing['billmate_pnum']) ? $billmate_pnum = $personnummer : $billmate_pnum = $user_billing['billmate_pnum'];
@@ -267,7 +260,6 @@ class billmate {
         //Livemode to set the right Host and Port
         $livemode = $this->billmate_livemode;
 
-        require (DIR_FS_CATALOG . DIR_WS_CLASSES . 'billmate/billmate_api.php');
         require(DIR_FS_CATALOG . DIR_WS_CLASSES . 'billmate/billmateutils.php');
 
         //INCLUDE THE VALIDATION FILE
@@ -293,22 +285,26 @@ class billmate {
 			$errors[] = sprintf( MODULE_PAYMENT_BILLMATE_EMAIL, $order->customer['email_address']);;
 		}
         if (!empty($errors)) {
-            tep_redirect(BillmateUtils::error_link(FILENAME_CHECKOUT_PAYMENT, 'payment_error=billmate&error='.implode(', ', $errors), 'SSL'));
+            tep_redirect(BillmateUtils::error_link(FILENAME_CHECKOUT_PAYMENT, 'payment_error=billmate_invoice&error='.implode(', ', $errors), 'SSL'));
         }
 
         $pno = $this->billmate_pnum = $_POST['billmate_pnum'];
-        $eid = MODULE_PAYMENT_BILLMATE_EID;
-        $secret = MODULE_PAYMENT_BILLMATE_SECRET;
+        $eid = (int)MODULE_PAYMENT_BILLMATE_EID;
+        $secret = (int)MODULE_PAYMENT_BILLMATE_SECRET;
+		$ssl = true;
+		$debug = false;
 
         $pnoencoding = $KRED_SE_PNO;
         $type = $GA_OLD;
 
-        $status = get_addresses($eid, BillmateUtils::convertData($pno), $secret, $pnoencoding, $type, $result);
+		$k = new Billmate($eid,$secret,$ssl,$debug);
+		$result = $k->GetAddress($pno);
+//        $status = get_addresses($eid, BillmateUtils::convertData($pno), $secret, $pnoencoding, $type, $result);
 
-        if ($status != 0) {
+        if (!is_array($result)) {
             tep_redirect(BillmateUtils::error_link(FILENAME_CHECKOUT_PAYMENT,
-                    'payment_error=billmate&error='.
-                    strip_tags( $result ). " ($status)",
+                    'payment_error=billmate_invoice&error='.
+                    strip_tags( $result ),
                     'SSL', true, false));
         }
 		$result[0][0] = utf8_encode($result[0][0]);
@@ -396,12 +392,12 @@ class billmate {
 	            function closefunc(obj){
     	           modalWin.HideModalPopUp();
 	            };
-				 modalWin.ShowMessage(\''.$html.'\',250,500,\''.MODULE_PAYMENT_BILLMATE_ADDRESS_WRONG.'\');</script>';
+				 ShowMessage(\''.$html.'\',\''.MODULE_PAYMENT_BILLMATE_ADDRESS_WRONG.'\');</script>';
 	            unset($_SESSION['WrongAddress']);
                 $WrongAddress = $code;
                 global $messageStack;
                 $_SESSION['WrongAddress'] = $WrongAddress;
-                tep_redirect(BillmateUtils::error_link(FILENAME_CHECKOUT_PAYMENT, 'payment_error=billmate&error=invalidaddress', 'SSL'));
+                tep_redirect(BillmateUtils::error_link(FILENAME_CHECKOUT_PAYMENT, 'payment_error=billmate_invoice&error=invalidaddress', 'SSL'));
 	        }else{
 			   if($result[0][0] == "") {
 					$this->billmate_fname = $order->billing['firstname'];
@@ -540,7 +536,7 @@ class billmate {
         //Set the right Host and Port
         $livemode = $this->billmate_livemode;
 
-        require (DIR_FS_CATALOG . DIR_WS_CLASSES . 'billmate/billmate_api.php');
+
         require(DIR_FS_CATALOG . DIR_WS_CLASSES . 'billmate/billmateutils.php');
 
         $addr_num = $_POST['addr_num'];
@@ -732,7 +728,7 @@ class billmate {
 		$ssl = true;
 		$debug = false;
 
-		$k = new BillMateAPI($eid,$secret,$ssl,$debug, $this->billmate_testmode);
+		$k = new Billmate($eid,$secret,$ssl,$debug, $this->billmate_testmode);
 		$result1 = $k->AddInvoice($pno,$ship_address,$bill_address,$goodsList,$transaction);
 
         if (is_array($result1)) {
@@ -782,7 +778,7 @@ class billmate {
             return false;
         } else {
             tep_redirect(BillmateUtils::error_link(FILENAME_CHECKOUT_PAYMENT,
-                    'payment_error=billmate&error=' . utf8_encode($result1),
+                    'payment_error=billmate_invoice&error=' . utf8_encode($result1),
                     'SSL', true, false));
         }
     }
@@ -823,7 +819,8 @@ class billmate {
         $secret = MODULE_PAYMENT_BILLMATE_SECRET;
         $eid = MODULE_PAYMENT_BILLMATE_EID;
         $invno = $order->billmateref;
-        update_orderno($eid, $invno, $secret, utf8_decode($insert_id), $result);
+		$k = new Billmate($eid,$secret,true,false);
+		$k->UpdateOrderNo((string)$invno, $insert_id);
 
         //Delete Session with user details
         tep_session_unregister('user_billing');

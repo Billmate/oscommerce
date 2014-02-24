@@ -11,8 +11,8 @@ if (!defined('PATH_SEPARATOR')) {
 }
 require_once(dirname( __FILE__ )."/lib/xmlrpc.inc");
 require_once(dirname( __FILE__ )."/lib/xmlrpcs.inc");
-require_once dirname(__FILE__).'/BillMate.php';
 require_once dirname(__FILE__) . DIRECTORY_SEPARATOR . 'commonfunctions.php';
+require_once dirname(__FILE__).'/BillMate.php';
 
 $GLOBALS['_PEAR_default_error_options']  = E_USER_NOTICE;
 $GLOBALS['_PEAR_destructor_object_list'] = array();
@@ -2083,6 +2083,8 @@ function get_addresses($eid, $pno, $secret, $pno_encoding, $type, &$result) {
 	$paramList = array($pno, $eid, $digestSecret, $pno_encoding, $type);
     $ssl = true;
     $debug = false;
+	$k = new Billmate($eid,$secret,$ssl,$debug);
+	$result = $k->GetAddress($pno);
 	return kred_call("get_addresses", $paramList, $result);
 }
 
@@ -2556,7 +2558,7 @@ function fetch_pclasses($eid, $cur, $secret, $country, $language, &$result){
     $debug = false;
 
 
-    $k = new BillMateAPI($eid,$secret,$ssl,$debug);
+    $k = new Billmate($eid,$secret,$ssl,$debug);
 
 
     $additionalinfo = array(

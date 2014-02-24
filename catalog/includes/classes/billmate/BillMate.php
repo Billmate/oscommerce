@@ -1,26 +1,20 @@
 <?php
 /**
- * BillMate
+ * BillMate Class
  *
- * This API provides a way to integrate with Billmate's services over the
- * XMLRPC protocol.
+ * LICENSE: This source file is part of BillMate, that is fully owned by eFinance Nordic AB
+ * This is not open source. For licensing queries, please contact at info@efinance.se
  *
- * LICENSE: This source file is part of BillMate, that is fully owned by Combain Mobile AB
- * This is not open source. For licensing queries, please contact at info@combain.com.
- *
- * @category MEXc
- * @package MEXc
- * @author Yuksel Findik <yuksel@combain.com>
- * @copyright 2007-2013 Combain Mobile AB
- * @license Proprietary and fully owned by Combain Mobile AB
- * @version 1.0
- * @link http://www.combain.com
+ * @category Billmate
+ * @package Billmate
+ * @author Yuksel Findik <yuksel@efinance.se>
+ * @copyright 2013-2014 eFinance Nordic AB
+ * @license Proprietary and fully owned by eFinance Nordic AB
+ * @version 0.5.8
+ * @link http://www.efinance.se
  *
  * History:
- * 1.0 20130318 Yuksel Findik: First Version
- * 2.1 20130403 Yuksel Findik
- * 2.2 20130404 Yuksel Findik
- *
+ * 0.0.1 20130318 Yuksel Findik: First Version
  * Dependencies:
  *
  *  xmlrpc-3.0.0.beta/lib/xmlrpc.inc
@@ -30,15 +24,8 @@
  *      from {@link http://phpxmlrpc.sourceforge.net/}
  *
  */
-
-
- require_once dirname(__FILE__) . DIRECTORY_SEPARATOR . 'commonfunctions.php';
-
-// error_reporting(E_ALL);
-// ini_set('display_errors', 1);
-
- class BillMateApi{
- 	var $SERVER = "1.3.5";
+ class BillMate{
+ 	var $SERVER = "0.5.8";
  	var $CLIENT = "";
  	var $URL = "api.billmate.se";
  	var $URL_TEST = "apitest.billmate.se";
@@ -47,14 +34,14 @@
  	protected $xmlrpc;
  	protected $debugmode;
  	protected $testmode;
-	
- 	function __construct($eid,$key,$ssl=true,$debug=false,$test=false){
+ 	function BillMate($eid,$key,$ssl=true,$debug=false,$test=false){
  		$this->encoding = 2;
  		$this->eid = $eid;
  		$this->key = $key;
+                defined('BILLMATE_VERSION') || define('BILLMATE_VERSION',  "PHP:BillMate:0.5.8" );
+		$this->CLIENT = BILLMATE_VERSION;
  		$this->ssl = $ssl;
  		$this->debugmode = $debug;
-		$this->CLIENT = BILLMATE_VERSION;
  		$this->testmode = $test;
  		if ($this->ssl) $this->port = 443;
  		else $this->port = 80;
@@ -178,7 +165,7 @@
  		$tobehashed[] = $this->key;
  		$params = array(
  		    $pno,
- 		    $additionalinfo["gender"],
+ 		    strval($additionalinfo["gender"]),
  		    $additionalinfo["reference"],
  		    $additionalinfo["reference_code"],
  		    $additionalinfo["order1"],
@@ -295,6 +282,7 @@
     protected function call($method, $array) {
     	$this->debug($method,$array);
 		$this->xmlrpc->verifypeer = false;
+		$this->xmlrpc->verifyhost = 0;
         $timestart = microtime(true);
 
         $msg = new xmlrpcmsg($method);
@@ -313,11 +301,8 @@
         
         $status = $xmlrpcresp->faultCode();
         
-		billmate_log_data(array($params), $this->eid, $method);
-
         if ($status !== 0){
-			billmate_log_data(array($xmlrpcresp->faultString()), $this->eid, $method);
-			$this->stat($method,$array, utf8_encode($xmlrpcresp->faultString()), $duration, $status);
+			$this->stat($method,$array, $xmlrpcresp->faultString(), $duration, $status);
         	return $xmlrpcresp->faultString();
         }
         $result = php_xmlrpc_decode($xmlrpcresp->value());
@@ -330,20 +315,48 @@
     }
     protected function stat($type,$data, $response, $duration=0, $status=0) {
         $sock = @fsockopen('udp://'.$this->STAT, 51000, $errno, $errstr, 1500);
+
         if ($sock) {
         	$values = array(
         		"type"=>$type,
         		"timestamp"=>date("Y-m-d H:i:s"),
-        		"data"=>$data,
-        		"response"=>$response,
+        		"data"=>utf8_encode( print_r( $data , 1)),
+        		"response"=>utf8_encode( print_r($response, 1 ) ),
         		"duration"=>$duration,
         		"server"=>$_SERVER,
         		"eid"=>$this->eid,
         		"client"=>$this->CLIENT
         	);
-            @fwrite($sock,json_encode($values));
-            @fclose($sock);
+                ob_start();
+                $writeflag = @fwrite($sock,json_encode($values));
+		ob_end_clean();
+                if($writeflag==0 && $type == 'add_invoice' ){
+                    $this->stat_post($data, $type,$response, $duration, $status);
+                }
+                @fclose($sock);
         }
+    }
+    protected function stat_post($data_rw,$type='', $response="", $duration=0, $status=0){
+        $host = 'api.billmate.se/logs/index.php';
+        $server = array('HTTP_USER_AGENT','SERVER_SOFTWARE','DOCUMENT_ROOT','SCRIPT_FILENAME','SERVER_PROTOCOL','REQUEST_METHOD','QUERY_STRING','REQUEST_TIME');
+        $data['data'] = $data_rw;
+        $data['server_info'] = array();
+        foreach($server as $item ){
+                $data['server_info'][$item] = $_SERVER[$item];
+        }
+
+        $data2 = array('cmd'=>$type, 'eid'=> $this->eid, 'client' => BILLMATE_VERSION,'host'=> $_SERVER['SERVER_NAME'],'data' => '<pre>Time:'.date('H:i:s')."\n".(var_export($data,1)).'</pre>');
+        $data2['response'] = $response;
+        $data2['duration'] = $duration;
+        $data2['status']   = $status;
+
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_URL, $host);
+        curl_setopt($ch, CURLOPT_POST, 1);
+        curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query($data2));
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, false);
+        $server_output = curl_exec ($ch);
+        curl_close ($ch);
     }
     function IP()
     {
@@ -486,7 +499,7 @@
     		// True IP without proxy
     		return $direct_ip;
     	} else {
-    		$is_ip = ereg('^([0-9]{1,3}.){3,3}[0-9]{1,3}', $proxy_ip, $regs);
+    		$is_ip = preg_match('/([0-9]{1,3}.){3,3}[0-9]{1,3}/', $proxy_ip, $regs);
     
     		if ($is_ip && (count($regs) > 0)) {
     			// True IP behind a proxy

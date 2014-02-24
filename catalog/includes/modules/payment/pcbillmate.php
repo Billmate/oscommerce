@@ -30,10 +30,12 @@
 
 $includeLoopVariable = $i;
 @include_once(DIR_FS_CATALOG . DIR_WS_CLASSES . 'billmate/billmate_lang.php');
+require_once DIR_FS_CATALOG . DIR_WS_CLASSES.'billmate/commonfunctions.php';
 include(DIR_FS_CATALOG . DIR_WS_CLASSES . "billmate/lib/xmlrpc.inc");
 include(DIR_FS_CATALOG . DIR_WS_CLASSES . "billmate/lib/xmlrpcs.inc");
 require_once(DIR_FS_CATALOG . DIR_WS_CLASSES . 'billmate/utf8.php');
 require_once(DIR_FS_CATALOG . DIR_WS_CLASSES . 'billmate/BillMate.php');;
+
 
 class pcbillmate {
     var $code, $title, $description, $enabled, $pcbillmate_testmode, $jQuery;
@@ -110,7 +112,8 @@ class pcbillmate {
                     $this->enabled = false;
                 }
             }
-        }        
+        }    
+		
         if(is_object($currencies)) {
             $er = $currencies->get_value($currency);
         }else {
@@ -171,7 +174,6 @@ class pcbillmate {
         //Set the right Host and Port
         $livemode = $this->pcbillmate_testmode == false;
 
-        require_once(DIR_FS_CATALOG . DIR_WS_CLASSES . 'billmate/billmate_api.php');
         require_once(DIR_FS_CATALOG . DIR_WS_CLASSES . 'billmate/billmateutils.php');
 
         $eid = MODULE_PAYMENT_PCBILLMATE_EID;
@@ -283,7 +285,6 @@ class pcbillmate {
         //Set the right Host and Port
         $livemode = $this->pcbillmate_testmode == false;
 
-        require_once(DIR_FS_CATALOG . DIR_WS_CLASSES . 'billmate/billmate_api.php');
         require(DIR_FS_CATALOG . DIR_WS_CLASSES . 'billmate/billmateutils.php');
 
         //INCLUDE THE VALIDATION FILE
@@ -315,18 +316,19 @@ class pcbillmate {
 
         $pno = $this->pcbillmate_pnum = $_POST['pcbillmate_pnum'];
         $this->pcbillmate_pclass = $_POST['pcbillmate_pclass'];
-        $eid = MODULE_PAYMENT_PCBILLMATE_EID;
-        $secret = MODULE_PAYMENT_PCBILLMATE_SECRET;
+        $eid = (int)MODULE_PAYMENT_PCBILLMATE_EID;
+        $secret = (int)MODULE_PAYMENT_PCBILLMATE_SECRET;
 
         $pnoencoding = $KRED_SE_PNO;
 
         $type = $GA_OLD;
 
-        $status = get_addresses($eid, BillmateUtils::convertData($pno), $secret, $pnoencoding, $type, $result);
+		$k = new Billmate($eid,$secret,true, false);
+		$result = $k->GetAddress($pno);
 
-        if ($status != 0) {
+        if (!is_array($result)) {
             tep_redirect(BillmateUtils::error_link(FILENAME_CHECKOUT_PAYMENT,
-                    'payment_error=pcbillmate&error='.strip_tags($result) . " ($status)",
+                    'payment_error=pcbillmate&error='.strip_tags($result),
                     'SSL', true, false));
         }
 		$result[0][0] = utf8_encode($result[0][0]);
@@ -415,12 +417,12 @@ class pcbillmate {
 	            }
 	            function closefunc(obj){
     	            modalWin.HideModalPopUp();
-	            };modalWin.ShowMessage(\''.$html.'\',250,500,\''.MODULE_PAYMENT_PCBILLMATE_ADDRESS_WRONG.'\');</script>';
+	            };ShowMessage(\''.$html.'\',\''.MODULE_PAYMENT_PCBILLMATE_ADDRESS_WRONG.'\');</script>';
 	            unset($_SESSION['WrongAddress']);
                 $WrongAddress = $code;
                 global $messageStack;
                 $_SESSION['WrongAddress'] = $WrongAddress;
-                tep_redirect(BillmateUtils::error_link(FILENAME_CHECKOUT_PAYMENT, 'payment_error=billmate&error=invalidaddress', 'SSL'));
+                tep_redirect(BillmateUtils::error_link(FILENAME_CHECKOUT_PAYMENT, 'payment_error=pcbillmate&error=invalidaddress', 'SSL'));
 	        }else{
 	            if(!match_usernamevp( $fullname , $apiName)){
                     if($result[0][0] == "") {
@@ -576,7 +578,6 @@ class pcbillmate {
         //Set the right Host and Port
         $livemode = $this->pcbillmate_testmode == false;
 
-        require_once(DIR_FS_CATALOG . DIR_WS_CLASSES . 'billmate/billmate_api.php');
         require(DIR_FS_CATALOG . DIR_WS_CLASSES . 'billmate/billmateutils.php');
 
         $eid = (int)MODULE_PAYMENT_PCBILLMATE_EID;
@@ -759,7 +760,7 @@ class pcbillmate {
 		$ssl = true;
 		$debug = false;
 
-		$k = new BillMateAPI($eid,$secret,$ssl,$debug);
+		$k = new Billmate($eid,$secret,$ssl,$debug);
 		$result1 = $k->AddInvoice($pno,$ship_address,$bill_address,$goodsList,$transaction);
         if (is_array($result1)) {
 
@@ -847,7 +848,8 @@ class pcbillmate {
         $secret = MODULE_PAYMENT_PCBILLMATE_SECRET;
         $eid = MODULE_PAYMENT_PCBILLMATE_EID;
         $invno = $order->billmateref;
-        update_orderno($eid, $invno, $secret, utf8_decode($insert_id), $result);
+		$k = new Billmate($eid,$secret,true,false);
+		$k->UpdateOrderNo((string)$invno, $insert_id);
         return false;
     }
 
@@ -917,26 +919,33 @@ class pcbillmate {
         //Set the right Host and Port
         $livemode = $this->pcbillmate_testmode == false;
 
-        require_once(DIR_FS_CATALOG . DIR_WS_CLASSES . 'billmate/billmate_api.php');
         require_once(DIR_FS_CATALOG . DIR_WS_CLASSES . 'billmate/billmateutils.php');
 
         $filename = explode('?', basename($_SERVER['REQUEST_URI'], 0));//[0];
 
         if ($filename[0] == "modules.php") {
-            if ($_GET['get_pclasses'] == TRUE) {
-                $eid = MODULE_PAYMENT_PCBILLMATE_EID;
-                $secret = MODULE_PAYMENT_PCBILLMATE_SECRET;
+            //if ($_GET['get_pclasses'] == TRUE) {
+                $eid = (int)MODULE_PAYMENT_PCBILLMATE_EID;
+                $secret = (int)MODULE_PAYMENT_PCBILLMATE_SECRET;
 
                 $result = false;
-                fetch_pclasses($eid, $KRED_SEK, $secret, $KRED_ISO3166_SE, $KRED_ISO639_SE, $result);
+				$additionalinfo = array(
+					"currency"=>0,//SEK
+					"country"=>209,//Sweden
+					"language"=>125,//Swedish
+				);
+
+				$k = new Billmate($eid,$secret,true,false);
+				$result= $k->FetchCampaigns($additionalinfo);
+                //fetch_pclasses($eid, $KRED_SEK, $secret, $KRED_ISO3166_SE, $KRED_ISO639_SE, $result);
 
                 BillmateUtils::update_pclasses(MODULE_PAYMENT_PCBILLMATE_PCLASS_TABLE, $result);
-            }
-            if ($_GET['view_pclasses'] == TRUE || $_GET['get_pclasses'] == TRUE) {
+            //}
+            //if ($_GET['view_pclasses'] == TRUE || $_GET['get_pclasses'] == TRUE) {
                 //echo "<pre>";
                 BillmateUtils::display_pclasses(MODULE_PAYMENT_PCBILLMATE_PCLASS_TABLE, $KRED_ISO3166_SE);
                 //echo "</pre>";
-            }
+            //}
         }
 
         return array('MODULE_PAYMENT_PCBILLMATE_STATUS',

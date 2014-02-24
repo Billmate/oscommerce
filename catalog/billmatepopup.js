@@ -1,7 +1,89 @@
+function match_media_mount(){
+window.matchMedia = window.matchMedia || (function(doc, undefined){
+
+  var docElem  = doc.documentElement,
+      refNode  = docElem.firstElementChild || docElem.firstChild,
+      // fakeBody required for <FF4 when executed in <head>
+      fakeBody = doc.createElement('body'),
+      div      = doc.createElement('div');
+
+  div.id = 'mq-test-1';
+  div.style.cssText = "position:absolute;top:-100em";
+  fakeBody.style.background = "none";
+  fakeBody.appendChild(div);
+
+  var mqRun = function ( mq ) {
+    div.innerHTML = '&shy;<style media="' + mq + '"> #mq-test-1 { width: 42px; }</style>';
+    docElem.insertBefore( fakeBody, refNode );
+    bool = div.offsetWidth === 42;
+    docElem.removeChild( fakeBody );
+    
+    return { matches: bool, media: mq };
+  },
+  
+  getEmValue = function () {
+    var ret,
+        body = docElem.body,
+        fakeUsed = false;
+
+    div.style.cssText = "position:absolute;font-size:1em;width:1em";
+
+    if( !body ) {
+      body = fakeUsed = doc.createElement( "body" );
+      body.style.background = "none";
+    }
+
+    body.appendChild( div );
+
+    docElem.insertBefore( body, docElem.firstChild );
+
+    if( fakeUsed ) {
+      docElem.removeChild( body );
+    } else {
+      body.removeChild( div );
+    }
+    
+    //also update eminpx before returning
+    ret = eminpx = parseFloat( div.offsetWidth );
+
+    return ret;
+  },
+  
+  //cached container for 1em value, populated the first time it's needed 
+  eminpx,
+  
+  // verify that we have support for a simple media query
+  mqSupport = mqRun( '(min-width: 0px)' ).matches;
+
+  return function ( mq ) {
+    if( mqSupport ) {
+      return mqRun( mq );
+    } else {
+      var min = mq.match( /\(min\-width:[\s]*([\s]*[0-9\.]+)(px|em)[\s]*\)/ ) && parseFloat( RegExp.$1 ) + ( RegExp.$2 || "" ),
+          max = mq.match( /\(max\-width:[\s]*([\s]*[0-9\.]+)(px|em)[\s]*\)/ ) && parseFloat( RegExp.$1 ) + ( RegExp.$2 || "" ),
+          minnull = min === null,
+          maxnull = max === null,
+          currWidth = doc.body.offsetWidth,
+          em = 'em';
+      
+      if( !!min ) { min = parseFloat( min ) * ( min.indexOf( em ) > -1 ? ( eminpx || getEmValue() ) : 1 ); }
+      if( !!max ) { max = parseFloat( max ) * ( max.indexOf( em ) > -1 ? ( eminpx || getEmValue() ) : 1 ); }
+      
+      bool = ( !minnull || !maxnull ) && ( minnull || currWidth >= min ) && ( maxnull || currWidth <= max );
+
+      return { matches: bool, media: mq };
+    }
+  };
+
+}( document ));
+
+//https://raw.github.com/paulirish/matchMedia.js/master/matchMedia.addListener.js
+(function(){if(window.matchMedia&&window.matchMedia("all").addListener){return false}var e=window.matchMedia,t=e("only all").matches,n=false,r=0,i=[],s=function(t){clearTimeout(r);r=setTimeout(function(){for(var t=0,n=i.length;t<n;t++){var r=i[t].mql,s=i[t].listeners||[],o=e(r.media).matches;if(o!==r.matches){r.matches=o;for(var u=0,a=s.length;u<a;u++){s[u].call(window,r)}}}},30)};window.matchMedia=function(r){var o=e(r),u=[],a=0;o.addListener=function(e){if(!t){return}if(!n){n=true;window.addEventListener("resize",s,true)}if(a===0){a=i.push({mql:o,listeners:u})}u.push(e)};o.removeListener=function(e){for(var t=0,n=u.length;t<n;t++){if(u[t]===e){u.splice(t,1)}}};return o}})()
+}
 if( typeof modalWin == 'undefined' ){
 
 var xxx_modalPopupWindow = null;
-
+var popupshowed = false;
 function CreateModalPopUpObject() {
     if (xxx_modalPopupWindow == null) {
         xxx_modalPopupWindow = new ModalPopupWindow();
@@ -10,7 +92,7 @@ function CreateModalPopUpObject() {
 }
 
 function ModalPopupWindow() {
-    var strOverLayHTML = '<div id="divOverlay" style="position:absolute;z-index:10; background-color:WHITE; filter: alpha(opacity = 70);opacity:0.7;"></div><div id="divFrameParent" style="position:absolute;z-index:12; display:none;background-color:white;border:1px solid;-moz-box-shadow: 0 0 10px 10px #BBB;-webkit-box-shadow: 0 0 10px 10px #BBB;box-shadow: 0 0 10px 10px #BBB;padding:10px;line-height:21px;font-size:15px;color:#000;text-align:left;font-family:Arial,Helvetica,sans-serif;"	class="Example_F"><table width="100%" height="95%" border="0" cellpadding="0" cellspacing="0"><tr><td align="left" colspan="2"><div class="checkout-heading" id="spanOverLayTitle"></div></td></tr><tr ><td colspan="2" width="100%" id="tdOverLay"><div id="divMessage" style="display:none;"><span id="spanMessage"></span></div><span id="spanLoading"> <img id="imgOverLayLoading" src="" alt="Loading..." /></span><iframe name="overlay_frame" id="overlay_frame" src="javascript://" frameborder="0" scrolling="auto" ></iframe> </td></tr></table></div>'
+    var strOverLayHTML = '<div id="divOverlay" style="position:absolute;z-index:99999; background-color:WHITE; filter: alpha(opacity = 70);opacity:0.7;"></div><div id="divFrameParent" style="position:absolute;z-index:999999; display:none;background-color:white;border:1px solid;-moz-box-shadow: 0 0 10px 10px #BBB;-webkit-box-shadow: 0 0 10px 10px #BBB;box-shadow: 0 0 10px 10px #BBB;padding:10px;line-height:21px;font-size:15px;color:#000;text-align:left;font-family:Arial,Helvetica,sans-serif;"	class="Example_F"><div class="heading" id="spanOverLayTitle"></div><div id="divMessage" style="display:none;"><span id="spanMessage"></span></div><span id="spanLoading"></span></div>'
     var orginalHeight;
     var orginalWidth;
     var btnStyle="";
@@ -19,21 +101,9 @@ function ModalPopupWindow() {
 	div.innerHTML = strOverLayHTML;
     document.body.appendChild(div);
 
-    function Maximisze() {
-        if (!maximize) {
-            maximize = true;
-            ResizePopUp(window.screen.availHeight - 200, window.screen.availWidth - 50);
-        } else {
-            maximize = false;
-            ResizePopUp(orginalHeight, orginalWidth);
-        }
-    }
-
-    function ResizePopUp(height, width) {
+    this.ResizePopUp = function(height, width) {
         var divFrameParent = document.getElementById("divFrameParent");
         var divOverlay = document.getElementById("divOverlay");
-        var iframe = document.getElementById("overlay_frame");
-        var tdOverLay = document.getElementById("tdOverLay");
         var left = (window.screen.availWidth - width) / 2;
         var top = (window.screen.availHeight - height) / 2;
         var xy = GetScroll();
@@ -48,8 +118,7 @@ function ModalPopupWindow() {
         divFrameParent.style.left = left + "px";
         divFrameParent.style.height = height + "px";
         divFrameParent.style.width = width + "px";
-        iframe.style.height = divFrameParent.offsetHeight - 60 + "px";
-        iframe.style.width = divFrameParent.offsetWidth - 2 + "px";
+		ShowDivInCenter("divFrameParent");
     }
     var onPopUpCloseCallBack = null;
     var callbackArray = null;
@@ -62,13 +131,12 @@ function ModalPopupWindow() {
     }
     
     function __InitModalPopUp(height, width, title) {
+		
         orginalWidth = width;
         orginalHeight = height;
         maximize = false;
         var divFrameParent = document.getElementById("divFrameParent");
         var divOverlay = document.getElementById("divOverlay");
-        var iframe = document.getElementById("overlay_frame");
-        var tdOverLay = document.getElementById("tdOverLay");
         var left = (window.screen.availWidth - width) / 2;
         var top = (window.screen.availHeight - height) / 2;
         var xy = GetScroll();
@@ -85,23 +153,18 @@ function ModalPopupWindow() {
         divOverlay.style.height = maxHeight + "px";
         divOverlay.style.width = maxWidth - 2 + "px";
         divOverlay.style.display = "";
-        iframe.style.display = "none";
         divFrameParent.style.display = "";
         //$('#divFrameParent').animate({ opacity: 1 }, 2000);
         divFrameParent.style.top = (top-100) + "px";
         divFrameParent.style.left = left + "px";
-        divFrameParent.style.height = height + "px";
+        //divFrameParent.style.height = height + "px";
         divFrameParent.style.width = width + "px";
-        iframe.style.height = "0px";
-        iframe.style.width = "0px";
         onPopUpCloseCallBack = null;
         callbackArray = null;
     }
     this.ShowMessage = function (message, height, width, title) {
         __InitModalPopUp(height, width, title);
-        var tdOverLay = document.getElementById("tdOverLay");
-        tdOverLay.style.height = "50px";
-        tdOverLay.style.width = "0px";
+		popupshowed = true;
         document.getElementById("spanMessage").innerHTML = message;
         document.getElementById("divMessage").style.display = "";
         document.getElementById("spanLoading").style.display = "none";
@@ -110,7 +173,6 @@ function ModalPopupWindow() {
     }
     this.ShowConfirmationMessage = function (message, height, width, title, onCloseCallBack, firstButtonText, onFirstButtonClick, secondButtonText, onSecondButtonClick) {
         this.ShowMessage(message, height, width, title);
-        var tdOverLay = document.getElementById("tdOverLay");
         var maxWidth = 100;
         document.getElementById("spanMessage").innerHTML = message;
         document.getElementById("divMessage").style.display = "";
@@ -121,10 +183,10 @@ function ModalPopupWindow() {
         ApplyBtnStyle();
     }
     function ShowLoading() {
-        document.getElementById("overlay_frame").style.display = "none";
         document.getElementById("spanLoading").style.display = "";
     }
     this.HideModalPopUp = function () {
+		popupshowed = false;
         var divFrameParent = document.getElementById("divFrameParent");
         var divOverlay = document.getElementById("divOverlay");
         divOverlay.style.display = "none";
@@ -174,10 +236,23 @@ function closefunc(obj){
 function reviewstep(){
 }
 
- function  ShowMessage(){
- modalWin.ShowMessage('This Modal Popup Window using Javascript',200,400,'User Information');
- }
-
+function ShowMessage(content,wtitle){
+	if(matchMedia('(min-width: 500px) and (max-width: 800px)').matches){
+		modalWin.ShowMessage(content,370,250,wtitle);
+	}else if(matchMedia('(min-width: 800px)').matches){
+		modalWin.ShowMessage(content,260,500,wtitle);
+	}
+}
+match_media_mount();
+AddEvent(window,'resize',function(){
+	if( popupshowed ){
+		if(matchMedia('(min-width: 500px) and (max-width: 800px)').matches){
+			modalWin.ResizePopUp(370,250);
+		}else if(matchMedia('(min-width: 800px)').matches){
+			modalWin.ResizePopUp(260,500);
+		}
+	}
+});
  function ShowDivInCenter(divId)
 {
     try

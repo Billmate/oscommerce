@@ -272,11 +272,11 @@ class billmatecardpay {
 		$_['prompt_name_entry'] = MODULE_PAYMENT_BILLMATECARDPAY_PROMPT_NAME_ENTRY;
 		$_['capture_now']   = MODULE_PAYMENT_BILLMATECARDPAY_AUTHENTICATION_MODE == 'sale' ? 'YES' :'NO';
         $mac_str = $_['accept_url'] . $_['amount'] . $_['callback_url'] . $_['cancel_url'] . $_['capture_now'] . $_['currency'] . $_['do_3d_secure'] . $_['language'] . $_['merchant_id'] . $_['order_id'] . $_['pay_method'] . $_['prompt_name_entry'] . $_['return_method'] . $secret;
+		tep_session_unregister('billmatecard_called_api');
+		tep_session_unregister('billmatecard_api_result');
         
 		$this->doInvoice();
 
-		billmate_log_data($_, $eid, 'Cardpay Redirect hidden form');
-		
         $mac = hash ( "sha256", $mac_str );
 
 		$_['mac']					= $mac;
@@ -353,7 +353,6 @@ class billmatecardpay {
 
         $livemode = $this->billmatecardpay_livemode;
 
-		require (DIR_FS_CATALOG . DIR_WS_CLASSES . 'billmate/billmate_api.php');
 		require(DIR_FS_CATALOG . DIR_WS_CLASSES . 'billmate/billmateutils.php');
 		
 		if( empty($_POST ) ) $_POST = $_GET;
@@ -524,7 +523,7 @@ class billmatecardpay {
 		$ssl = true;
 		$debug = false;
 		
-		$k = new BillMateAPI($eid,$secret,$ssl,$debug);
+		$k = new Billmate($eid,$secret,$ssl,$debug);
 		$result1 = $k->AddOrder('',$bill_address,$ship_address,$goodsList,$transaction);
 	}
     function before_process() {
@@ -532,7 +531,6 @@ class billmatecardpay {
 		global $order, $customer_id, $currency, $currencies, $sendto, $billto,
 			   $billmatecardpay_ot, $billmatecardpay_livemode, $billmatecardpay_testmode,$insert_id;
 
-		require (DIR_FS_CATALOG . DIR_WS_CLASSES . 'billmate/billmate_api.php');
 		require(DIR_FS_CATALOG . DIR_WS_CLASSES . 'billmate/billmateutils.php');
 	
 		if( empty($_POST ) ) $_POST = $_GET;
@@ -714,10 +712,16 @@ class billmatecardpay {
 		$ssl = true;
 		$debug = false;
 		
-		$k = new BillMateAPI($eid,$secret,$ssl,$debug);
-		$result1 = $k->AddInvoice('',$bill_address,$ship_address,$goodsList,$transaction);
-
+		$k = new Billmate($eid,$secret,$ssl,$debug);
+		if( isset( $_SESSION['billmatecard_called_api']) && $_SESSION['billmatecard_called_api'] ){
+			$result1 = $_SESSION['billmatecard_api_result'];
+		} else {
+			$result1 = $billmatecard_api_result = $k->AddInvoice('',$bill_address,$ship_address,$goodsList,$transaction);
+		}
         if (is_array($result1)) {
+			$billmatecard_called_api = true;
+			tep_session_register('billmatecard_called_api');
+			tep_session_register('billmatecard_api_result');
 
             // insert address in address book to get correct address in
             // confirmation mail (or fetch correct address from address book
@@ -806,7 +810,8 @@ class billmatecardpay {
         $secret = MODULE_PAYMENT_BILLMATECARDPAY_SECRET;
         $eid = MODULE_PAYMENT_BILLMATECARDPAY_EID;
         $invno = $order->billmateref;
-        update_orderno($eid, $invno, $secret, utf8_decode($insert_id), $result);
+		$k = new Billmate($eid,$secret,true,false);
+		$k->UpdateOrderNo((string)$invno, $insert_id);
 
         //Delete Session with user details
         tep_session_unregister('user_billing');

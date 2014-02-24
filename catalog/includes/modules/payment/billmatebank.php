@@ -235,9 +235,10 @@ class billmatebank {
 		$_['return_method'] = 'GET';
 		$_['capture_now']   = 'YES';
         $mac_str = $_['accept_url'] . $_['amount'] . $_['callback_url'] . $_['cancel_url'] . $_['capture_now'] . $_['currency'] . $_['do_3d_secure'] . $_['language'] . $_['merchant_id'] . $_['order_id'] . $_['pay_method'] . $_['prompt_name_entry'] . $_['return_method'] . $secret;
+		tep_session_unregister('billmatebank_called_api');
+		tep_session_unregister('billmatebank_api_result');
         
 		$this->doInvoice();
-		billmate_log_data($_, $eid, 'Bank Redirect hidden form');
 		
         $mac = hash ( "sha256", $mac_str );
 
@@ -317,7 +318,6 @@ class billmatebank {
 
         $livemode = $this->billmatebank_livemode;
 
-		require (DIR_FS_CATALOG . DIR_WS_CLASSES . 'billmate/billmate_api.php');
 		require(DIR_FS_CATALOG . DIR_WS_CLASSES . 'billmate/billmateutils.php');
 		
 		if( empty($_POST ) ) $_POST = $_GET;
@@ -484,7 +484,7 @@ class billmatebank {
 		$ssl = true;
 		$debug = false;
 		
-		$k = new BillMateAPI($eid,$secret,$ssl,$debug);
+		$k = new Billmate($eid,$secret,$ssl,$debug);
 		$result1 = $k->AddOrder('',$bill_address,$ship_address,$goodsList,$transaction);
 	}	
 	
@@ -493,7 +493,6 @@ class billmatebank {
      global $order, $customer_id, $currency, $currencies, $sendto, $billto,
                $billmatebank_ot, $billmatebank_livemode, $billmatebank_testmode,$insert_id;
 
-    require (DIR_FS_CATALOG . DIR_WS_CLASSES . 'billmate/billmate_api.php');
     require(DIR_FS_CATALOG . DIR_WS_CLASSES . 'billmate/billmateutils.php');
 	
 	if( empty($_POST ) ) $_POST = $_GET;
@@ -672,11 +671,18 @@ class billmatebank {
 		$ssl = true;
 		$debug = false;
 		
-		$k = new BillMateAPI($eid,$secret,$ssl,$debug);
-		$result1 = $k->AddInvoice('',$bill_address,$ship_address,$goodsList,$transaction);
-
-        if (empty($result1['error'])) {
-
+		
+		$k = new Billmate($eid,$secret,$ssl,$debug);
+		if( isset( $_SESSION['billmatebank_called_api']) && $_SESSION['billmatebank_called_api'] ){
+			$result1 = $_SESSION['billmatebank_api_result'];
+		} else {
+			$result1 = $billmatebank_api_result = $k->AddInvoice('',$bill_address,$ship_address,$goodsList,$transaction);
+		}
+        if (is_array($result1)) {
+			$billmatebank_called_api = true;
+			tep_session_register('billmatebank_called_api');
+			tep_session_register('billmatebank_api_result');
+			
             // insert address in address book to get correct address in
             // confirmation mail (or fetch correct address from address book
             // if it exists)
@@ -764,7 +770,8 @@ class billmatebank {
         $secret = MODULE_PAYMENT_BILLMATEBANK_SECRET;
         $eid = MODULE_PAYMENT_BILLMATEBANK_EID;
         $invno = $order->billmateref;
-        update_orderno($eid, $invno, $secret, utf8_decode($insert_id), $result);
+		$k = new Billmate($eid,$secret,true,false);
+		$k->UpdateOrderNo((string)$invno, $insert_id);
 
         //Delete Session with user details
         tep_session_unregister('user_billing');

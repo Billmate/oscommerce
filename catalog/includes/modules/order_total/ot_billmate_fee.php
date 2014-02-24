@@ -74,7 +74,7 @@ class ot_billmate_fee {
 
         $od_amount=0;
 
-        if ($payment != "billmate")
+        if ($payment != "billmate_invoice")
             return $od_amount;
 
         if (MODULE_BILLMATE_FEE_MODE == 'fixed') {

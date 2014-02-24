@@ -28,8 +28,22 @@
  *
  */
 
-require_once(DIR_FS_CATALOG . DIR_WS_CLASSES . 'billmate/billmate_api.php');
+require_once(dirname( __FILE__ )."/lib/xmlrpc.inc");
+require_once(dirname( __FILE__ )."/lib/xmlrpcs.inc");
+require_once dirname(__FILE__).'/BillMate.php';
+require_once dirname(__FILE__) . DIRECTORY_SEPARATOR . 'commonfunctions.php';
+
 require_once(DIR_FS_CATALOG . DIR_WS_CLASSES . 'billmate/billmatecalc.php');
+
+function mk_goods_flags($qty, $artno, $title, $price, $vat, $discount, $flags){
+	return array("goods" => array("artno" => $artno,
+								  "title" => $title,
+								  "price" => $price,
+								  "vat" => $vat,
+								  "discount" => $discount,
+								  "flags" => $flags),
+				 "qty" => $qty);
+}
 
 /**
  *
@@ -129,6 +143,7 @@ class BillmateUtils {
 
         $pclasses = self::get_pclasses($table, $country);
         foreach($pclasses as &$pclass) {
+			$pclass['desc'] = utf8_decode($pclass['desc']);
             if($total >= ($pclass['minamount']/100)) {
                 if($pclass['type'] < 2) {
                     $pclass['minpay'] = ceil(BillmateCalc::calc_monthly_cost($total, $pclass['months'], $pclass['fee']/100, $pclass['startfee']/100, $pclass['interest']/100, $pclass['type'], $flags, $country));
@@ -184,6 +199,8 @@ class BillmateUtils {
     public static function display_pclasses($table, $country) {
 	
         $pclasses = self::get_pclasses($table, $country);
+		
+		if( sizeof($pclasses) == 0 ) return false;
 		?>
 		<tr><td valign="top" colspan="3">
 		<table border="0" cellspacing="0" cellpadding="2" width="100%">
@@ -196,10 +213,12 @@ class BillmateUtils {
 				<th class="dataTableHeadingContent">Handling Fee</th>
 				<th class="dataTableHeadingContent">Start Fee</th>
 				<th class="dataTableHeadingContent">Min Amount</th>
-				<th class="dataTableHeadingContent">Country Number</th>
+				<th class="dataTableHeadingContent">Country</th>
+				<th class="dataTableHeadingContent">Expiry</th>
 			</tr>
 		<?php
         foreach($pclasses as $pclass) {
+		
             if(strtolower(CHARSET) == 'utf-8') {
                 $desc = self::forceUTF8($pclass['desc']);
             }
@@ -214,7 +233,8 @@ class BillmateUtils {
 			echo '<td class="dataTableContent" align="center">', $pclass['fee'],'</td>';
 			echo '<td class="dataTableContent" align="center">', $pclass['startfee'],'</td>';
 			echo '<td class="dataTableContent" align="center">', $pclass['minamount'],'</td>';
-			echo '<td class="dataTableContent" align="center">', $pclass['country'],'</td></tr>';
+			echo '<td class="dataTableContent" align="center">', ($pclass['country'] == 209 ? 'SWEDEN' : $pclass['country']),'</td>';
+			echo '<td class="dataTableContent" align="center">', $pclass['expiry_date'],'</td></tr>';
 
             /*printf(" %-6s,");
             printf(" %-13s,");
@@ -236,7 +256,7 @@ class BillmateUtils {
     public static function get_pclasses($table, $country) {
         if(strlen(trim($table)) > 0) {
             self::create_db($table); //incase it doesn't exist, below will not cause an error.
-            $query = tep_db_query("SELECT * FROM `".$table."` WHERE `country` = '".$country."'");
+            $query = tep_db_query("SELECT * FROM `".$table."`");
             $tmp = array();
             while($row = mysql_fetch_assoc($query)) {
                 $tmp[] = $row;
@@ -254,13 +274,14 @@ class BillmateUtils {
         tep_db_query("CREATE TABLE IF NOT EXISTS `".$table."` (
           `id` int(10) unsigned NOT NULL,
           `type` tinyint(4) NOT NULL,
-          `desc` varchar(255) NOT NULL,
+          `desc` varchar(255) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL,
           `months` int(11) NOT NULL,
           `interest` int(11) NOT NULL,
           `fee` int(11) NOT NULL,
           `startfee` int(11) NOT NULL,
           `minamount` int(11) NOT NULL,
           `country` int(11) NOT NULL,
+		  `expiry_date` varchar(20) NOT NULL,
           KEY `id` (`id`)
         )");
     }
@@ -281,25 +302,29 @@ class BillmateUtils {
     public static function update_pclasses($table, $pclasses) {
         if(strlen(trim($table)) > 0) {
             //Create table, will not do anything if it exists.
+
             BillmateUtils::create_db($table);
 
             foreach((array)$pclasses as $pclass) {
+				
+				//die;
                 $pclass_id = $pclass[0];
                 $pclass_type = $pclass[8];
-                $pclass_desc = $pclass[1];
+                $pclass_desc = utf8_encode($pclass[1]);
                 $pclass_months = $pclass[2];
                 $pclass_startfee = $pclass[3];
                 $pclass_fee = $pclass[4];
                 $pclass_interest = $pclass[5];
                 $pclass_minamount = $pclass[6];
                 $pclass_country = $pclass[7];
+				$pclass_expiry = $pclass[9];
 
                 //Delete existing pclass
-                tep_db_query("DELETE FROM `".$table."` WHERE `id` = '".$pclass_id."'");
+               // tep_db_query("DELETE FROM `".$table."` WHERE `id` = '".$pclass_id."'");
                 //Insert new pclass (replace into only exists for MySQL...)
-                tep_db_query("INSERT INTO `".$table."` (`id`, `type`, `desc`, `months`, `interest`, `fee`, `startfee`, `minamount`, `country`) " .
+              /*  tep_db_query("INSERT INTO `".$table."` (`id`, `type`, `desc`, `months`, `interest`, `fee`, `startfee`, `minamount`, `country`,`expiry_date`) " .
                         "VALUES ('".$pclass_id."', '".$pclass_type."', '".$pclass_desc."', '".$pclass_months."', '".$pclass_interest."', ".
-                        "'".$pclass_fee."', '".$pclass_startfee."', '".$pclass_minamount."', '".$pclass_country."')");
+                        "'".$pclass_fee."', '".$pclass_startfee."', '".$pclass_minamount."', '".$pclass_country."','".$pclass_expiry."')");*/
             }
         }
     }

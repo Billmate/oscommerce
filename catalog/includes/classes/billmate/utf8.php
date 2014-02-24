@@ -1132,7 +1132,7 @@ class Encoding {
 /**
  * Provides encoding constants.
  *
- * @package BillmateAPI
+ * @package Billmate
  */
 class BillmateEncoding {
 
@@ -1349,7 +1349,7 @@ class BillmateEncoding {
 /**
  * Provides flags/constants used for various methods.
  *
- * @package BillmateAPI
+ * @package Billmate
  */
 class BillmateFlags {
 
@@ -1651,7 +1651,7 @@ class BillmateFlags {
 /**
  * Provides currency constants for the supported countries.
  *
- * @package BillmateAPI
+ * @package Billmate
  */
 class BillmateCurrency {
 
@@ -1741,7 +1741,7 @@ class BillmateCurrency {
 /**
  * Provides language constants (ISO639) for the supported countries.
  *
- * @package BillmateAPI
+ * @package Billmate
  */
 class BillmateLanguage {
 
@@ -1869,7 +1869,7 @@ class BillmateLanguage {
 /**
  * Provides country constants (ISO3166) for the supported countries.
  *
- * @package BillmateAPI
+ * @package Billmate
  */
 class BillmateCountry {
 
