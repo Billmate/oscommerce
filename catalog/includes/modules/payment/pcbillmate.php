@@ -761,8 +761,10 @@ class pcbillmate {
 		$debug = false;
 
 		$k = new Billmate($eid,$secret,$ssl,$debug);
+		
 		$result1 = $k->AddInvoice($pno,$ship_address,$bill_address,$goodsList,$transaction);
-        if (is_array($result1)) {
+		
+		if (is_array($result1)) {
 
             // insert address in address book to get correct address in
             // confirmation mail (or fetch correct address from address book

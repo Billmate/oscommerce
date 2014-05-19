@@ -144,7 +144,8 @@ class BillmateUtils {
         $pclasses = self::get_pclasses($table, $country);
         foreach($pclasses as &$pclass) {
 			$pclass['desc'] = utf8_decode($pclass['desc']);
-            if($total >= ($pclass['minamount']/100)) {
+
+            if($total >= ($pclass['minamount']/100) && ($total <= ($pclass['maxamount']/100) || $pclass['maxamount'] == 0 ) ) {
                 if($pclass['type'] < 2) {
                     $pclass['minpay'] = ceil(BillmateCalc::calc_monthly_cost($total, $pclass['months'], $pclass['fee']/100, $pclass['startfee']/100, $pclass['interest']/100, $pclass['type'], $flags, $country));
 
@@ -197,9 +198,9 @@ class BillmateUtils {
      * @return void
      */
     public static function display_pclasses($table, $country) {
-	
+
         $pclasses = self::get_pclasses($table, $country);
-		
+
 		if( sizeof($pclasses) == 0 ) return false;
 		?>
 		<tr><td valign="top" colspan="3">
@@ -213,6 +214,7 @@ class BillmateUtils {
 				<th class="dataTableHeadingContent">Handling Fee</th>
 				<th class="dataTableHeadingContent">Start Fee</th>
 				<th class="dataTableHeadingContent">Min Amount</th>
+				<th class="dataTableHeadingContent">Max Amount</th>                
 				<th class="dataTableHeadingContent">Country</th>
 				<th class="dataTableHeadingContent">Expiry</th>
 			</tr>
@@ -233,6 +235,7 @@ class BillmateUtils {
 			echo '<td class="dataTableContent" align="center">', $pclass['fee'],'</td>';
 			echo '<td class="dataTableContent" align="center">', $pclass['startfee'],'</td>';
 			echo '<td class="dataTableContent" align="center">', $pclass['minamount'],'</td>';
+			echo '<td class="dataTableContent" align="center">', $pclass['maxamount'],'</td>';			
 			echo '<td class="dataTableContent" align="center">', ($pclass['country'] == 209 ? 'SWEDEN' : $pclass['country']),'</td>';
 			echo '<td class="dataTableContent" align="center">', $pclass['expiry_date'],'</td></tr>';
 
@@ -280,6 +283,7 @@ class BillmateUtils {
           `fee` int(11) NOT NULL,
           `startfee` int(11) NOT NULL,
           `minamount` int(11) NOT NULL,
+          `maxamount` int(11) NOT NULL,		  
           `country` int(11) NOT NULL,
 		  `expiry_date` varchar(20) NOT NULL,
           KEY `id` (`id`)
@@ -304,7 +308,6 @@ class BillmateUtils {
             //Create table, will not do anything if it exists.
 
             BillmateUtils::create_db($table);
-
             foreach((array)$pclasses as $pclass) {
 				
 				//die;
@@ -318,13 +321,14 @@ class BillmateUtils {
                 $pclass_minamount = $pclass[6];
                 $pclass_country = $pclass[7];
 				$pclass_expiry = $pclass[9];
+                $pclass_maxamount = $pclass[10];
 
                 //Delete existing pclass
-               // tep_db_query("DELETE FROM `".$table."` WHERE `id` = '".$pclass_id."'");
+                tep_db_query("DELETE FROM `".$table."` WHERE `id` = '".$pclass_id."'");
                 //Insert new pclass (replace into only exists for MySQL...)
-              /*  tep_db_query("INSERT INTO `".$table."` (`id`, `type`, `desc`, `months`, `interest`, `fee`, `startfee`, `minamount`, `country`,`expiry_date`) " .
+                tep_db_query("INSERT INTO `".$table."` (`id`, `type`, `desc`, `months`, `interest`, `fee`, `startfee`, `minamount`, `maxamount`, `country`,`expiry_date`) " .
                         "VALUES ('".$pclass_id."', '".$pclass_type."', '".$pclass_desc."', '".$pclass_months."', '".$pclass_interest."', ".
-                        "'".$pclass_fee."', '".$pclass_startfee."', '".$pclass_minamount."', '".$pclass_country."','".$pclass_expiry."')");*/
+                        "'".$pclass_fee."', '".$pclass_startfee."', '".$pclass_minamount."', '".$pclass_maxamount."', '".$pclass_country."','".$pclass_expiry."')");
             }
         }
     }
