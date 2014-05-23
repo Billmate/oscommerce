@@ -16,7 +16,7 @@ if(!function_exists('getCountryID')){
 			die($msg);
 		}
 	}
-	define('BILLPLUGIN_VERSION','1.14');
+	define('BILLPLUGIN_VERSION','1.15');
 	define('BILLMATE_VERSION',  "PHP:OsCommerce:".BILLPLUGIN_VERSION );
 
 	function getCountryID(){
