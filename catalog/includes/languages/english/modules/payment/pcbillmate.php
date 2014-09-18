@@ -74,7 +74,7 @@
   define('MODULE_PAYMENT_PCBILLMATE_PCLASS_DEFAULT_TITLE', 'Pclass for Account');
   define('MODULE_PAYMENT_PCBILLMATE_PCLASS_DEFAULT_DESC', 'Pclass for \"Account\"');
   
-  define('MODULE_PAYMENT_PCBILLMATE_TEXT_TITLE', 'Billmate - Part payment');
+  define('MODULE_PAYMENT_PCBILLMATE_TEXT_TITLE', 'Billmate part payment');
   define('MODULE_PAYMENT_PCBILLMATE_TEXT_DESCRIPTION', 'Part payment Sweden from Billmate');
   define('MODULE_PAYMENT_PCBILLMATE_TEXT_CONFIRM_DESCRIPTION', 'www.billmate.se');
   
@@ -85,7 +85,7 @@ define('MODULE_PAYMENT_PCBILLMATE_CORRECT_ADDRESS_OPTION', 'Click Yes to continu
 define('MODULE_PAYMENT_PCBILLMATE_YES', 'Yes');
 define('MODULE_PAYMENT_PCBILLMATE_NO', 'No');
 define('MODULE_PAYMENT_PCBILLMATE_CHOOSEALTERNATIVES', 'Choose alternative address below');
-define('MODULE_PAYMENT_PCBILLMATE_ERRORDIVIDE', 'BillMate Account - error');
+define('MODULE_PAYMENT_PCBILLMATE_ERRORDIVIDE', 'Billmate Account - error');
 
 define('MODULE_PAYMENT_PCBILLMATE_PERSON_NUMBER','Personal Number');
 define('MODULE_PAYMENT_PCBILLMATE_EMAIL','My email %s is accurate and can be used for billing');
@@ -94,7 +94,7 @@ define('MODULE_PAYMENT_PCBILLMATE_CONDITIONS','Terms and conditions');
 define('MODULE_PAYMENT_PCBILLMATE_ADDR_NOTICE','Your billing and shipping address will be automatically updated to your registered address.');
 define('MODULE_PAYMENT_PCBILLMATE_CHOOSECONSUMERCREDIT','Select installment');
 
-define('MODULE_PAYMENT_PCBILLMATE_TITLE', 'Part payment - Bill Mate from xx / month'); //replace xx with amount + currency (e.g. 100 kr)
+define('MODULE_PAYMENT_PCBILLMATE_TITLE', 'Billmate part payment from xx / month'); //replace xx with amount + currency (e.g. 100 kr)
 define('MODULE_PAYMENT_PCBILLMATE_WITHOUT_TAX', 'Prices are excluding VAT');
 
 

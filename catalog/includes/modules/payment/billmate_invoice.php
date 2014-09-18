@@ -533,6 +533,9 @@ class billmate_invoice {
      global $order, $customer_id, $currency, $currencies, $sendto, $billto,
                $billmate_ot, $billmate_livemode, $billmate_testmode,$insert_id;
 
+		//Assigning billing session
+		$billmate_ot = $_SESSION['billmate_ot'];
+
         //Set the right Host and Port
         $livemode = $this->billmate_livemode;
 

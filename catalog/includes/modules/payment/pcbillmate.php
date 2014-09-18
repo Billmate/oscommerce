@@ -52,8 +52,9 @@ class pcbillmate {
             $this->title = MODULE_PAYMENT_PCBILLMATE_TEXT_TITLE;
         }
         else {
-            $tmp = explode('Billmate', MODULE_PAYMENT_PCBILLMATE_TEXT_TITLE);
-            $this->title = $tmp[0] . 'Billmate';
+            //$tmp = explode('Billmate', MODULE_PAYMENT_PCBILLMATE_TEXT_TITLE);
+            //$this->title = $tmp[0] . 'Billmate';
+			$this->title = MODULE_PAYMENT_PCBILLMATE_TEXT_TITLE;
         }
 
         $this->sort_order = MODULE_PAYMENT_PCBILLMATE_SORT_ORDER;
@@ -213,7 +214,7 @@ class pcbillmate {
 
         $er = $currencies->get_value($currency);
         $total = $order->info['total']*$er;
-        $default = "";
+        $default = ( isset($_SESSION['pcbillmate_pclass']) ) ? $_SESSION['pcbillmate_pclass'] : '';
 
         //Show price excl. tax. if display with tax isn't true.
         if(DISPLAY_PRICE_WITH_TAX != 'true') {
@@ -315,7 +316,7 @@ class pcbillmate {
         }
 
         $pno = $this->pcbillmate_pnum = $_POST['pcbillmate_pnum'];
-        $this->pcbillmate_pclass = $_POST['pcbillmate_pclass'];
+        $_SESSION['pcbillmate_pclass'] = $this->pcbillmate_pclass = $_POST['pcbillmate_pclass'];
         $eid = (int)MODULE_PAYMENT_PCBILLMATE_EID;
         $secret = (int)MODULE_PAYMENT_PCBILLMATE_SECRET;
 
@@ -574,6 +575,9 @@ class pcbillmate {
 
     function before_process() {
         global $order, $customer_id, $currency, $currencies, $sendto, $billto, $pcbillmate_ot, $pcbillmate_testmode;
+
+		//Assigning billing session
+		$billmate_ot = $_SESSION['billmate_ot'];
 
         //Set the right Host and Port
         $livemode = $this->pcbillmate_testmode == false;

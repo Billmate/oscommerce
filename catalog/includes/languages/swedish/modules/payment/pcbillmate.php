@@ -68,7 +68,7 @@
   define('MODULE_PAYMENT_PCBILLMATE_PCLASS_DEFAULT_TITLE', 'Pclass för Konto');
   define('MODULE_PAYMENT_PCBILLMATE_PCLASS_DEFAULT_DESC', 'Pclass för \"konto\"');
   
-  define('MODULE_PAYMENT_PCBILLMATE_TEXT_TITLE', 'Billmate - Delbetalning');
+  define('MODULE_PAYMENT_PCBILLMATE_TEXT_TITLE', 'Billmate Delbetalning');
   define('MODULE_PAYMENT_PCBILLMATE_TEXT_DESCRIPTION', 'Delbetalning Sverige från Billmate');
   define('MODULE_PAYMENT_PCBILLMATE_TEXT_CONFIRM_DESCRIPTION', 'www.billmate.se');
   
@@ -79,7 +79,7 @@
   define('MODULE_PAYMENT_PCBILLMATE_ADDR_NOTICE','Din faktura- och leveransadress kommer att uppdateras automatiskt till din folkbokförda adress.');
   define('MODULE_PAYMENT_PCBILLMATE_CHOOSECONSUMERCREDIT','Välj delbetalning');
   define('MODULE_PAYMENT_PCBILLMATE_WITHOUT_TAX', 'Priser exkl. moms');
-  define('MODULE_PAYMENT_PCBILLMATE_TITLE', 'Delbetalning - Billmate fr&aring;n xx/m&aring;n'); //replace xx with amount + currency (e.g. 100 kr)
+  define('MODULE_PAYMENT_PCBILLMATE_TITLE', 'Billmate Delbetalning fr&aring;n xx/m&aring;n'); //replace xx with amount + currency (e.g. 100 kr)
 
 define('MODULE_PAYMENT_PCBILLMATE_ADDRESS_WRONG', 'Din angivna adress kan inte användas. Köp mot faktura kan bara faktureras och levereras till din bokföringsadress.');
 define('MODULE_PAYMENT_PCBILLMATE_CORRECT_ADDRESS', 'Din bokföringsadress:');

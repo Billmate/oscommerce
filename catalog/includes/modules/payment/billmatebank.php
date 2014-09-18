@@ -251,17 +251,28 @@ class billmatebank {
             reset($order_total_modules->modules);
             while (list(, $value) = each($order_total_modules->modules)) {
               $class = substr($value, 0, strrpos($value, '.'));
-              if ($GLOBALS[$class]->enabled) {
-                for ($i=0, $n=sizeof($GLOBALS[$class]->output); $i<$n; $i++) {
-                  if (tep_not_null($GLOBALS[$class]->output[$i]['title']) && tep_not_null($GLOBALS[$class]->output[$i]['text'])) {
-                    $order_totals[] = array('code' => $GLOBALS[$class]->code,
-                                            'title' => $GLOBALS[$class]->output[$i]['title'],
-                                            'text' => $GLOBALS[$class]->output[$i]['text'],
-                                            'value' => $GLOBALS[$class]->output[$i]['value'],
-                                            'sort_order' => $GLOBALS[$class]->sort_order);
-                  }
-                }
-              }
+			  if( $class == 'ot_shipping' ) {
+				    $shipping_title = $order->info['shipping_method'] . ':';
+				    $shipping_text = $currencies->format($order->info['shipping_cost'], true, $order->info['currency'], $order->info['currency_value']);
+				    $shipping_value = $order->info['shipping_cost'];
+					$order_totals[] = array('code' => $GLOBALS[$class]->code,
+											'title' => $shipping_title,
+											'text' => $shipping_text,
+											'value' => $shipping_value,
+											'sort_order' => $GLOBALS[$class]->sort_order);
+			  } else {
+				  if ($GLOBALS[$class]->enabled) {
+					for ($i=0, $n=sizeof($GLOBALS[$class]->output); $i<$n; $i++) {
+					  if (tep_not_null($GLOBALS[$class]->output[$i]['title']) && tep_not_null($GLOBALS[$class]->output[$i]['text'])) {
+						$order_totals[] = array('code' => $GLOBALS[$class]->code,
+												'title' => $GLOBALS[$class]->output[$i]['title'],
+												'text' => $GLOBALS[$class]->output[$i]['text'],
+												'value' => $GLOBALS[$class]->output[$i]['value'],
+												'sort_order' => $GLOBALS[$class]->sort_order);
+					  }
+					}
+				  }
+			  }
             }
           }
 
@@ -418,8 +429,6 @@ class billmatebank {
 		tep_session_unregister('billmatebank_called_api');
 		tep_session_unregister('billmatebank_api_result');
         
-		$this->doInvoice();
-		
         $mac = hash ( "sha256", $mac_str );
 
 		$_['mac']					= $mac;
@@ -488,6 +497,7 @@ class billmatebank {
         }
 
         tep_session_register('billmatebank_ot');
+		$this->doInvoice();
         return $process_button_string;
     }
 
@@ -496,6 +506,8 @@ class billmatebank {
 		 global $order, $customer_id, $currency, $currencies, $sendto, $billto,
 				   $billmatebank_ot, $billmatebank_livemode, $billmatebank_testmode,$insert_id,$cart_billmate_bank_ID;
 
+		$billmatebank_ot = $_SESSION['billmatebank_ot'];
+		
         $livemode = $this->billmatebank_livemode;
 
 		require(DIR_FS_CATALOG . DIR_WS_CLASSES . 'billmate/billmateutils.php');
@@ -790,7 +802,6 @@ class billmatebank {
 		$email_order = STORE_NAME . "\n" .
 					 EMAIL_SEPARATOR . "\n" .
 					 EMAIL_TEXT_ORDER_NUMBER . ' ' . $order_id . "\n" .
-					 EMAIL_TEXT_INVOICE_URL . ' ' . tep_href_link(FILENAME_ACCOUNT_HISTORY_INFO, 'order_id=' . $order_id, 'SSL', false) . "\n" .
 					 EMAIL_TEXT_DATE_ORDERED . ' ' . strftime(DATE_FORMAT_LONG) . "\n\n";
 
 		if ($order->info['comments']) {
