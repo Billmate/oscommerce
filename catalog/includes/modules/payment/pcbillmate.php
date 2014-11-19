@@ -251,7 +251,7 @@ class pcbillmate {
         $js = ($this->jQuery) ? BillmateUtils::get_display_jQuery($this->code) : "";
 
         $fields=array(
-                array('title' => BILLMATE_LANG_SE_IMGCONSUMERCREDIT,
+                array('title' => BILLMATE_LANG_SE_IMGCONSUMERCREDIT.sprintf(MODULE_PAYMENT_PCBILLMATE_CONDITIONS, $eid),
                         'field' => $js.$error),
                 array('title' => MODULE_PAYMENT_PCBILLMATE_CHOOSECONSUMERCREDIT,
                         'field' => tep_draw_pull_down_menu('pcbillmate_pclass', $pclasses, $default)),
@@ -329,7 +329,7 @@ class pcbillmate {
 
         if (!is_array($result)) {
             tep_redirect(BillmateUtils::error_link(FILENAME_CHECKOUT_PAYMENT,
-                    'payment_error=pcbillmate&error='.strip_tags($result),
+                    'payment_error=pcbillmate&error='.strip_tags( utf8_encode($result) ),
                     'SSL', true, false));
         }
 		$result[0][0] = utf8_encode($result[0][0]);

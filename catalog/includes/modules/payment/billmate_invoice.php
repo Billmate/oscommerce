@@ -304,7 +304,7 @@ class billmate_invoice {
         if (!is_array($result)) {
             tep_redirect(BillmateUtils::error_link(FILENAME_CHECKOUT_PAYMENT,
                     'payment_error=billmate_invoice&error='.
-                    strip_tags( $result ),
+                    strip_tags( utf8_encode($result) ),
                     'SSL', true, false));
         }
 		$result[0][0] = utf8_encode($result[0][0]);

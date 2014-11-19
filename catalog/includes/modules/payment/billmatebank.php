@@ -435,6 +435,7 @@ class billmatebank {
         foreach($_ as $key => $col ){
             $process_button_string.=tep_draw_hidden_field($key,$col);
         }
+		$process_button_string .= '<script type="text/javascript">$(document).ready(function(){ $("input[name=\'comments\']").remove(); });</script>';
         $order_totals = $order_total_modules->modules;
 
         if (is_array($order_totals)) {
