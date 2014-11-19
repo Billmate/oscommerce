@@ -331,6 +331,14 @@ class billmatebank {
             tep_db_perform(TABLE_ORDERS_TOTAL, $sql_data_array);
           }
 
+		  $customer_notification = (SEND_EMAILS == 'true') ? '1' : '0';
+		  $sql_data_array = array('orders_id' => $insert_id, 
+								  'orders_status_id' => $order->info['order_status'], 
+								  'date_added' => 'now()', 
+								  'customer_notified' => $customer_notification,
+								  'comments' => $order->info['comments']);
+		  tep_db_perform(TABLE_ORDERS_STATUS_HISTORY, $sql_data_array);
+
           for ($i=0, $n=sizeof($order->products); $i<$n; $i++) {
             $sql_data_array = array('orders_id' => $insert_id,
                                     'products_id' => tep_get_prid($order->products[$i]['id']),
