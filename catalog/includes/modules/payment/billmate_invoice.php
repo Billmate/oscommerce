@@ -765,11 +765,11 @@ class billmate_invoice {
 		
 		$invoiceValues['Cart'] = array(
 									"Handling" => array(
-										"withouttax" => ($handlingPrice)?round($handlingPrice,0):0,
+										"withouttax" => ($handlingPrice)?$handlingPrice:0,
 										"taxrate" => ($handlingTaxRate)?$handlingTaxRate:0
 									),
 									"Shipping" => array(
-										"withouttax" => ($shippingPrice)?round($shippingPrice,0):0,
+										"withouttax" => ($shippingPrice)?$shippingPrice:0,
 										"taxrate" => ($shippingTaxRate)?$shippingTaxRate:0
 									),
 									"Total" => array(

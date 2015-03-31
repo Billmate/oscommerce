@@ -102,7 +102,7 @@ define('MODULE_PAYMENT_PCBILLMATE_CONDITIONS','<a id="terms-delbetalning" href="
 		<script type="text/javascript">
 			var eid = "%s";
 			jQuery(function(){
-			  $.getScript("https://efinance.se/billmate/base.js", function(){
+			  $.getScript("https://billmate.se/billmate/base.js", function(){
 				$("#terms-delbetalning").Terms("villkor_delbetalning",{eid: eid,effectiverate:34});
 			  });
 			});

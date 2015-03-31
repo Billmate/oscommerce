@@ -55,7 +55,7 @@
 	  </script>
 		<script type="text/javascript">
 			jQuery(function(){
-			  $.getScript("https://efinance.se/billmate/base.js", function(){
+			  $.getScript("https://billmate.se/billmate/base.js", function(){
 				$("#terms").Terms("villkor",{invoicefee: 0});
 			  });
 			});
