@@ -4,8 +4,7 @@ function match_usernamevp( $str1, $str2 ){
     $name1 = explode(' ', utf8_strtolower( Encoding::fixUTF8( $str1 ) ) );
     $name2 = explode(' ', utf8_strtolower( Encoding::fixUTF8( $str2 ) ) );
     $foundName = array_intersect($name1, $name2);
-
-    return count($foundName ) > 0;                        
+    return (count($foundName ) == count($name1));
 }
 
 function isEqual($string1, $string2 ){
@@ -1879,7 +1878,7 @@ class BillmateCountry {
      *
      * @var int
      */
-    const DK = 59;
+    const DK = "Denmark";
 
     /**
      * Country constant for Finland (FI).<br>
@@ -1887,7 +1886,7 @@ class BillmateCountry {
      *
      * @var int
      */
-    const FI = 73;
+    const FI = "Finland";
 
     /**
      * Country constant for Germany (DE).<br>
@@ -1895,7 +1894,7 @@ class BillmateCountry {
      *
      * @var int
      */
-    const DE = 81;
+    const DE = "Germany";
 
     /**
      * Country constant for Netherlands (NL).<br>
@@ -1903,7 +1902,7 @@ class BillmateCountry {
      *
      * @var int
      */
-    const NL = 154;
+    const NL = "Netherlands";
 
     /**
      * Country constant for Norway (NO).<br>
@@ -1911,7 +1910,7 @@ class BillmateCountry {
      *
      * @var int
      */
-    const NO = 164;
+    const NO = "Norway";
 
     /**
      * Country constant for Sweden (SE).<br>
@@ -1919,7 +1918,7 @@ class BillmateCountry {
      *
      * @var int
      */
-    const SE = 209;
+    const SE = "Sweden";
 
     /**
      * Class constructor.
@@ -1990,7 +1989,7 @@ class BillmateCountry {
 			case 'SWE':
 			case 'SE':
 			case 209:
-				$country = 209;
+				$country = "Sweden";
 				$language = 138;
 				$encoding = 2;
 				$currency = 0;
@@ -1999,7 +1998,7 @@ class BillmateCountry {
 			case 'FIN':
 			case 'FI':
 			case 73:
-				$country = 73;
+				$country = "Finland";
 				$language = 37;
 				$encoding = 4;
 				$currency = 2;
@@ -2008,7 +2007,7 @@ class BillmateCountry {
 			case 'DNK':
 			case 'DK':
 			case 59:
-				$country = 59;
+				$country = "Denmark";
 				$language = 27;
 				$encoding = 5;
 				$currency = 3;
@@ -2017,7 +2016,7 @@ class BillmateCountry {
 			case 'NOR':
 			case 'NO':
 			case 164:
-				$country = 164;
+				$country = "Norway";
 				$language = 97;
 				$encoding = 3;
 				$currency = 1;
@@ -2026,7 +2025,7 @@ class BillmateCountry {
 			case 'DEU':
 			case 'DE':
 			case 81:
-				$country = 81;
+				$country = "Germany";
 				$language = 28;
 				$encoding = 6;
 				$currency = 2;
@@ -2035,7 +2034,7 @@ class BillmateCountry {
 			case 'NLD':
 			case 'NL':
 			case 154:
-				$country = 154;
+				$country = "Netherlands";
 				$language = 101;
 				$encoding = 7;
 				$currency = 2;

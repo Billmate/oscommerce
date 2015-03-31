@@ -51,7 +51,8 @@ function validate_pno_se($pno) {
     $result = false;
 
     //Pno has 10-13 characters
-    if (check_length_ge($pno, 10) && check_length_le($pno, 13)) {
+    //if (check_length_ge($pno, 10) && check_length_le($pno, 13)) {
+	if( !empty($pno) ){
         $result = true;
     }
     return $result;

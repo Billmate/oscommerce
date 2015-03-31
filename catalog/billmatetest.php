@@ -63,22 +63,22 @@ $goodsList = array(
 );
 $post = array
 (
-    'status' => 0
-    'order_id' => 1380526749
-    'currency' => 'SEK'
-    'mac' => 'aab629195d4a98ce10bcd84669f9aaa307c7b4a4b2594018b63f4835ed3ed097'
-    'approval_code' => '2345'
-    'merchant_id' => '7270'
-    'exp_year' => '15'
-    'exp_mon' => '02'
-    'error_message' => 'Approved'
-    'amount' => 5625
-    'time' => '2013-09-30 09:39:28.371433'
-    'test' => 'YES'
-    'pay_method' => 'visa'
-    'trans_id' => '800505955'
+    'status' => 0,
+    'order_id' => 1380526749,
+    'currency' => 'SEK',
+    'mac' => 'aab629195d4a98ce10bcd84669f9aaa307c7b4a4b2594018b63f4835ed3ed097',
+    'approval_code' => '2345',
+    'merchant_id' => '7270',
+    'exp_year' => '15',
+    'exp_mon' => '02',
+    'error_message' => 'Approved',
+    'amount' => 5625,
+    'time' => '2013-09-30 09:39:28.371433',
+    'test' => 'YES',
+    'pay_method' => 'visa',
+    'trans_id' => '800505955',
     'card_no' => '444433......1111'
-));
+);
 $transaction = array(
 	"order1"=>"O12345",
 	"order2"=>"654321",

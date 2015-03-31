@@ -30,19 +30,26 @@
 
 require_once(dirname( __FILE__ )."/lib/xmlrpc.inc");
 require_once(dirname( __FILE__ )."/lib/xmlrpcs.inc");
-require_once dirname(__FILE__).'/BillMate.php';
+require_once dirname(__FILE__).'/Billmate.php';
 require_once dirname(__FILE__) . DIRECTORY_SEPARATOR . 'commonfunctions.php';
 
 require_once(DIR_FS_CATALOG . DIR_WS_CLASSES . 'billmate/billmatecalc.php');
 
 function mk_goods_flags($qty, $artno, $title, $price, $vat, $discount, $flags){
-	return array("goods" => array("artno" => $artno,
-								  "title" => $title,
-								  "price" => $price,
-								  "vat" => $vat,
-								  "discount" => $discount,
-								  "flags" => $flags),
-				 "qty" => $qty);
+
+	$price_without_tax = $price * $qty;
+	$goods_tax = ($price_without_tax/100)*$vat;
+	
+	return array(	"artnr" => $artno,
+					"title" => $title,
+					"quantity" => $qty,
+					"aprice" => $price,
+					"taxrate" => $vat,
+					"discount" => $discount,
+					"withouttax" => $price_without_tax,
+					"tax" => $goods_tax,
+				);
+
 }
 
 /**
@@ -59,20 +66,27 @@ class BillmateUtils {
                 jQuery(document).ready(function() {
                     var input = jQuery('input[value=\"".$code."\"][name=\"payment\"]');
                     var elem = input.parent().parent().next().children().children().children().children().next();
-                    elem.attr('khidden', 'true');
+                    elem.attr('hidden', 'true');
                     elem.hide();
 
                     var showFunc = function() {
                         var input = jQuery('input[value=\"".$code."\"][name=\"payment\"]');
                         jQuery('input[name=\"payment\"]:checked').attr('checked', false);
-                        input.attr('checked', 'checked');
+                        $.each(document.checkout_payment.payment,function(index,val){
+                            if($(val).val() == \"".$code."\"){
+                                document.checkout_payment.payment[index].checked = true;
+                            }
+                        });
+                        //input.attr('checked', 'checked');
                         var element = input.parent().parent().next().children().children().children().children().next();
-                        if(element.attr('khidden') != 'false') {
+                        console.log(element.attr('hidden'));
+                        console.log(element);
+                        if(element.attr('hidden') == 'hidden') {
                             element.fadeIn();
-                            element.attr('khidden', 'false');
+                            element.attr('hidden', 'false');
                             var checkelem = jQuery('input[name=\"".$code."_invoice_type\"]:checked');
                             var checkid = checkelem.attr('id');
-                            if(!checkelem.attr('khidden') && input.attr('value').substr(0, 6) == 'billmate') {
+                            if(!checkelem.attr('hidden') && input.attr('value').substr(0, 6) == 'billmate') {
                                 if(checkid == 'company') {
                                     toggle('company');
                                 }
@@ -81,24 +95,24 @@ class BillmateUtils {
                                 }
                             }
                         }
+                        return true;
                     };
 
-                    input.parent().parent().parent().click(showFunc);
+                    input.parent().parent().click(showFunc);
                     input.change(showFunc);
-
                     var inputs = jQuery('input[name=\"payment\"]').not(input);
 
                     var hideFunc = function() {
                         var input = jQuery('input[value=\"".$code."\"][name=\"payment\"]');
                         input.attr('checked', false);
                         var element = input.parent().parent().next().children().children().children().children().next();
-                        if(element.attr('khidden') != 'true') {
+                        if(element.attr('hidden') != 'true') {
                             element.hide();
-                            element.attr('khidden', 'true');
+                            element.attr('hidden', 'true');
                         }
                     }
 
-                    inputs.parent().parent().parent().click(hideFunc);
+                    inputs.parent().parent().click(hideFunc);
                     inputs.change(hideFunc);
                 });
             </script>";
@@ -143,25 +157,25 @@ class BillmateUtils {
 
         $pclasses = self::get_pclasses($table, $country);
         foreach($pclasses as &$pclass) {
-			$pclass['desc'] = utf8_decode($pclass['desc']);
+			$pclass['description'] = utf8_decode($pclass['description']);
 
             if($total >= ($pclass['minamount']/100) && ($total <= ($pclass['maxamount']/100) || $pclass['maxamount'] == 0 ) ) {
                 if($pclass['type'] < 2) {
-                    $pclass['minpay'] = ceil(BillmateCalc::calc_monthly_cost($total, $pclass['months'], $pclass['fee']/100, $pclass['startfee']/100, $pclass['interest']/100, $pclass['type'], $flags, $country));
+                    $pclass['minpay'] = ceil(BillmateCalc::calc_monthly_cost($total, $pclass['nbrofmonths'], $pclass['handlingfee']/100, $pclass['startfee']/100, $pclass['interestrate']/100, $pclass['type'], $flags, $country));
 
-                    $pclass['desc'] = htmlentities($pclass['desc']);
-                    $pclass['text'] = $pclass['desc']." - ".$currencies->format($pclass['minpay'], false);
+                    $pclass['description'] = htmlentities($pclass['description']);
+                    $pclass['text'] = $pclass['description']." - ".$currencies->format($pclass['minpay'], false);
 
                     //Norway only
                     if($country === $KRED_ISO3166_NO) {
-                        $pclass['tcpc'] = BillmateCalc::total_credit_purchase_cost($total, $pclass['interest']/100, $pclass['fee']/100, $pclass['minpay'], $pclass['months'], $pclass['startfee']/100, $pclass['type']);
+                        $pclass['tcpc'] = BillmateCalc::total_credit_purchase_cost($total, $pclass['interestrate']/100, $pclass['handlingfee']/100, $pclass['minpay'], $pclass['nbrofmonths'], $pclass['startfee']/100, $pclass['type']);
                         $pclass['text'] .= " ".BILLMATE_LANG_NO_PAYMENTTEXT2_EACH." (* ".$currencies->format(ceil($pclass['tcpc']), false).")";
                     }
 
                     $listarray[] = $pclass;
                 }
                 else {
-                    $pclass['text'] = htmlentities($pclass['desc']);
+                    $pclass['text'] = htmlentities($pclass['description']);
                     $special[] = $pclass;
                 }
             }
@@ -222,22 +236,22 @@ class BillmateUtils {
         foreach($pclasses as $pclass) {
 		
             if(strtolower(CHARSET) == 'utf-8') {
-                $desc = self::forceUTF8($pclass['desc']);
+                $desc = self::forceUTF8($pclass['description']);
             }
             else {
-                $desc = self::forceLatin1($pclass['desc']);
+                $desc = self::forceLatin1($pclass['description']);
             }
 
 			echo '<tr class="dataTableRow"><td class="dataTableContent" align="center">', $pclass['id'],'</td>';
 			echo '<td class="dataTableContent">', $desc,'</td>';
-			echo '<td class="dataTableContent" align="center">', $pclass['months'],'</td>';
-			echo '<td class="dataTableContent" align="center">', $pclass['interest'],'</td>';
-			echo '<td class="dataTableContent" align="center">', $pclass['fee'],'</td>';
+			echo '<td class="dataTableContent" align="center">', $pclass['nbrofmonths'],'</td>';
+			echo '<td class="dataTableContent" align="center">', $pclass['interestrate'],'</td>';
+			echo '<td class="dataTableContent" align="center">', $pclass['handlingfee'],'</td>';
 			echo '<td class="dataTableContent" align="center">', $pclass['startfee'],'</td>';
 			echo '<td class="dataTableContent" align="center">', $pclass['minamount'],'</td>';
 			echo '<td class="dataTableContent" align="center">', $pclass['maxamount'],'</td>';			
 			echo '<td class="dataTableContent" align="center">', ($pclass['country'] == 209 ? 'SWEDEN' : $pclass['country']),'</td>';
-			echo '<td class="dataTableContent" align="center">', $pclass['expiry_date'],'</td></tr>';
+			echo '<td class="dataTableContent" align="center">', $pclass['expirydate'],'</td></tr>';
 
             /*printf(" %-6s,");
             printf(" %-13s,");
@@ -261,7 +275,7 @@ class BillmateUtils {
             self::create_db($table); //incase it doesn't exist, below will not cause an error.
             $query = tep_db_query("SELECT * FROM `".$table."`");
             $tmp = array();
-            while($row = mysql_fetch_assoc($query)) {
+            while($row = tep_db_fetch_array($query)) {
                 $tmp[] = $row;
             }
             return $tmp;
@@ -274,20 +288,24 @@ class BillmateUtils {
      * @param string $table
      */
     public static function create_db($table) {
-        tep_db_query("CREATE TABLE IF NOT EXISTS `".$table."` (
-          `id` int(10) unsigned NOT NULL,
-          `type` tinyint(4) NOT NULL,
-          `desc` varchar(255) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL,
-          `months` int(11) NOT NULL,
-          `interest` int(11) NOT NULL,
-          `fee` int(11) NOT NULL,
-          `startfee` int(11) NOT NULL,
-          `minamount` int(11) NOT NULL,
-          `maxamount` bigint(20) NOT NULL,		  
-          `country` int(11) NOT NULL,
-		  `expiry_date` varchar(20) NOT NULL,
-          KEY `id` (`id`)
-        )");
+		tep_db_query("CREATE TABLE IF NOT EXISTS `".$table."` (
+		  `eid` int(10) unsigned NOT NULL,
+		  `id` int(10) NOT NULL,
+		  `description` varchar(250) NOT NULL,
+		  `nbrofmonths` int(2) NOT NULL,
+		  `startfee` decimal(10,2) NOT NULL,
+		  `handlingfee` decimal(10,2) NOT NULL,
+		  `minamount` decimal(10,2) NOT NULL,
+		  `maxamount` decimal(15,2) NOT NULL,
+		  `country` int(10) NOT NULL,
+		  `type` int(10) NOT NULL,
+		  `expirydate` date NOT NULL,
+		  `interestrate` decimal(10,2) NOT NULL,
+		  `currency` int(10) NOT NULL,
+		  `language` int(10) NOT NULL,
+		  `activated` int(10) NOT NULL,
+		  UNIQUE KEY `id` (`id`)
+		)");
     }
 
     /**
@@ -309,27 +327,19 @@ class BillmateUtils {
 
             BillmateUtils::remove_db($table);
             BillmateUtils::create_db($table);
-            foreach((array)$pclasses as $pclass) {
-				
-				//die;
-                $pclass_id = $pclass[0];
-                $pclass_type = $pclass[8];
-                $pclass_desc = utf8_encode($pclass[1]);
-                $pclass_months = $pclass[2];
-                $pclass_startfee = $pclass[3];
-                $pclass_fee = $pclass[4];
-                $pclass_interest = $pclass[5];
-                $pclass_minamount = $pclass[6];
-                $pclass_country = $pclass[7];
-				$pclass_expiry = $pclass[9];
-                $pclass_maxamount = $pclass[10];
-
-                //Delete existing pclass
-                tep_db_query("DELETE FROM `".$table."` WHERE `id` = '".$pclass_id."'");
-                //Insert new pclass (replace into only exists for MySQL...)
-                tep_db_query("INSERT INTO `".$table."` (`id`, `type`, `desc`, `months`, `interest`, `fee`, `startfee`, `minamount`, `maxamount`, `country`,`expiry_date`) " .
-                        "VALUES ('".$pclass_id."', '".$pclass_type."', '".$pclass_desc."', '".$pclass_months."', '".$pclass_interest."', ".
-                        "'".$pclass_fee."', '".$pclass_startfee."', '".$pclass_minamount."', '".$pclass_maxamount."', '".$pclass_country."','".$pclass_expiry."')");
+			$eid = $pclasses['eid'];
+            foreach((array)$pclasses as $key=>$pclass) {
+				if( is_array($pclass) ) :
+					//Delete existing pclass
+					$pclass_id = $key+1;
+					$pclass['startfee'] /= 100; $pclass['handlingfee'] /= 100; $pclass['minamount'] /= 100; $pclass['maxamount'] /= 100;
+					tep_db_query("DELETE FROM `".$table."` WHERE `eid` = '".$eid."' and `id` = '".$pclass_id."'");
+					//Insert new pclass (replace into only exists for MySQL...)
+					tep_db_query("INSERT INTO `".$table."` (`eid`, `id`, `description`, `nbrofmonths`, `startfee`, `handlingfee`, `minamount`, `maxamount`, `country`, 
+								  `type`, `expirydate`, `interestrate`, `currency`, `language`, `activated`) VALUES ('".$eid."', '".$pclass_id."','".$pclass['description']."', 
+								  '".$pclass['nbrofmonths']."', '".$pclass['startfee']."', '".$pclass['handlingfee']."', '".$pclass['minamount']."', '".$pclass['maxamount']."', 
+								  '209', '".$pclass['type']."', '".$pclass['expirydate']."', '".$pclass['interestrate']."', '', '', '')");
+				endif;
             }
         }
     }
@@ -452,7 +462,7 @@ class BillmateUtils {
     }
 
     /**
-     * @author   "Sebastián Grignoli" <grignoli@framework2.com.ar>
+     * @author   "Sebastiï¿½n Grignoli" <grignoli@framework2.com.ar>
      * @package  forceUTF8
      * @version  1.1
      * @link     http://www.framework2.com.ar/dzone/forceUTF8-es/
@@ -466,15 +476,15 @@ class BillmateUtils {
          *
          * It may fail to convert characters to unicode if they fall into one of these scenarios:
          *
-         * 1) when any of these characters:   ÀÁÂÃÄÅÆÇÈÉÊËÌÍÎÏÐÑÒÓÔÕÖ×ØÙÚÛÜÝÞß
+         * 1) when any of these characters:   ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
          *    are followed by any of these:  ("group B")
-         *                                    ¡¢£¤¥¦§¨©ª«¬­®¯°±²³´µ¶?¸¹º»¼½¾¿
-         * For example:   %ABREPRESENT%C9%BB. «REPRESENTÉ»
-         * The "«" (%AB) character will be converted, but the "É" followed by "»" (%C9%BB)
+         *                                    ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½?ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+         * For example:   %ABREPRESENT%C9%BB. ï¿½REPRESENTÉ»
+         * The "ï¿½" (%AB) character will be converted, but the "ï¿½" followed by "ï¿½" (%C9%BB)
          * is also a valid unicode character, and will be left unchanged.
          *
-         * 2) when any of these: àáâãäåæçèéêëìíîï  are followed by TWO chars from group B,
-         * 3) when any of these: ðñòó  are followed by THREE chars from group B.
+         * 2) when any of these: ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½  are followed by TWO chars from group B,
+         * 3) when any of these: ï¿½ï¿½ï¿½ï¿½  are followed by THREE chars from group B.
          *
          * @name forceUTF8
          * @param string $text  Any string.

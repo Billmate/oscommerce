@@ -34,7 +34,7 @@ require_once DIR_FS_CATALOG . DIR_WS_CLASSES.'billmate/commonfunctions.php';
 include(DIR_FS_CATALOG . DIR_WS_CLASSES . "billmate/lib/xmlrpc.inc");
 include(DIR_FS_CATALOG . DIR_WS_CLASSES . "billmate/lib/xmlrpcs.inc");
 require_once(DIR_FS_CATALOG . DIR_WS_CLASSES . 'billmate/utf8.php');
-require_once(DIR_FS_CATALOG . DIR_WS_CLASSES . 'billmate/BillMate.php');;
+require_once(DIR_FS_CATALOG . DIR_WS_CLASSES . 'billmate/Billmate.php');;
 
 
 class pcbillmate {
@@ -65,7 +65,7 @@ class pcbillmate {
             $this->title .= ' '.MODULE_PAYMENT_PCBILLMATE_TESTMODE_TITLE;
         }
 
-        $this->description = MODULE_PAYMENT_PCBILLMATE_TEXT_DESCRIPTION . "<br />Version: 1.50";
+        $this->description = MODULE_PAYMENT_PCBILLMATE_TEXT_DESCRIPTION . "<br />Version: ".BILLPLUGIN_VERSION;
         $this->enabled = ((MODULE_PAYMENT_PCBILLMATE_STATUS == 'True') ? true : false);
 
         if($this->enabled) {
@@ -204,7 +204,7 @@ class pcbillmate {
             $customer_query = tep_db_query("select DATE_FORMAT(customers_dob, '%Y%m%d') AS customers_dob from " .
                     TABLE_CUSTOMERS . " where customers_id = '" . (int)$customer_id."'");
             $customer = tep_db_fetch_array($customer_query);
-            $personnummer = $customer['customers_dob'];
+            $personnummer = ""; //$personnummer = $customer['customers_dob'];
         }
         else
             $personnummer = "";
@@ -324,45 +324,46 @@ class pcbillmate {
 
         $type = $GA_OLD;
 
-		$k = new Billmate($eid,$secret,true, false);
-		$result = $k->GetAddress($pno);
+		$k = new Billmate($eid,$secret,true, $this->pcbillmate_testmode, false);
+		$result = (object)$k->GetAddress(array('pno'=>$pno));
 
-        if (!is_array($result)) {
+		if (isset($result->message) || empty($result) || !is_object($result)) {
             tep_redirect(BillmateUtils::error_link(FILENAME_CHECKOUT_PAYMENT,
-                    'payment_error=pcbillmate&error='.strip_tags( utf8_encode($result) ),
+                    'payment_error=pcbillmate&error='.strip_tags( utf8_encode($result->message) ),
                     'SSL', true, false));
         }
-		$result[0][0] = utf8_encode($result[0][0]);
-		$result[0][1] = utf8_encode($result[0][1]);
-		$result[0][2] = utf8_encode($result[0][2]);
-		$result[0][3] = utf8_encode($result[0][3]);
-		$result[0][4] = utf8_encode($result[0][4]);
-
-        $this->addrs = $result;
+		$result->firstname = utf8_encode($result->firstname);
+		$result->lastname = utf8_encode($result->lastname);
+		$result->street = utf8_encode($result->street);
+		$result->zip = utf8_encode($result->zip);
+		$result->city = utf8_encode($result->city);
+		$result->country = 209;
 
         $fullname = $order->billing['firstname'].' '.$order->billing['lastname'] .' '.$order->billing['company'];
-		if( empty ( $result[0][0] ) ){
+		if( empty ( $result->firstname ) ){
 			$apiName = $fullname;
 		} else {
-			$apiName  = $result[0][0].' '.$result[0][1];
+			$apiName  = $result->firstname.' '.$result->lastname;
 		}
+        $this->addrs = $result;
+
         $firstArr = explode(' ', $order->billing['firstname']);
         $lastArr  = explode(' ', $order->billing['lastname']);
         
-        if( empty( $result[0][0] ) ){
+        if( empty( $result->firstname ) ){
             $apifirst = $firstArr;
             $apilast  = $lastArr ;
         }else {
-            $apifirst = explode(' ', $result[0][0] );
-            $apilast  = explode(' ', $result[0][1] );
+            $apifirst = explode(' ', $result->firstname );
+            $apilast  = explode(' ', $result->lastname );
         }
         $matchedFirst = array_intersect($apifirst, $firstArr );
         $matchedLast  = array_intersect($apilast, $lastArr );
         $apiMatchedName   = !empty($matchedFirst) && !empty($matchedLast);
 
-		$addressNotMatched = !isEqual($result[0][2], $order->billing['street_address'] ) ||
-		    !isEqual($result[0][3], $order->billing['postcode']) || 
-		    !isEqual($result[0][4], $order->billing['city']) || 
+		$addressNotMatched = !isEqual($result->street, $order->billing['street_address'] ) ||
+		    !isEqual($result->zip, $order->billing['postcode']) || 
+		    !isEqual($result->city, $order->billing['city']) || 
 		    !isEqual($result[0][5], BillmateCountry::fromCode($order->billing['country']['iso_code_3']));
 
         $shippingAndBilling =  !$apiMatchedName ||
@@ -374,7 +375,7 @@ class pcbillmate {
 
         if( $addressNotMatched || $shippingAndBilling ){
             if( empty($_POST['geturl'])){
-	            $html = '<p><b>'.MODULE_PAYMENT_PCBILLMATE_CORRECT_ADDRESS.' </b></p>'.($result[0][0]).' '.$result[0][1].'<br>'.$result[0][2].'<br>'.$result[0][3].' '.$result[0][4].'<div style="padding: 17px 0px;"> <i>'.MODULE_PAYMENT_PCBILLMATE_CORRECT_ADDRESS_OPTION.'</i></div> <input type="button" value="'.MODULE_PAYMENT_PCBILLMATE_YES.'" onclick="updateAddresspart();" class="button"/> <input type="button" value="'.MODULE_PAYMENT_PCBILLMATE_NO.'" onclick="closefunc(this)" class="button" style="float:right" />';
+	            $html = '<p><b>'.MODULE_PAYMENT_PCBILLMATE_CORRECT_ADDRESS.' </b></p>'.($result->firstname).' '.$result->lastname.'<br>'.$result->street.'<br>'.$result->zip.' '.$result->city.'<div style="padding: 17px 0px;"> <i>'.MODULE_PAYMENT_PCBILLMATE_CORRECT_ADDRESS_OPTION.'</i></div> <input type="button" value="'.MODULE_PAYMENT_PCBILLMATE_YES.'" onclick="updateAddresspart();" class="button"/> <input type="button" value="'.MODULE_PAYMENT_PCBILLMATE_NO.'" onclick="closefunc(this)" class="button" style="float:right" />';
 
 	            $code = '<style type="text/css">
 .checkout-heading {
@@ -426,20 +427,20 @@ class pcbillmate {
                 tep_redirect(BillmateUtils::error_link(FILENAME_CHECKOUT_PAYMENT, 'payment_error=pcbillmate&error=invalidaddress', 'SSL'));
 	        }else{
 	            if(!match_usernamevp( $fullname , $apiName)){
-                    if($result[0][0] == "") {
+                    if($result->firstname == "") {
                         $this->pcbillmate_fname = $order->billing['firstname'];
                         $this->pcbillmate_lname = $order->billing['lastname'];
-						$this->pccompany_name   = $result[0][1];
+						$this->pccompany_name   = $result->lastname;
                     }else {
-                        $this->pcbillmate_fname = $result[0][0];
-                        $this->pcbillmate_lname = $result[0][1];
+                        $this->pcbillmate_fname = $result->firstname;
+                        $this->pcbillmate_lname = $result->lastname;
 						$this->pccompany_name   = '';
                     }
                 }
-                $this->pcbillmate_street = $result[0][2];
-                $this->pcbillmate_postno = $result[0][3];
-                $this->pcbillmate_city = $result[0][4];
-                $countryCode = BillmateCountry::getCode($result[0][5]);
+                $this->pcbillmate_street = $result->street;
+                $this->pcbillmate_postno = $result->zip;
+                $this->pcbillmate_city = $result->city;
+                $countryCode = BillmateCountry::getCode($result->country);
                 $country_query = tep_db_query("select countries_id from " . TABLE_COUNTRIES . " where countries_iso_code_2 = '" .$countryCode . "'");
                 $country = tep_db_fetch_array($country_query);
                 global $customer_id;
@@ -503,7 +504,7 @@ class pcbillmate {
 		tep_draw_hidden_field('pcbillmate_postno'.$counter, $order->billing['postcode']).
 		tep_draw_hidden_field('pcbillmate_company'.$counter, $order->billing['company']).
 		tep_draw_hidden_field('pcbillmate_city'.$counter, $order->billing['city']).
-		tep_draw_hidden_field('pcbillmate_country'.$counter,  $this->addrs[0][5]).
+		tep_draw_hidden_field('pcbillmate_country'.$counter,  $this->addrs->country).
 		tep_draw_hidden_field('pcbillmate_pclass'.$counter,$this->pcbillmate_pclass).
 		tep_draw_hidden_field('pcbillmate_pnum'.$counter,$this->pcbillmate_pnum);
 
@@ -587,8 +588,12 @@ class pcbillmate {
         $eid = (int)MODULE_PAYMENT_PCBILLMATE_EID;
         $estoreUser = $customer_id;
         $goodsList = array();
+		$shippingPrice = 0; $shippingTaxRate = 0;
         $n = sizeof($order->products);
 
+	    $totalValue = 0;
+	    $taxValue = 0;
+	    $prepareDiscounts = array();
         // First all the ordinary items
         for ($i = 0 ; $i < $n ; $i++) {
             //    $price_without_tax = ($order->products[$i]['final_price'] * 100/
@@ -613,7 +618,7 @@ class pcbillmate {
 
             if (MODULE_PAYMENT_PCBILLMATE_ARTNO == 'id' ||
                     MODULE_PAYMENT_PCBILLMATE_ARTNO == '') {
-                $goodsList[] =
+                $temp =
                         mk_goods_flags($order->products[$i]['qty'],
                         $order->products[$i]['id'],
                         $order->products[$i]['name'] . $attributes,
@@ -621,8 +626,19 @@ class pcbillmate {
                         $order->products[$i]['tax'],
                         0,
                         0); //incl VAT
+	            $totalValue += $temp['withouttax'];
+	            $taxValue += $temp['tax'];
+	            $tax1 = (int)$order->products[$i]['tax'];
+	            if(isset($prepareDiscounts[$tax1])){
+
+		            $prepareDiscounts[$tax1] += $temp['withouttax'];
+	            } else {
+		            $prepareDiscounts[$tax1] = $temp['withouttax'];
+	            }
+
+	            $goodsList[] = $temp;
             } else {
-                $goodsList[] =
+                $temp =
                         mk_goods_flags($order->products[$i]['qty'],
                         $order->products[$i][MODULE_PAYMENT_PCBILLMATE_ARTNO],
                         $order->products[$i]['name'] . $attributes,
@@ -630,6 +646,16 @@ class pcbillmate {
                         $order->products[$i]['tax'],
                         0,
                         0); //incl VAT
+	            $totalValue += $temp['withouttax'];
+	            $taxValue += $temp['tax'];
+	            $tax1 = (int)$order->products[$i]['tax'];
+	            if(isset($prepareDiscounts[$tax1])){
+
+		            $prepareDiscounts[$tax1] += $temp['withouttax'];
+	            } else {
+		            $prepareDiscounts[$tax1] = $temp['withouttax'];
+	            }
+	            $goodsList[] = $temp;
             }
         }
 
@@ -648,21 +674,24 @@ class pcbillmate {
                 $tax = $pcbillmate_ot["tax_rate_".$j."_".$i];
                 $code = $pcbillmate_ot["code_".$j."_".$i];
                 $name = rtrim($name, ":");
-                $flags = 0; //INC VAT
-                if($code == 'ot_shipping') {
-                    $flags += 8; //IS_SHIPMENT
-                }
-/*
-                if(DISPLAY_PRICE_WITH_TAX == 'true') {
-                    $price_with_tax = $currencies->get_value($currency) * $value * 100;
-                } else {
-                    $price_with_tax = $currencies->get_value($currency) * $value * 100*(($tax/100)+1);
-                }*/
 				
-				$price_with_tax = $currencies->get_value($currency) * $value * 100;
-                
+				$price_without_tax = $currencies->get_value($currency) * $value * 100;
+                if(DISPLAY_PRICE_WITH_TAX == 'true') {
+					$price_without_tax = $price_without_tax/(($tax+100)/100);
+                }
+				if( $code == 'ot_discount' ) { $price_without_tax = 0 - $price_without_tax; }
+				if( $code == 'ot_shipping' ){ $shippingPrice = $price_without_tax; $shippingTaxRate = $tax; continue; }
 				if ($value != "" && $value != 0) {
-                    $goodsList[] = mk_goods_flags(1, "", BillmateUtils::convertData($name), $price_with_tax, $tax, 0, $flags);
+					$totals = $totalValue;
+					foreach($prepareDiscounts as $tax => $value)
+					{
+						$percent = $value / $totals;
+						$price_without_tax_out = $price_without_tax * $percent;
+						$temp = mk_goods_flags(1, "", BillmateUtils::convertData($name).' '.(int)$tax.'Moms', $price_without_tax_out, $tax, 0, 0);
+						$totalValue += $temp['withouttax'];
+						$taxValue += $temp['tax'];
+						$goodsList[] = $temp;
+					}
                 }
             }
         }
@@ -706,70 +735,97 @@ class pcbillmate {
         $order->delivery['country']['iso_code_2'] = $order->billing['country']['iso_code_2'];
         $order->delivery['country']['iso_code_3'] = $order->billing['country']['iso_code_3'];
 
-	    $ship_address = array(
-		    'email'           => $order->customer['email_address'],
-		    'telno'           => $order->customer['telephone'],
-		    'cellno'          => '',
-		    'fname'           => $order->delivery['firstname'],
-		    'lname'           => $order->delivery['lastname'],
-		    'company'         => $order->delivery['company'],
-		    'street'          => $order->delivery['street_address'],
-		    'zip'             => $order->delivery['postcode'],
-		    'city'            => $order->delivery['city'],
-		    'country'         => (int)$countryData['country'],
-	    );
-	    $bill_address = array(
-		    'email'           => $order->customer['email_address'],
-		    'telno'           => $order->customer['telephone'],
-		    'cellno'          => '',
-		    'fname'           => $order->billing['firstname'],
-		    'lname'           => $order->billing['lastname'],
-		    'company'         => $order->billing['company'],
-		    'street'          => $order->billing['street_address'],
-		    'zip'             => $order->billing['postcode'],
-		    'city'            => $order->billing['city'],
-		    'country'         => (int)$countryData['country'],
-	    );
+        $ship_address = array(
+			"firstname" => $order->delivery['firstname'],
+			"lastname" 	=> $order->delivery['lastname'],
+			"company" 	=> $order->delivery['company'],
+			"street" 	=> $order->delivery['street_address'],
+			"street2" 	=> "",
+			"zip" 		=> $order->delivery['postcode'],
+			"city" 		=> $order->delivery['city'],
+			"country" 	=> $countryData['country'],
+			"phone" 	=> $order->customer['telephone'],
+        );
+		
+        $bill_address = array(
+			"firstname" => $order->billing['firstname'],
+			"lastname" 	=> $order->billing['lastname'],
+			"company" 	=> $order->billing['company'],
+			"street" 	=> $order->billing['street_address'],
+			"street2" 	=> "",
+			"zip" 		=> $order->billing['postcode'],
+			"city" 		=> $order->billing['city'],
+			"country" 	=> $countryData['country'],
+			"phone" 	=> $order->customer['telephone'],
+			"email" 	=> $order->customer['email_address'],
+        );
 
-       foreach($ship_address as $key => $col ){
+       /*foreach($ship_address as $key => $col ){
             if(is_numeric($col) ) continue;
             $ship_address[$key] = utf8_decode(Encoding::fixUTF8( $col ));
         }
        foreach($bill_address as $key => $col ){
             if(is_numeric($col) ) continue;
             $bill_address[$key] = utf8_decode(Encoding::fixUTF8( $col ));
-        }
+        }*/
    
-        //extract($countryData);
-		
-
-		$transaction = array(
-			"order1"=>(string)time(),
-			"comment"=>(string)"",
-			"flags"=>0,
-			"reference"=>"",
-			"reference_code"=>"",
-			"currency"=>$countryData['currency'],
-			"country"=>$countryData['country'],
-			"language"=>$countryData['language'],
-			"pclass"=>(int)$pclass,
-			"shipInfo"=>array("delay_adjust"=>"1"),
-			"travelInfo"=>array(),
-			"incomeInfo"=>array(),
-			"bankInfo"=>array(),
-			"sid"=>array("time"=>microtime(true)),
-			"extraInfo"=>array(array("cust_no"=>(int)$customer_id))
-		);
-
 		$ssl = true;
 		$debug = false;
+		$k = new Billmate($eid,$secret,$ssl,$this->pcbillmate_testmode,$debug);
+		$invoiceValues = array();
+		$invoiceValues['PaymentData'] = array(	"method" => "4",		//1=Factoring, 2=Service, 4=PartPayment, 8=Card, 16=Bank, 24=Card/bank and 32=Cash.
+												"paymentplanid" => $pclass,
+												"currency" => "SEK",
+												"language" => "sv",
+												"country" => "SE",
+												"autoactivate" => "0",
+												"orderid" => (string)time(),
+											);
+		$invoiceValues['PaymentInfo'] = array( 	"paymentdate" => date('Y-m-d'),
+											"paymentterms" => "14",
+											"yourreference" => "",
+											"ourreference" => "",
+											"projectname" => "",
+											"delivery" => "Post",
+											"deliveryterms" => "FOB",
+									);
+		$invoiceValues['Card'] = array();
+		$invoiceValues['Customer'] = array(	'customernr'=> (string)$customer_id,
+											'pno'=>$pno,
+											'Billing'=> $bill_address, 
+											'Shipping'=> $ship_address
+										);
+		$invoiceValues['Articles'] = $goodsList;
 
-		$k = new Billmate($eid,$secret,$ssl,$debug);
-		
-		$result1 = $k->AddInvoice($pno,$ship_address,$bill_address,$goodsList,$transaction);
-		
-		if (is_array($result1)) {
+	    $totalValue += $shippingPrice;
+	    $taxValue += $shippingPrice * ($shippingTaxRate/100);
+		$totaltax = round($taxValue,0);
+		$totalwithtax = round($order->info['total']*100,0);
+		$totalwithouttax = $totalValue;
+		$rounding = $totalwithtax - ($totalwithouttax+$totaltax);
 
+		$invoiceValues['Cart'] = array(
+									"Handling" => array(
+										"withouttax" => 0,
+										"taxrate" => 0
+									),
+									"Shipping" => array(
+										"withouttax" => ($shippingPrice)?round($shippingPrice,2):0,
+										"taxrate" => ($shippingTaxRate)?$shippingTaxRate:0
+									),
+									"Total" => array(
+										"withouttax" => $totalwithouttax,
+										"tax" => $totaltax,
+										"rounding" => $rounding,
+										"withtax" => $totalwithtax,
+									)
+								);	
+		$result1 = (object)$k->AddPayment($invoiceValues);
+		if(is_string($result1) || (isset($result1->message) && is_object($result1))){
+            tep_redirect(BillmateUtils::error_link(FILENAME_CHECKOUT_PAYMENT,
+                    'payment_error=pcbillmate&error=' . utf8_encode($result1->message),
+                    'SSL', true, false));
+        } else {
             // insert address in address book to get correct address in
             // confirmation mail (or fetch correct address from address book
             // if it exists)
@@ -807,15 +863,10 @@ class pcbillmate {
                 $sendto = $billto = tep_db_insert_id();
             }
 
-            $order->billmateref=$result1[1];
-            $payment['tan']=$result1;
-
+            $order->billmateref=$result1->number;
+            $payment['tan']=$result1->number;
             tep_session_unregister('pcbillmate_ot');
 
-        } else {
-            tep_redirect(BillmateUtils::error_link(FILENAME_CHECKOUT_PAYMENT,
-                    'payment_error=pcbillmate&error=' . utf8_encode($result1),
-                    'SSL', true, false));
         }
     }
 
@@ -826,7 +877,6 @@ class pcbillmate {
                 tep_db_query("show columns from " . TABLE_ORDERS);
 
         $has_billmate_ref = false;
-
         while($fields = tep_db_fetch_array($find_st_optional_field_query)) {
             if ( $fields['Field'] == "billmateref" )
                 $has_billmate_ref = true;
@@ -854,8 +904,8 @@ class pcbillmate {
         $secret = MODULE_PAYMENT_PCBILLMATE_SECRET;
         $eid = MODULE_PAYMENT_PCBILLMATE_EID;
         $invno = $order->billmateref;
-		$k = new Billmate($eid,$secret,true,false);
-		$k->UpdateOrderNo((string)$invno, $insert_id);
+		$k = new Billmate($eid,$secret,true,$this->pcbillmate_testmode,false);
+		$k->UpdatePayment( array('PaymentData'=> array("number"=>$invno, "orderid"=>(string)$insert_id, "currency" => "SEK", "language" => "sv", "country" => "se")) ); 
         return false;
     }
 
@@ -930,28 +980,21 @@ class pcbillmate {
         $filename = explode('?', basename($_SERVER['REQUEST_URI'], 0));//[0];
 
         if ($filename[0] == "modules.php") {
-            //if ($_GET['get_pclasses'] == TRUE) {
                 $eid = (int)MODULE_PAYMENT_PCBILLMATE_EID;
                 $secret = (int)MODULE_PAYMENT_PCBILLMATE_SECRET;
 
                 $result = false;
-				$additionalinfo = array(
-					"currency"=>0,//SEK
-					"country"=>209,//Sweden
-					"language"=>125,//Swedish
+				$additionalinfo['PaymentData'] = array(
+					"currency"=>'SEK',//SEK
+					"country"=>'se',//Sweden
+					"language"=>'sv',//Swedish
 				);
-
-				$k = new Billmate($eid,$secret,true,false);
-				$result= $k->FetchCampaigns($additionalinfo);
-                //fetch_pclasses($eid, $KRED_SEK, $secret, $KRED_ISO3166_SE, $KRED_ISO639_SE, $result);
+				$k = new Billmate($eid,$secret,true,$this->pcbillmate_testmode,false);
+				$result= $k->GetPaymentPlans($additionalinfo);
 
                 BillmateUtils::update_pclasses(MODULE_PAYMENT_PCBILLMATE_PCLASS_TABLE, $result);
-            //}
-            //if ($_GET['view_pclasses'] == TRUE || $_GET['get_pclasses'] == TRUE) {
-                //echo "<pre>";
+	            error_log($KRED_ISO3166_SE);
                 BillmateUtils::display_pclasses(MODULE_PAYMENT_PCBILLMATE_PCLASS_TABLE, $KRED_ISO3166_SE);
-                //echo "</pre>";
-            //}
         }
 
         return array('MODULE_PAYMENT_PCBILLMATE_STATUS',

@@ -98,18 +98,18 @@ class ot_billmate_fee {
         if (MODULE_BILLMATE_FEE_TAX_CLASS > 0) {
             $tod_rate =tep_get_tax_rate(MODULE_BILLMATE_FEE_TAX_CLASS);
             $tod_amount = $od_amount - $od_amount/($tod_rate/100+1);
-            $order->info['tax'] += $tod_amount;
+            $order->info['tax'] += ($tod_amount/$currencies->get_value($currency));
             $tax_desc = tep_get_tax_description(
                     MODULE_BILLMATE_FEE_TAX_CLASS,
                     $customer_country_id, $customer_zone_id);
-            $order->info['tax_groups']["$tax_desc"] += $tod_amount;
+            $order->info['tax_groups']["$tax_desc"] += ($tod_amount/$currencies->get_value($currency));
         }
 
         if (DISPLAY_PRICE_WITH_TAX=="true") {
             $od_amount = $od_amount;
         } else {
             $od_amount = $od_amount-$tod_amount;
-            $order->info['total'] += $tod_amount;
+            $order->info['total'] += ($tod_amount/$currencies->get_value($currency));
         }
 
         return ($od_amount/$currencies->get_value($currency));

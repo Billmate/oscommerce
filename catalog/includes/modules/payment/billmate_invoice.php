@@ -65,7 +65,7 @@ class billmate_invoice {
 			$this->billmate_livemode = false;
         }
 
-        $this->description = MODULE_PAYMENT_BILLMATE_TEXT_DESCRIPTION . "<br />Version: 1.50";
+        $this->description = MODULE_PAYMENT_BILLMATE_TEXT_DESCRIPTION . "<br />Version: ".BILLPLUGIN_VERSION;
         $this->enabled = ((MODULE_PAYMENT_BILLMATE_STATUS == 'True') ?
                 true : false);
 
@@ -297,48 +297,50 @@ class billmate_invoice {
         $pnoencoding = $KRED_SE_PNO;
         $type = $GA_OLD;
 
-		$k = new Billmate($eid,$secret,$ssl,$debug);
-		$result = $k->GetAddress($pno);
-//        $status = get_addresses($eid, BillmateUtils::convertData($pno), $secret, $pnoencoding, $type, $result);
+		$k = new Billmate($eid,$secret,$ssl,$this->billmate_testmode,$debug);
+		$result = (object)$k->GetAddress(array('pno'=>$pno));
+//      $status = get_addresses($eid, BillmateUtils::convertData($pno), $secret, $pnoencoding, $type, $result);
 
-        if (!is_array($result)) {
+        if (isset($result->message) || empty($result) || !is_object($result)) {
             tep_redirect(BillmateUtils::error_link(FILENAME_CHECKOUT_PAYMENT,
                     'payment_error=billmate_invoice&error='.
-                    strip_tags( utf8_encode($result) ),
+                    strip_tags( utf8_encode($result->message) ),
                     'SSL', true, false));
         }
-		$result[0][0] = utf8_encode($result[0][0]);
-		$result[0][1] = utf8_encode($result[0][1]);
-		$result[0][2] = utf8_encode($result[0][2]);
-		$result[0][3] = utf8_encode($result[0][3]);
-		$result[0][4] = utf8_encode($result[0][4]);
+				
+		$result->firstname = utf8_encode($result->firstname);
+		$result->lastname = utf8_encode($result->lastname);
+		$result->street = utf8_encode($result->street);
+		$result->zip = utf8_encode($result->zip);
+		$result->city = utf8_encode($result->city);
+		$result->country = utf8_encode($result->country);
 
         $fullname = $order->billing['firstname'].' '.$order->billing['lastname'] .' '.$order->billing['company'];
-		if( empty ( $result[0][0] ) ){
+		if( empty ( $result->firstname ) ){
 			$apiName = $fullname;
 		} else {
-			$apiName  = $result[0][0].' '.$result[0][1];
+			$apiName  = $result->firstname.' '.$result->lastname;
 		}
 		$this->addrs = $result;
 		
         $firstArr = explode(' ', $order->billing['firstname']);
         $lastArr  = explode(' ', $order->billing['lastname']);
         
-        if( empty( $result[0][0] ) ){
+        if( empty( $result->firstname ) ){
             $apifirst = $firstArr;
             $apilast  = $lastArr ;
         }else {
-            $apifirst = explode(' ', $result[0][0] );
-            $apilast  = explode(' ', $result[0][1] );
+            $apifirst = explode(' ', $result->firstname );
+            $apilast  = explode(' ', $result->lastname );
         }
         $matchedFirst = array_intersect($apifirst, $firstArr );
         $matchedLast  = array_intersect($apilast, $lastArr );
         $apiMatchedName   = !empty($matchedFirst) && !empty($matchedLast);
 
-		$addressNotMatched = !isEqual($result[0][2], $order->billing['street_address'] ) ||
-		    !isEqual($result[0][3], $order->billing['postcode']) || 
-		    !isEqual($result[0][4], $order->billing['city']) || 
-		    !isEqual($result[0][5], BillmateCountry::fromCode($order->billing['country']['iso_code_3']));
+		$addressNotMatched = !isEqual($result->street, $order->billing['street_address'] ) ||
+		    !isEqual($result->zip, $order->billing['postcode']) || 
+		    !isEqual($result->city, $order->billing['city']) || 
+		    !isEqual($result->country, BillmateCountry::fromCode($order->billing['country']['iso_code_3']));
 
         $shippingAndBilling =  !$apiMatchedName ||
 		    !isEqual($order->billing['street_address'],  $order->delivery['street_address'] ) ||
@@ -348,7 +350,7 @@ class billmate_invoice {
 
         if( $addressNotMatched || $shippingAndBilling ){
             if( empty($_POST['geturl'])){
-	            $html = '<p><b>'.MODULE_PAYMENT_BILLMATE_CORRECT_ADDRESS.' </b></p>'.($result[0][0]).' '.$result[0][1].'<br>'.$result[0][2].'<br>'.$result[0][3].' '.$result[0][4].'<div style="padding: 17px 0px;"> <i>'.MODULE_PAYMENT_BILLMATE_CORRECT_ADDRESS_OPTION.'</i></div> <input type="button" value="'.MODULE_PAYMENT_BILLMATE_YES.'" onclick="updateAddress();" class="button"/> <input type="button" value="'.MODULE_PAYMENT_BILLMATE_NO.'" onclick="closefunc(this)" class="button" style="float:right" />';
+	            $html = '<p><b>'.MODULE_PAYMENT_BILLMATE_CORRECT_ADDRESS.' </b></p>'.($result->firstname).' '.$result->lastname.'<br>'.$result->street.'<br>'.$result->zip.' '.$result->city.'<div style="padding: 17px 0px;"> <i>'.MODULE_PAYMENT_BILLMATE_CORRECT_ADDRESS_OPTION.'</i></div> <input type="button" value="'.MODULE_PAYMENT_BILLMATE_YES.'" onclick="updateAddress();" class="button"/> <input type="button" value="'.MODULE_PAYMENT_BILLMATE_NO.'" onclick="closefunc(this)" class="button" style="float:right" />';
 	            $code = '<style type="text/css">
 .checkout-heading {
     background: none repeat scroll 0 0 #F8F8F8;
@@ -399,19 +401,19 @@ class billmate_invoice {
                 $_SESSION['WrongAddress'] = $WrongAddress;
                 tep_redirect(BillmateUtils::error_link(FILENAME_CHECKOUT_PAYMENT, 'payment_error=billmate_invoice&error=invalidaddress', 'SSL'));
 	        }else{
-			   if($result[0][0] == "") {
+			   if($result->firstname == "") {
 					$this->billmate_fname = $order->billing['firstname'];
 					$this->billmate_lname = $order->billing['lastname'];
-					$this->company_name   = $result[0][1];
+					$this->company_name   = $result->lastname;
 				}else {
-					$this->billmate_fname = $result[0][0];
-					$this->billmate_lname = $result[0][1];
+					$this->billmate_fname = $result->firstname;
+					$this->billmate_lname = $result->lastname;
 					$this->company_name   = '';
 				}
 
-                $this->billmate_street = $result[0][2];
-                $this->billmate_postno = $result[0][3];
-                $this->billmate_city = $result[0][4];
+                $this->billmate_street = $result->street;
+                $this->billmate_postno = $result->zip;
+                $this->billmate_city = $result->city;
 				
                 $order->delivery['firstname'] = $this->billmate_fname;
                 $order->billing['firstname'] = $this->billmate_fname;
@@ -458,7 +460,7 @@ class billmate_invoice {
 		tep_draw_hidden_field('billmate_street'.$counter, $order->billing['street_address']).
 		tep_draw_hidden_field('billmate_postno'.$counter, $order->billing['postcode']).
 		tep_draw_hidden_field('billmate_city'.$counter, $order->billing['city']).
-		tep_draw_hidden_field('billmate_country'.$counter,  $this->addrs[0][5]);
+		tep_draw_hidden_field('billmate_country'.$counter,  $this->addrs->country);
 
         $order_totals = $order_total_modules->modules;
 
@@ -550,8 +552,7 @@ class billmate_invoice {
         $order->delivery['company'] =  $_POST['billmate_company'.$addr_num];
         $order->billing['company'] =   $_POST['billmate_company'.$addr_num];
         $order->delivery['street_address'] =  $_POST['billmate_street'.$addr_num];
-        $order->billing['street_address'] =
-                $_POST['billmate_street'.$addr_num];
+        $order->billing['street_address'] = $_POST['billmate_street'.$addr_num];
         $order->delivery['postcode'] = $_POST['billmate_postno'.$addr_num];
         $order->billing['postcode'] = $_POST['billmate_postno'.$addr_num];
         $order->delivery['city'] = $_POST['billmate_city'.$addr_num];
@@ -563,8 +564,12 @@ class billmate_invoice {
 
         $estoreUser = $customer_id;
         $goodsList = array();
+		$shippingPrice = 0; $shippingTaxRate = 0;
+		$handlingPrice = 0; $handlingTaxRate = 0;
         $n = sizeof($order->products);
-
+		$totalValue = 0;
+	    $taxValue = 0;
+	    $prepareDiscounts = array();
         // First all the ordinary items
         for ($i = 0 ; $i < $n ; $i++) {
             //    $price_without_tax = ($order->products[$i]['final_price'] * 100/
@@ -590,23 +595,44 @@ class billmate_invoice {
 
             if (MODULE_PAYMENT_BILLMATE_ARTNO == 'id' ||
                     MODULE_PAYMENT_BILLMATE_ARTNO == '') {
-                $goodsList[] =
-                        mk_goods_flags($order->products[$i]['qty'],
-                        tep_get_prid($order->products[$i]['id']),
-                        $order->products[$i]['name'] . $attributes,
-                        $price_without_tax,
-                        $order->products[$i]['tax'],
-                        0,
-                        0); //incl VAT
+	            $temp =
+		            mk_goods_flags($order->products[$i]['qty'],
+			            $order->products[$i]['id'],
+			            $order->products[$i]['name'] . $attributes,
+			            $price_without_tax,
+			            $order->products[$i]['tax'],
+			            0,
+			            0); //incl VAT
+	            $totalValue += $temp['withouttax'];
+	            $taxValue += $temp['tax'];
+	            $tax1 = (int)$order->products[$i]['tax'];
+	            if(isset($prepareDiscounts[$tax1])){
+
+		            $prepareDiscounts[$tax1] += $temp['withouttax'];
+	            } else {
+		            $prepareDiscounts[$tax1] = $temp['withouttax'];
+	            }
+
+	            $goodsList[] = $temp;
             } else {
-                $goodsList[] =
-                        mk_goods_flags($order->products[$i]['qty'],
-                        $order->products[$i][MODULE_PAYMENT_BILLMATE_ARTNO],
-                        $order->products[$i]['name'] . $attributes,
-                        $price_without_tax,
-                        $order->products[$i]['tax'],
-                        0,
-                        0); //incl VAT
+	            $temp =
+		            mk_goods_flags($order->products[$i]['qty'],
+			            $order->products[$i][MODULE_PAYMENT_PCBILLMATE_ARTNO],
+			            $order->products[$i]['name'] . $attributes,
+			            $price_without_tax,
+			            $order->products[$i]['tax'],
+			            0,
+			            0); //incl VAT
+	            $totalValue += $temp['withouttax'];
+	            $taxValue += $temp['tax'];
+	            $tax1 = (int)$order->products[$i]['tax'];
+	            if(isset($prepareDiscounts[$tax1])){
+
+		            $prepareDiscounts[$tax1] += $temp['withouttax'];
+	            } else {
+		            $prepareDiscounts[$tax1] = $temp['withouttax'];
+	            }
+	            $goodsList[] = $temp;
             }
         }
 
@@ -624,118 +650,141 @@ class billmate_invoice {
                 $tax = $billmate_ot["tax_rate_".$j."_".$i];
                 $name = rtrim($name, ":");
                 $code = $billmate_ot["code_".$j."_".$i];
-                $flags = 0; //INC VAT
-                if($code == 'ot_shipping') {
-                    $flags += 8; //IS_SHIPMENT
-                }
-                else if($code == 'ot_'.$this->code.'_fee') {
-                    $flags += 16; //IS_HANDLING
-                }
-				if( $code == 'ot_billmate_fee' ){
-					$flags = 16;
-				}
-/*
-                if(DISPLAY_PRICE_WITH_TAX == 'true') {
-                    $price_with_tax = $currencies->get_value($currency) * $value * 100;
-                } else {
-                    $price_with_tax = $currencies->get_value($currency) * $value * 100*(($tax/100)+1);
-                }*/
+				$flags = 0;
 				
-				$price_with_tax = $currencies->get_value($currency) * $value * 100;
-                
-				if ($value != "" && $value != 0) {
-                    $goodsList[] = mk_goods_flags(1, "", BillmateUtils::convertData($name), $price_with_tax, $tax, 0, $flags);
+				$price_without_tax = $currencies->get_value($currency) * $value * 100;
+                if(DISPLAY_PRICE_WITH_TAX == 'true') {
+					$price_without_tax = $price_without_tax/(($tax+100)/100);
                 }
+
+				if( $code == 'ot_discount' ) { $price_without_tax = 0 - $price_without_tax; }
+				if( $code == 'ot_shipping' ){ $shippingPrice = $price_without_tax; $shippingTaxRate = $tax; continue; }
+				if( $code == 'ot_billmate_fee' ){ $handlingPrice = $price_without_tax; $handlingTaxRate = $tax; continue; }
+
+				if ($value != "" && $value != 0) {
+					$totals = $totalValue;
+					foreach($prepareDiscounts as $tax => $value)
+					{
+						$percent = $value / $totals;
+						$price_without_tax_out = $price_without_tax * $percent;
+						$temp = mk_goods_flags(1, "", BillmateUtils::convertData($name).' '.(int)$tax.'Moms', $price_without_tax_out, $tax, 0, 0);
+						$totalValue += $temp['withouttax'];
+						$taxValue += $temp['tax'];
+						$goodsList[] = $temp;
+					}
+				}
 
             }
         }
-
 
         $secret = MODULE_PAYMENT_BILLMATE_SECRET;
         $estoreOrderNo = "";
         $shipmentfee = 0;
         $shipmenttype = 1;
-
         $handlingfee = 0;
         $ready_date = "";
 
         $pno   = BillmateUtils::convertData($_POST['billmate_pnum1']);
-
 		$pclass = -1;
 		$ship_address = $bill_address = array();
-
         $countryData = BillmateCountry::getCountryData($order->billing['country']['iso_code_3']);
 	
-	    $ship_address = array(
-		    'email'           => $order->customer['email_address'],
-		    'telno'           => $order->customer['telephone'],
-		    'cellno'          => '',
-		    'fname'           => $order->delivery['firstname'],
-		    'lname'           => $order->delivery['lastname'],
-		    'company'         => $order->delivery['company'],
-		    'careof'          => '',
-		    'street'          => $order->delivery['street_address'],
-		    'house_number'    => isset($house_no)? $house_no: '',
-		    'house_extension' => isset($house_ext)?$house_ext:'',
-		    'zip'             => $order->delivery['postcode'],
-		    'city'            => $order->delivery['city'],
-		    'country'         => (int)$countryData['country'],
-	    );
-	    $bill_address = array(
-		    'email'           => $order->customer['email_address'],
-		    'telno'           => $order->customer['telephone'],
-		    'cellno'          => '',
-		    'fname'           => $order->billing['firstname'],
-		    'lname'           => $order->billing['lastname'],
-		    'company'         => $order->billing['company'],
-		    'careof'          => '',
-		    'street'          => $order->billing['street_address'],
-		    'house_number'    => '',
-		    'house_extension' => '',
-		    'zip'             => $order->billing['postcode'],
-		    'city'            => $order->billing['city'],
-		    'country'         => (int)$countryData['country'],
-	    );
+        $ship_address = array(
+			"firstname" => $order->delivery['firstname'],
+			"lastname" 	=> $order->delivery['lastname'],
+			"company" 	=> $order->delivery['company'],
+			"street" 	=> $order->delivery['street_address'],
+			"street2" 	=> "",
+			"zip" 		=> $order->delivery['postcode'],
+			"city" 		=> $order->delivery['city'],
+			"country" 	=> $countryData['country'],
+			"phone" 	=> $order->customer['telephone'],
+        );
+		
+        $bill_address = array(
+			"firstname" => $order->billing['firstname'],
+			"lastname" 	=> $order->billing['lastname'],
+			"company" 	=> $order->billing['company'],
+			"street" 	=> $order->billing['street_address'],
+			"street2" 	=> "",
+			"zip" 		=> $order->billing['postcode'],
+			"city" 		=> $order->billing['city'],
+			"country" 	=> $countryData['country'],
+			"phone" 	=> $order->customer['telephone'],
+			"email" 	=> $order->customer['email_address'],
+        );
 
-       foreach($ship_address as $key => $col ){
+       /*foreach($ship_address as $key => $col ){
             if(is_numeric($col) ) continue;
             $ship_address[$key] = utf8_decode(Encoding::fixUTF8( $col ));
         }
        foreach($bill_address as $key => $col ){
             if(is_numeric($col) ) continue;
             $bill_address[$key] = utf8_decode(Encoding::fixUTF8( $col ));
-        }
+        }*/
    
-		$transaction = array(
-			"order1"=>(string)time(),
-			"comment"=>(string)"",
-			"flags"=>0,
-			"reference"=>"",
-			"reference_code"=>"",
-			"currency"=>$countryData['currency'],
-			"country"=>$countryData['country'],
-			"language"=>$countryData['language'],
-			"pclass"=>$pclass,
-			"shipInfo"=>array("delay_adjust"=>"1"),
-			"travelInfo"=>array(),
-			"incomeInfo"=>array(),
-			"bankInfo"=>array(),
-			"sid"=>array("time"=>microtime(true)),
-			"extraInfo"=>array(array("cust_no"=>(string)$customer_id))
-		);
-		
- 		require_once DIR_FS_CATALOG . DIR_WS_CLASSES.'/billmate/BillMate.php';
+ 		require_once DIR_FS_CATALOG . DIR_WS_CLASSES.'/billmate/Billmate.php';
 		include_once(DIR_FS_CATALOG . DIR_WS_CLASSES."/billmate/lib/xmlrpc.inc");
 		include_once(DIR_FS_CATALOG . DIR_WS_CLASSES."/billmate/lib/xmlrpcs.inc");
 		
 		$ssl = true;
 		$debug = false;
-
-		$k = new Billmate($eid,$secret,$ssl,$debug, $this->billmate_testmode);
-		$result1 = $k->AddInvoice($pno,$ship_address,$bill_address,$goodsList,$transaction);
-
-        if (is_array($result1)) {
-
+		$k = new Billmate($eid,$secret,$ssl,$this->billmate_testmode,$debug);
+		$invoiceValues = array();
+		$invoiceValues['PaymentData'] = array(	"method" => "1",		//1=Factoring, 2=Service, 4=PartPayment, 8=Card, 16=Bank, 24=Card/bank and 32=Cash.
+												"paymentplanid" => $pclass,
+												"currency" => "SEK",
+												"language" => "sv",
+												"country" => "SE",
+												"autoactivate" => "0",
+												"orderid" => (string)time(),
+											);
+		$invoiceValues['PaymentInfo'] = array( 	"paymentdate" => date('Y-m-d'),
+											"paymentterms" => "14",
+											"yourreference" => "",
+											"ourreference" => "",
+											"projectname" => "",
+											"delivery" => "Post",
+											"deliveryterms" => "FOB",
+									);
+		$invoiceValues['Card'] = array();
+		$invoiceValues['Customer'] = array(	'customernr'=> (string)$customer_id,
+											'pno'=>$pno, 
+											'Billing'=> $bill_address, 
+											'Shipping'=> $ship_address
+										);
+		$invoiceValues['Articles'] = $goodsList;
+	    $totalValue += $shippingPrice;
+	    $taxValue += $shippingPrice * ($shippingTaxRate/100);
+	    $totalValue += $handlingPrice;
+	    $taxValue += $handlingPrice * ($handlingTaxRate/100);
+	    $totaltax = round($taxValue,0);
+		$totalwithtax = round($order->info['total']*100,0);
+		$totalwithouttax = $totalValue;
+		$rounding = $totalwithtax - ($totalwithouttax+$totaltax);
+		
+		$invoiceValues['Cart'] = array(
+									"Handling" => array(
+										"withouttax" => ($handlingPrice)?round($handlingPrice,0):0,
+										"taxrate" => ($handlingTaxRate)?$handlingTaxRate:0
+									),
+									"Shipping" => array(
+										"withouttax" => ($shippingPrice)?round($shippingPrice,0):0,
+										"taxrate" => ($shippingTaxRate)?$shippingTaxRate:0
+									),
+									"Total" => array(
+										"withouttax" => $totalwithouttax,
+										"tax" => $totaltax,
+										"rounding" => $rounding,
+										"withtax" => $totalwithtax,
+									)
+								);
+		$result1 = (object)$k->AddPayment($invoiceValues);
+        if(is_string($result1) || (isset($result1->message) && is_object($result1))){
+            tep_redirect(BillmateUtils::error_link(FILENAME_CHECKOUT_PAYMENT,
+                    'payment_error=billmate_invoice&error=' . utf8_encode($result1->message),
+                    'SSL', true, false));
+		} else {
             // insert address in address book to get correct address in
             // confirmation mail (or fetch correct address from address book
             // if it exists)
@@ -775,19 +824,14 @@ class billmate_invoice {
                 $sendto = $billto = tep_db_insert_id();
             }
 
-            $order->billmateref=$result1[1];
-            $payment['tan']=$result1[1];
+            $order->billmateref = $result1->number;
+            $payment['tan'] = $result1->number;
             tep_session_unregister('billmate_ot');
             return false;
-        } else {
-            tep_redirect(BillmateUtils::error_link(FILENAME_CHECKOUT_PAYMENT,
-                    'payment_error=billmate_invoice&error=' . utf8_encode($result1),
-                    'SSL', true, false));
-        }
+		}
     }
 
     function after_process() {
-
         global $insert_id, $order;
 
         $find_st_optional_field_query =
@@ -809,8 +853,7 @@ class billmate_invoice {
         // Insert transaction # into history file
 
         $sql_data_array = array('orders_id' => $insert_id,
-                'orders_status_id' =>
-                ($order->info['order_status']),
+                'orders_status_id' => MODULE_PAYMENT_BILLMATE_ORDER_STATUS_ID,
                 'date_added' => 'now()',
                 'customer_notified' => 0,
                 'comments' => ('Accepted by Billmate ' .
@@ -822,8 +865,9 @@ class billmate_invoice {
         $secret = MODULE_PAYMENT_BILLMATE_SECRET;
         $eid = MODULE_PAYMENT_BILLMATE_EID;
         $invno = $order->billmateref;
-		$k = new Billmate($eid,$secret,true,false);
-		$k->UpdateOrderNo((string)$invno, $insert_id);
+
+		$k = new Billmate($eid,$secret,true,$this->billmate_testmode,false);
+		$k->UpdatePayment( array('PaymentData'=> array("number"=>$invno, "orderid"=>(string)$insert_id, "currency" => "SEK", "language" => "sv", "country" => "se")) ); 
 
         //Delete Session with user details
         tep_session_unregister('user_billing');
