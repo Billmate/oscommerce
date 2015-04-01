@@ -92,6 +92,8 @@ class billmatebank {
 			if ($order->info['total']*$er > MODULE_PAYMENT_BILLMATEBANK_ORDER_LIMIT)
 				$this->enabled = false;
 
+			if ($order->info['total'] * $er < MODULE_PAYMENT_BILLMATEBANK_MIN_ORDER_LIMIT)
+				$this->enabled = false;
 			
 			$this->order_status = DEFAULT_ORDERS_STATUS_ID;
 
@@ -653,7 +655,7 @@ class billmatebank {
 												"currency" => "SEK",
 												"language" => "sv",
 												"country" => "SE",
-												"autoactivate" => "0",
+												"autoactivate" => (MODULE_PAYMENT_BILLMATEBANK_AUTHENTICATION_MODE == 'sale')?1:0,
 												"orderid" => (string)$cart_billmate_bank_ID,
 											);
 		$invoiceValues['PaymentInfo'] = array( 	"paymentdate" => date('Y-m-d'),
@@ -784,9 +786,19 @@ class billmatebank {
 		$ssl = true;
 		$debug = false;
 		
-		if(!$already_completed ){
-			$k = new Billmate($eid,$secret,$ssl, $this->billmatebank_testmode,$debug);
-			$result1 = (object)($k->UpdatePayment( array('PaymentData'=> array("number"=>$_DATA['number'], "orderid"=>(string)$_DATA['order_id']))) );
+		if(!$already_completed )
+		{
+			if (MODULE_PAYMENT_BILLMATEBANK_AUTHENTICATION_MODE != 'sale')
+			{
+				$k       = new Billmate($eid, $secret, $ssl, $this->billmatebank_testmode, $debug);
+				$result1 = (object)($k->UpdatePayment(array('PaymentData' => array("number"  => $_DATA['number'],
+				                                                                   "orderid" => (string)$_DATA['order_id']
+				)
+				)));
+
+			} else {
+				$result1 = $_DATA;
+			}
 		}
 	
         if(is_string($result1) || (isset($result1->message) && is_object($result1))){
@@ -953,15 +965,21 @@ class billmatebank {
         tep_db_query("insert into " . TABLE_CONFIGURATION . " (configuration_title, configuration_key, configuration_value, configuration_description, configuration_group_id, sort_order, date_added) values ('Ignore table', 'MODULE_PAYMENT_BILLMATEBANK_ORDER_TOTAL_IGNORE', 'ot_tax,ot_total,ot_subtotal', 'Ignore these entries from order total list when compiling the invoice data', '6', '2', now())");
 
 
-        tep_db_query("insert into " . TABLE_CONFIGURATION . " (configuration_title, configuration_key, configuration_value, configuration_description, configuration_group_id, sort_order, date_added) values ('Credit limit', 'MODULE_PAYMENT_BILLMATEBANK_ORDER_LIMIT', '50000', 'Only show this payment alternative for orders less than the value below.', '6', '2', now())");
+        tep_db_query("insert into " . TABLE_CONFIGURATION . " (configuration_title, configuration_key, configuration_value, configuration_description, configuration_group_id, sort_order, date_added) values ('Order value maximum limit', 'MODULE_PAYMENT_BILLMATEBANK_ORDER_LIMIT', '50000', 'Only show this payment alternative for orders less than the value below.', '6', '2', now())");
+        tep_db_query("insert into " . TABLE_CONFIGURATION . " (configuration_title, configuration_key, configuration_value, configuration_description, configuration_group_id, sort_order, date_added) values ('Order value minimum limit', 'MODULE_PAYMENT_BILLMATEBANK_MIN_ORDER_LIMIT', '0', 'Only show this payment alternative for orders greater than the value below.', '6', '2', now())");
 
         tep_db_query("insert into " . TABLE_CONFIGURATION . " (configuration_title, configuration_key, configuration_value, configuration_description, configuration_group_id, sort_order, date_added) values ('Sort order of display.', 'MODULE_PAYMENT_BILLMATEBANK_SORT_ORDER', '0', 'Sort order of display. Lowest is displayed first.', '6', '0', now())");
+
+
 
         tep_db_query("insert into " . TABLE_CONFIGURATION . " (configuration_title, configuration_key, configuration_value, configuration_description, configuration_group_id, sort_order, set_function, use_function, date_added) values ('Set Order Status', 'MODULE_PAYMENT_BILLMATEBANK_ORDER_STATUS_ID', '0', 'Set the status of orders made with this payment module to this value', '6', '0', 'tep_cfg_pull_down_order_statuses(', 'tep_get_order_status_name', now())");
 
         tep_db_query("insert into " . TABLE_CONFIGURATION . " (configuration_title, configuration_key, configuration_value, configuration_description, configuration_group_id, sort_order, set_function, date_added) values ('Testmode', 'MODULE_PAYMENT_BILLMATEBANK_TESTMODE', 'False', 'Do you want to activate the Testmode? We will not pay for the invoices created with the test persons nor companies and we will not collect any fees as well.', '6', '0', 'tep_cfg_select_option(array(\'True\', \'False\'), ', now())");
 
-        tep_db_query("insert into " . TABLE_CONFIGURATION . " (configuration_title, configuration_key, configuration_value, configuration_description, configuration_group_id, sort_order, date_added) values ('Disabled countries', 'MODULE_PAYMENT_BILLMATEBANK_DISABLED_COUNTRYIES', 'se,fi,dk,no', 'Disable in these countries<br/>Enter country ISO Code of two characters <br/>se = Sweden<br/>fi = Finland<br/>dk = Denmark<br/>no = Norway', '10', '0', now())");
+	    tep_db_query("insert into " . TABLE_CONFIGURATION . " (configuration_title, configuration_key, configuration_value, configuration_description, configuration_group_id, sort_order, set_function, date_added) values ('Authentication Mode', 'MODULE_PAYMENT_BILLMATEBANK_AUTHENTICATION_MODE', 'sale', '', '7', '0', 'tep_cfg_select_option(array(\'sale\', \'authentication\'), ', now())");
+
+
+	    tep_db_query("insert into " . TABLE_CONFIGURATION . " (configuration_title, configuration_key, configuration_value, configuration_description, configuration_group_id, sort_order, date_added) values ('Disabled countries', 'MODULE_PAYMENT_BILLMATEBANK_DISABLED_COUNTRYIES', 'se,fi,dk,no', 'Disable in these countries<br/>Enter country ISO Code of two characters <br/>se = Sweden<br/>fi = Finland<br/>dk = Denmark<br/>no = Norway', '10', '0', now())");
 
     }
 
@@ -977,8 +995,10 @@ class billmatebank {
 				'MODULE_PAYMENT_BILLMATEBANK_ARTNO',
                 'MODULE_PAYMENT_BILLMATEBANK_DISABLED_COUNTRYIES',
                 'MODULE_PAYMENT_BILLMATEBANK_ORDER_LIMIT',
+                'MODULE_PAYMENT_BILLMATEBANK_MIN_ORDER_LIMIT',
                 'MODULE_PAYMENT_BILLMATEBANK_ORDER_TOTAL_IGNORE',
                 'MODULE_PAYMENT_BILLMATEBANK_TESTMODE',
+                'MODULE_PAYMENT_BILLMATEBANK_AUTHENTICATION_MODE',
                 'MODULE_PAYMENT_BILLMATEBANK_ZONE',
                 'MODULE_PAYMENT_BILLMATEBANK_SORT_ORDER');
     }

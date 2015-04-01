@@ -41,7 +41,7 @@ if(!class_exists('Encoding',false)){
 
 			if( (MODULE_PAYMENT_BILLMATECARDPAY_AUTHENTICATION_MODE != 'sale') ) {
 				$k = new Billmate($eid,$secret,$ssl, $testmode,$debug);
-				$result1 = (object)$k->UpdatePayment( array('PaymentData'=> array("number"=>$_DATA['number'], "orderid"=>(string)$_DATA['order_id'], "currency" => "SEK", "language" => "sv", "country" => "se")));
+				$result1 = (object)$k->UpdatePayment( array('PaymentData'=> array("number"=>$_DATA['number'], "orderid"=>(string)$_DATA['order_id'])));
 			} else {
 				$result1 = (object)$_DATA;
 			}

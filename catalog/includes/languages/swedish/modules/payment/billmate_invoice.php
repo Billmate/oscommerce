@@ -64,7 +64,10 @@
   define('MODULE_PAYMENT_BILLMATE_ADDR_NOTICE','Din faktura- och leveransadress kommer att uppdateras automatiskt till din folkbokförda adress.');
   
   define('MODULE_PAYMENT_BILLMATE_ORDER_LIMIT_TITLE', 'kreditgräns');
+  define('MODULE_PAYMENT_BILLMATE_MIN_ORDER_LIMIT_TITLE', 'Minsta Ordervärde');
+
   define('MODULE_PAYMENT_BILLMATE_ORDER_LIMIT_DESC', 'Visa endast denna betalning alternativ för beställningar med färre än värdet nedan.');
+  define('MODULE_PAYMENT_BILLMATE_MIN_ORDER_LIMIT_DESC', 'Visa endast denna betalning alternativ för beställningar med större än värdet nedan.');
   define('MODULE_PAYMENT_BILLMATE_ORDER_TOTAL_IGNORE_TITLE', 'Ignorera tabell');
   define('MODULE_PAYMENT_BILLMATE_ORDER_TOTAL_IGNORE_DESC', 'Ignorera dessa poster från den totala ordersumman listan när de sammanställer fakturaunderlag');
   define('MODULE_PAYMENT_BILLMATE_ZONE_TITLE', 'Betalning Zone');

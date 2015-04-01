@@ -39,9 +39,12 @@ if(!class_exists('Encoding',false)){
 			$debug = false;
 			$testmode = ((MODULE_PAYMENT_BILLMATEBANK_TESTMODE == 'True')) ? true : false;
 
-			$k = new Billmate($eid,$secret,$ssl, $testmode, $debug);
-			$result1 = (object)$k->UpdatePayment( array('PaymentData'=> array("number"=>$_DATA['number'], "orderid"=>(string)$_DATA['order_id'], "currency" => "SEK", "language" => "sv", "country" => "se")));
-
+			if( (MODULE_PAYMENT_BILLMATEBANK_AUTHENTICATION_MODE != 'sale') ) {
+				$k = new Billmate($eid,$secret,$ssl, $testmode,$debug);
+				$result1 = (object)$k->UpdatePayment( array('PaymentData'=> array("number"=>$_DATA['number'], "orderid"=>(string)$_DATA['order_id'])));
+			} else {
+				$result1 = (object)$_DATA;
+			}
 			if(is_string($result1) || (isset($result1->message) && is_object($result1))){
 			} else {
 

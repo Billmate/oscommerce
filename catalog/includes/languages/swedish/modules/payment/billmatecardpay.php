@@ -42,7 +42,9 @@
   define('MODULE_PAYMENT_BILLMATECARDPAY_ARTNO_TITLE', 'Produkt art nr attribut (id eller modell)');
   define('MODULE_PAYMENT_BILLMATECARDPAY_ARTNO_DESC', 'Använd följande produkt attribut för artnr.');
   define('MODULE_PAYMENT_BILLMATECARDPAY_ORDER_LIMIT_TITLE', 'kreditgräns');
+  define('MODULE_PAYMENT_BILLMATECARDPAY_MIN_ORDER_LIMIT_TITLE', 'Minsta ordervärde');
   define('MODULE_PAYMENT_BILLMATECARDPAY_ORDER_LIMIT_DESC', 'Visa endast denna betalning alternativ för beställningar med färre än värdet nedan.');
+  define('MODULE_PAYMENT_BILLMATECARDPAY__MIN_ORDER_LIMIT_DESC', 'Visa endast denna betalning alternativ för beställningar med större än värdet nedan.');
   define('MODULE_PAYMENT_BILLMATECARDPAY_ORDER_TOTAL_IGNORE_TITLE', 'Ignorera tabell');
   define('MODULE_PAYMENT_BILLMATECARDPAY_ORDER_TOTAL_IGNORE_DESC', 'Ignorera dessa poster från den totala ordersumman listan när de sammanställer fakturaunderlag');
   define('MODULE_PAYMENT_BILLMATECARDPAY_ZONE_TITLE', 'Betalning Zone');

@@ -123,6 +123,9 @@ class billmatecardpay {
         if ($order->info['total']*$er > MODULE_PAYMENT_BILLMATECARDPAY_ORDER_LIMIT)
             $this->enabled = false;
 
+	    if($order->info['total'] * $er < MODULE_PAYMENT_BILLMATECARDPAY_MIN_ORDER_LIMIT)
+		    $this->enabled = false;
+
         $this->sort_order = MODULE_PAYMENT_BILLMATECARDPAY_SORT_ORDER;
 
        
@@ -998,7 +1001,8 @@ class billmatecardpay {
         tep_db_query("insert into " . TABLE_CONFIGURATION . " (configuration_title, configuration_key, configuration_value, configuration_description, configuration_group_id, sort_order, date_added) values ('Ignore table', 'MODULE_PAYMENT_BILLMATECARDPAY_ORDER_TOTAL_IGNORE', 'ot_tax,ot_total,ot_subtotal', 'Ignore these entries from order total list when compiling the invoice data', '6', '2', now())");
 
 
-        tep_db_query("insert into " . TABLE_CONFIGURATION . " (configuration_title, configuration_key, configuration_value, configuration_description, configuration_group_id, sort_order, date_added) values ('Credit limit', 'MODULE_PAYMENT_BILLMATECARDPAY_ORDER_LIMIT', '50000', 'Only show this payment alternative for orders less than the value below.', '6', '2', now())");
+        tep_db_query("insert into " . TABLE_CONFIGURATION . " (configuration_title, configuration_key, configuration_value, configuration_description, configuration_group_id, sort_order, date_added) values ('Order value maximum limit', 'MODULE_PAYMENT_BILLMATECARDPAY_ORDER_LIMIT', '50000', 'Only show this payment alternative for orders less than the value below.', '6', '2', now())");
+        tep_db_query("insert into " . TABLE_CONFIGURATION . " (configuration_title, configuration_key, configuration_value, configuration_description, configuration_group_id, sort_order, date_added) values ('Order value minimum limit', 'MODULE_PAYMENT_BILLMATECARDPAY_MIN_ORDER_LIMIT', '0', 'Only show this payment alternative for orders greater than the value below.', '6', '2', now())");
 
         tep_db_query("insert into " . TABLE_CONFIGURATION . " (configuration_title, configuration_key, configuration_value, configuration_description, configuration_group_id, sort_order, date_added) values ('Sort order of display.', 'MODULE_PAYMENT_BILLMATECARDPAY_SORT_ORDER', '0', 'Sort order of display. Lowest is displayed first.', '6', '0', now())");
 
@@ -1031,6 +1035,7 @@ class billmatecardpay {
                 'MODULE_PAYMENT_BILLMATECARDPAY_AUTHENTICATION_MODE',
                 'MODULE_PAYMENT_BILLMATECARDPAY_DISABLED_COUNTRYIES',
                 'MODULE_PAYMENT_BILLMATECARDPAY_ORDER_LIMIT',
+                'MODULE_PAYMENT_BILLMATECARDPAY_MIN_ORDER_LIMIT',
                 'MODULE_PAYMENT_BILLMATECARDPAY_ORDER_TOTAL_IGNORE',
                 'MODULE_PAYMENT_BILLMATECARDPAY_TESTMODE',
                 'MODULE_PAYMENT_BILLMATECARDPAY_ZONE',
