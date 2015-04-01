@@ -230,9 +230,13 @@ function AddEvent(html_element, event_name, event_function)
 } 
 var modalWin = new CreateModalPopUpObject();
 function closefunc(obj){
-	checkout.setLoadWaiting(false);
+	//checkout.setLoadWaiting(false);
 	modalWin.HideModalPopUp();
 }
+function updateAddress(){
+    jQuery('form[name="checkout_payment"]').append("<input type=\'hidden\' name=\'geturl\' value=\'true\'/>");
+    jQuery('form[name="checkout_payment"]').submit()
+};
 function reviewstep(){
 }
 

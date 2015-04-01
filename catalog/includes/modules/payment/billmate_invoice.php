@@ -162,7 +162,39 @@ class billmate_invoice {
     }
 
     function javascript_validation() {
-        return false;
+	    $script = '
+			if(payment_value == "'.$this->code.'"){
+				console.log("'.$this->code.'");
+				var formdata = $(\'form[name="checkout_payment"]\').serializeArray();
+
+				if($(\'input[name="success"]\') && $(\'input[name="success"]\').val() == "true"){
+					return true;
+				}
+				$.ajax({
+					url: "'.tep_href_link('ext/modules/payment/billmate/getaddress.php?method='.$this->code, '', 'SSL').'",
+					data: formdata,
+					method: "POST",
+					success:function(response){
+						var result = JSON.parse(response);
+						if(result.success){
+							jQuery(":input[name=billmate_pnum]").after("<input type=\'hidden\' name=\'success\' value=\'true\'/>");
+	                        jQuery(":input[name=billmate_pnum]").parents("form").submit()
+						}
+						else if(result.popup) {
+							ShowMessage(result.content,"'.MODULE_PAYMENT_BILLMATE_ADDRESS_WRONG.'");
+
+						}
+						else {
+							alert(result.content);
+						}
+					}
+				})
+				return false;
+			}
+
+
+		';
+        return $script;
     }
 
     function selection() {

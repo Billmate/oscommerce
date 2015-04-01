@@ -61,7 +61,7 @@ class BillmateUtils {
      *
      */
     public static function get_display_jQuery($code) {
-        return "<script type='text/javascript'>
+        return "<script type=\"text/javascript\" src='".HTTP_SERVER.DIR_WS_HTTP_CATALOG."billmatepopup.js'></script><script type='text/javascript'>
                 if(typeof jQuery != 'undefined')
                 jQuery(document).ready(function() {
                     var input = jQuery('input[value=\"".$code."\"][name=\"payment\"]');
@@ -355,7 +355,7 @@ class BillmateUtils {
      * @param bool   $search_engine_safe
      * @return string
      */
-    function error_link($page = '', $parameters = '', $connection = 'NONSSL', $add_session_id = true, $search_engine_safe = true) {
+    static function error_link($page = '', $parameters = '', $connection = 'NONSSL', $add_session_id = true, $search_engine_safe = true) {
         global $request_type, $session_started, $SID;
 
         if (!tep_not_null($page)) {
