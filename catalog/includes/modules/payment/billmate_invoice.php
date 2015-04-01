@@ -69,7 +69,7 @@ class billmate_invoice {
         $this->enabled = ((MODULE_PAYMENT_BILLMATE_STATUS == 'True') ?
                 true : false);
 
-        $currencyValid = array('SEK','EUR');
+        $currencyValid = array('SEK','EUR','USD','DKK','NOK','GBP');
         $countryValid  = array('SE', 'DK', 'FI', 'NO');
         $enabled_countries = explode(',',
                                 trim( 

@@ -74,8 +74,8 @@ class billmatecardpay {
         $this->enabled = ((MODULE_PAYMENT_BILLMATECARDPAY_STATUS == 'True') ?
                 true : false);
 
-        $currencyValid = array('SEK','EUR');
-        $countryValid  = array('SE', 'DK', 'FI', 'NO');
+        $currencyValid = array('SEK','EUR','USD','DKK','NOK','GBP');
+        $countryValid  = array('SE', 'DK', 'GB', 'NO');
         $disabled_countries = explode(',',
                                 trim( 
                                     strtolower(MODULE_PAYMENT_BILLMATECARDPAY_DISABLED_COUNTRYIES),

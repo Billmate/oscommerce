@@ -5,13 +5,15 @@
  * Date: 15-04-01
  * Time: 13:28
  */
-global $user_billing;
+global $user_billing, $language;
 	chdir('../../../../');
 	require('includes/application_top.php');
 	require(DIR_FS_CATALOG . DIR_WS_CLASSES . 'billmate/Billmate.php');
 	require(DIR_FS_CATALOG . DIR_WS_CLASSES . 'billmate/utf8.php');
 
 	require(DIR_WS_CLASSES . 'order.php');
+	// load the language file according to set language.
+	include(DIR_WS_LANGUAGES . $language . '/modules/payment/billmate_invoice.php');
 	$order = new order;
 	$method = $_GET['method'];
 	if($method == 'billmate_invoice')
