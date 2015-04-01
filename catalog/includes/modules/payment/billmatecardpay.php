@@ -630,7 +630,7 @@ class billmatecardpay {
 	                {
 		                $percent = $value / $totals;
 		                $price_without_tax_out = $price_without_tax * $percent;
-		                $temp = mk_goods_flags(1, "", utf8_encode($name).' '.(int)$tax.'Moms', $price_without_tax_out, $tax, 0, 0);
+		                $temp = mk_goods_flags(1, "", ($name).' '.(int)$tax.'Moms', $price_without_tax_out, $tax, 0, 0);
 		                $totalValue += $temp['withouttax'];
 		                $taxValue += $temp['tax'];
 		                $goodsList[] = $temp;
