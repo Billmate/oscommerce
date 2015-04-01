@@ -786,7 +786,7 @@ class billmatebank {
 		
 		if(!$already_completed ){
 			$k = new Billmate($eid,$secret,$ssl, $this->billmatebank_testmode,$debug);
-			$result1 = (object)($k->UpdatePayment( array('PaymentData'=> array("number"=>$_DATA['number'], "orderid"=>(string)$_DATA['order_id'], "currency" => "SEK", "language" => "sv", "country" => "se"))) ); 
+			$result1 = (object)($k->UpdatePayment( array('PaymentData'=> array("number"=>$_DATA['number'], "orderid"=>(string)$_DATA['order_id']))) );
 		}
 	
         if(is_string($result1) || (isset($result1->message) && is_object($result1))){

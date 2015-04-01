@@ -907,7 +907,7 @@ class pcbillmate {
         $eid = MODULE_PAYMENT_PCBILLMATE_EID;
         $invno = $order->billmateref;
 		$k = new Billmate($eid,$secret,true,$this->pcbillmate_testmode,false);
-		$k->UpdatePayment( array('PaymentData'=> array("number"=>$invno, "orderid"=>(string)$insert_id, "currency" => "SEK", "language" => "sv", "country" => "se")) ); 
+		$k->UpdatePayment( array('PaymentData'=> array("number"=>$invno, "orderid"=>(string)$insert_id)) );
         return false;
     }
 

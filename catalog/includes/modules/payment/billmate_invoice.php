@@ -733,7 +733,7 @@ class billmate_invoice {
 		$invoiceValues = array();
 		$invoiceValues['PaymentData'] = array(	"method" => "1",		//1=Factoring, 2=Service, 4=PartPayment, 8=Card, 16=Bank, 24=Card/bank and 32=Cash.
 												"paymentplanid" => $pclass,
-												"currency" => "SEK",
+												"currency" => strtoupper($currency),
 												"language" => "sv",
 												"country" => "SE",
 												"autoactivate" => "0",
@@ -867,7 +867,7 @@ class billmate_invoice {
         $invno = $order->billmateref;
 
 		$k = new Billmate($eid,$secret,true,$this->billmate_testmode,false);
-		$k->UpdatePayment( array('PaymentData'=> array("number"=>$invno, "orderid"=>(string)$insert_id, "currency" => "SEK", "language" => "sv", "country" => "se")) ); 
+		$k->UpdatePayment( array('PaymentData'=> array("number"=>$invno, "orderid"=>(string)$insert_id)) );
 
         //Delete Session with user details
         tep_session_unregister('user_billing');
