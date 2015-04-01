@@ -204,7 +204,7 @@ class pcbillmate {
     }
 
     function selection() {
-        global $pcbillmate_testmode, $order, $customer_id, $currencies, $KRED_ISO3166_SE, $currency, $user_billing;
+        global $pcbillmate_testmode, $order, $customer_id, $currencies, $KRED_ISO3166_SE, $currency, $user_billing, $shipping;
 
         //Set the right Host and Port
         $livemode = $this->pcbillmate_testmode == false;
@@ -254,7 +254,18 @@ class pcbillmate {
         if(DISPLAY_PRICE_WITH_TAX != 'true') {
             $total -= ($order->info['tax'])*$er;
         }
+		// if not free ship
+	    if($shipping['id'] != 'free_free')
+	    {
+		    list($module, $method) = explode('_', $shipping['id']);
 
+		    require(DIR_WS_CLASSES.'shipping.php');
+		    $shipping_modules = new shipping;
+			// Get shipping quote for set module
+		    $shipp = $shipping_modules->quote($method, $module);
+		    if(isset($shipp[0]['tax']))
+			$total += $order->info['shipping_cost'] * ($shipp[0]['tax']/100);
+	    }
         //Get and calculate monthly costs for all pclasses
         $pclasses = BillmateUtils::calc_monthly_cost($total, MODULE_PAYMENT_PCBILLMATE_PCLASS_TABLE, $order->billing['country']['iso_code_2'], 0);
         
