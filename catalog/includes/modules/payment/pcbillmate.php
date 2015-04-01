@@ -72,8 +72,8 @@ class pcbillmate {
             $this->description .= '<br /><b>Click <a href="modules.php?set=payment&module=pcbillmate&get_pclasses=true">here</a> to update your pclasses</b><br />';
         }
 
-        $currencyValid = array('SE','SEK','EU', 'EUR','NOK','NO', 'SE','sek','eu', 'eur','nok','no' );
-        $countryValid  = array('SE', 'DK', 'FI', 'NO','se', 'dk', 'fi', 'no');
+        $currencyValid = array('SEK' );
+        $countryValid  = array('SE');
         $enabled_countries = explode(',',
                                 trim( 
                                     strtolower(MODULE_PAYMENT_PCBILLMATE_ENABLED_COUNTRYIES),
@@ -90,12 +90,12 @@ class pcbillmate {
 			$billing = $_SESSION['billmate_billing'] = $order->billing;
 		}
 		$availablecountries = array_intersect($countryValid,$enabled_countries);
-        if (!in_array($currency,$currencyValid)) {
+        if (!in_array(strtoupper($currency),$currencyValid)) {
             $this->enabled = false;
         }
         else {
             if(!empty($billing) && is_array($billing)) {
-                if(!in_array($billing['country']['iso_code_2'],$availablecountries)) {
+                if(!in_array(strtoupper($billing['country']['iso_code_2']),$availablecountries)) {
                     $this->enabled = false;
                 }
             }
@@ -104,10 +104,10 @@ class pcbillmate {
                 $result = tep_db_fetch_array($query);
         
                 if(is_array($result)) {
-                    if(!in_array($result['countries_iso_code_2'],$countryValid)) {
+                    if(!in_array(strtoupper($result['countries_iso_code_2']),$countryValid)) {
                         $this->enabled = false;
                     }
-                    $this->enabled = $this->enabled && in_array($result['countries_iso_code_2'],$enabled_countries);
+                    $this->enabled = $this->enabled && in_array(strtoupper($result['countries_iso_code_2']),$enabled_countries);
                 }
                 else {
                     $this->enabled = false;

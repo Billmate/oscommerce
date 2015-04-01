@@ -74,8 +74,8 @@ class billmatecardpay {
         $this->enabled = ((MODULE_PAYMENT_BILLMATECARDPAY_STATUS == 'True') ?
                 true : false);
 
-        $currencyValid = array('SE','SEK','EU', 'EUR','NOK','NO', 'SE','sek','eu', 'eur','nok','no' );
-        $countryValid  = array('SE', 'DK', 'FI', 'NO','se', 'dk', 'fi', 'no');
+        $currencyValid = array('SEK','EUR');
+        $countryValid  = array('SE', 'DK', 'FI', 'NO');
         $disabled_countries = explode(',',
                                 trim( 
                                     strtolower(MODULE_PAYMENT_BILLMATECARDPAY_DISABLED_COUNTRYIES),
@@ -87,10 +87,10 @@ class billmatecardpay {
                                  )
                               );
 
-        /*if (!in_array($currency,$currencyValid)) {
+        if (!in_array(strtoupper($currency),$currencyValid)) {
             $this->enabled = false;
         }
-        else {*/
+        else {
             if(is_array($billing)) {
                 if(in_array($billing['country']['iso_code_2'],$disabled_countries)) {
                     $this->enabled = false;
@@ -110,7 +110,7 @@ class billmatecardpay {
                     $this->enabled = false;
                 }
             }
-        //}
+        }
         
     
         if(is_object($currencies)) {
