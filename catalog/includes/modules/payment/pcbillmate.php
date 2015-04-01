@@ -251,8 +251,10 @@ class pcbillmate {
         $js = ($this->jQuery) ? BillmateUtils::get_display_jQuery($this->code) : "";
 
         $fields=array(
-                array('title' => BILLMATE_LANG_SE_IMGCONSUMERCREDIT.sprintf(MODULE_PAYMENT_PCBILLMATE_CONDITIONS, $eid),
+                array('title' => BILLMATE_LANG_SE_IMGCONSUMERCREDIT,
                         'field' => $js.$error),
+                array('title' => sprintf(MODULE_PAYMENT_PCBILLMATE_CONDITIONS, $eid),
+	                'field' => "<a href=\"#\" id=\"pcbillmate\" onclick=\"ShowBillmateInvoicePopup(event);return false;\"></a>"),
                 array('title' => MODULE_PAYMENT_PCBILLMATE_CHOOSECONSUMERCREDIT,
                         'field' => tep_draw_pull_down_menu('pcbillmate_pclass', $pclasses, $default)),
                 array('title' => MODULE_PAYMENT_PCBILLMATE_PERSON_NUMBER,
