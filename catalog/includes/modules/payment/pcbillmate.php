@@ -124,7 +124,7 @@ class pcbillmate {
             $this->enabled = false;
         }
 
-	    if($order->info['total'] < MODULE_PAYMENT_PCBILLMATE_MIN_ORDER_LIMIT)
+	    if($order->info['total'] * $er < MODULE_PAYMENT_PCBILLMATE_MIN_ORDER_LIMIT)
 		    $this->enabled = false;
 
         if ((int)MODULE_PAYMENT_PCBILLMATE_ORDER_STATUS_ID > 0) {
@@ -256,9 +256,9 @@ class pcbillmate {
         }
 
         //Get and calculate monthly costs for all pclasses
-        $pclasses = BillmateUtils::calc_monthly_cost($total, MODULE_PAYMENT_PCBILLMATE_PCLASS_TABLE, $KRED_ISO3166_SE, 0);
+        $pclasses = BillmateUtils::calc_monthly_cost($total, MODULE_PAYMENT_PCBILLMATE_PCLASS_TABLE, $order->billing['country']['iso_code_2'], 0);
         
-        $lowest = BillmateUtils::get_cheapest_pclass($pclasses);
+        $lowest = BillmateUtils::get_cheapest_pclass($pclasses,$total);
 
         //Disable payment option if no pclasses are available
         if(count($pclasses) == 0) {

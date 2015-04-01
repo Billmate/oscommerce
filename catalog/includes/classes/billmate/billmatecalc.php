@@ -231,6 +231,7 @@ class BillmateCalc {
         return $payarray;
     }
 
+
     /**
      * Calculates how much you have to pay each month if you want to
      * pay exactly the same amount each month. The interesting input
@@ -475,7 +476,7 @@ class BillmateCalc {
     /**
      * Calculates the monthly cost for the specified pclass.
      *
-     * @param  int   $sum          The sum for the order/product in ören/cents
+     * @param  int   $sum          The sum for the order/product in ï¿½ren/cents
      * @param  int   $months       Number of months.
      * @param  int   $fee          fee for the pclass.
      * @param  int   $startfee     Starting fee for the pclass.
@@ -485,6 +486,7 @@ class BillmateCalc {
      * @param  int   $country      The Billmate country.
      * @return int/float  The monthly cost.
      */
+	/*
     public static function calc_monthly_cost($sum, $months, $fee, $startfee, $rate, $type, $flags, $country) {
         $monthsfee = ($flags == 0 ? $fee : 0);
         $startfee = ($flags == 0 ? $startfee : 0);
@@ -495,7 +497,69 @@ class BillmateCalc {
         $payarr = self::fulpacc($sum, $rate, $monthsfee, $minamount, $payment, $months, $account);
 
         return isset($payarr[0]) ? $payarr[0] : 0;
-    }
+    }*/
+
+	private static function _getPayArray($sum, $pclass, $flags)
+	{
+		$monthsfee = 0;
+		if ($flags === BillmateFlags::CHECKOUT_PAGE)
+			$monthsfee = $pclass['handlingfee'];
+
+		$startfee = 0;
+		if ($flags === BillmateFlags::CHECKOUT_PAGE)
+			$startfee = $pclass['startfee'];
+
+		$sum += $startfee;
+		$base   = true;//($pclass['type'] === BillmatePClass::ACCOUNT);
+		$lowest = self::get_lowest_payment_for_account($pclass['country']);
+
+		if ($flags == BillmateFlags::CHECKOUT_PAGE)
+			$minpay = $lowest;
+		else
+			$minpay = 0;
+
+		$payment = self::annuity(
+			$sum,
+			$pclass['nbrofmonths'],
+			$pclass['interestrate']
+		);
+		$payment += $monthsfee;
+
+		return self::fulpacc(
+			$sum,
+			$pclass['interestrate'],
+			$monthsfee,
+			$minpay,
+			$payment,
+			$pclass['nbrofmonths'],
+			$base
+		);
+	}
+
+	public static function calc_monthly_cost($sum, $pclass, $flags)
+	{
+		if (!is_numeric($sum))
+			throw new Exception('sum', 'numeric');
+
+		if (is_numeric($sum) && (!is_int($sum) || !is_float($sum)))
+			$sum = (float)$sum;
+
+		if (is_numeric($flags) && !is_int($flags))
+			$flags = (int)$flags;
+
+
+
+		$payarr = self::_getPayArray($sum, $pclass, $flags);
+		$value  = 0;
+		if (isset($payarr[0]))
+			$value = $payarr[0];
+
+		if (0 == $flags)
+			return round($value, 0);
+
+
+		return self::pRound($value, $pclass['country']);
+	}
 
     /**
      * Returns the lowest monthly payment for Billmate Account.
@@ -505,20 +569,20 @@ class BillmateCalc {
      */
     public static function get_lowest_payment_for_account($country) {
         switch ($country) {
-            case 209:
+            case 'se':
                 $lowest_monthly_payment = 50.0000;
                 break;
-            case 164:
+            case 'no':
                 $lowest_monthly_payment = 95.0000;
                 break;
-            case 73:
+            case 'fi':
                 $lowest_monthly_payment = 8.9500;
                 break;
-            case 59:
+            case 'dk':
                 $lowest_monthly_payment = 89.0000;
                 break;
-            case 81:
-            case 154:
+            case 'de':
+            case 'nl':
                 $lowest_monthly_payment = 6.9500;
                 break;
             default:
@@ -527,5 +591,19 @@ class BillmateCalc {
 
         return $lowest_monthly_payment;
     }
+	public static function pRound($value, $country)
+	{
+		$multiply = 1;
+		switch ($country)
+		{
+			case BillmateCountry::FI:
+			case BillmateCountry::DE:
+			case BillmateCountry::NL:
+				$multiply = 10;
+				break;
+		}
+
+		return floor(($value * $multiply) + 0.5) / $multiply;
+	}
 
 } // end BillmateCalc

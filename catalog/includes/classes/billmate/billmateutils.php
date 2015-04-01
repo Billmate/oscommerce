@@ -122,14 +122,19 @@ class BillmateUtils {
      * @param  array  $pclasses
      * @return array
      */
-    public static function get_cheapest_pclass($pclasses) {
+    public static function get_cheapest_pclass($pclasses,$total) {
         $lowest = false;
         $lowest_pp;
         foreach($pclasses as $pclass) {
-            if($pclass['type'] < 2) {
+            if($pclass['type'] < 2 && $total >= $pclass['minamount'] &&( $total <= $pclass['maxamount'] || $pclass['maxamount'] == 0)) {
+
                 if($pclass['minpay'] < $lowest_pp || !isset($lowest_pp)) {
-                    $lowest_pp = $pclass['minpay'];
-                    $lowest = $pclass;
+
+	                if($pclass['minpay'] >= BillmateCalc::get_lowest_payment_for_account($pclass['country']))
+	                {
+		                $lowest_pp = $pclass['minpay'];
+		                $lowest    = $pclass;
+	                }
                 }
             }
         }
@@ -159,16 +164,16 @@ class BillmateUtils {
         foreach($pclasses as &$pclass) {
 			$pclass['description'] = utf8_decode($pclass['description']);
 
-            if($total >= ($pclass['minamount']/100) && ($total <= ($pclass['maxamount']/100) || $pclass['maxamount'] == 0 ) ) {
+            if($total >= ($pclass['minamount']) && ($total <= ($pclass['maxamount']) || $pclass['maxamount'] == 0 ) ) {
                 if($pclass['type'] < 2) {
-                    $pclass['minpay'] = ceil(BillmateCalc::calc_monthly_cost($total, $pclass['nbrofmonths'], $pclass['handlingfee']/100, $pclass['startfee']/100, $pclass['interestrate']/100, $pclass['type'], $flags, $country));
+                    $pclass['minpay'] = ceil(BillmateCalc::calc_monthly_cost($total, $pclass, $flags));
 
                     $pclass['description'] = htmlentities($pclass['description']);
                     $pclass['text'] = $pclass['description']." - ".$currencies->format($pclass['minpay'], false);
 
                     //Norway only
                     if($country === $KRED_ISO3166_NO) {
-                        $pclass['tcpc'] = BillmateCalc::total_credit_purchase_cost($total, $pclass['interestrate']/100, $pclass['handlingfee']/100, $pclass['minpay'], $pclass['nbrofmonths'], $pclass['startfee']/100, $pclass['type']);
+                        $pclass['tcpc'] = BillmateCalc::total_credit_purchase_cost($total, $pclass['interestrate'], $pclass['handlingfee'], $pclass['minpay'], $pclass['nbrofmonths'], $pclass['startfee'], $pclass['type']);
                         $pclass['text'] .= " ".BILLMATE_LANG_NO_PAYMENTTEXT2_EACH." (* ".$currencies->format(ceil($pclass['tcpc']), false).")";
                     }
 
@@ -297,12 +302,12 @@ class BillmateUtils {
 		  `handlingfee` decimal(10,2) NOT NULL,
 		  `minamount` decimal(10,2) NOT NULL,
 		  `maxamount` decimal(15,2) NOT NULL,
-		  `country` int(10) NOT NULL,
+		  `country` varchar(5) NOT NULL,
 		  `type` int(10) NOT NULL,
 		  `expirydate` date NOT NULL,
 		  `interestrate` decimal(10,2) NOT NULL,
-		  `currency` int(10) NOT NULL,
-		  `language` int(10) NOT NULL,
+		  `currency` varchar(5) NOT NULL,
+		  `language` varchar(5) NOT NULL,
 		  `activated` int(10) NOT NULL,
 		  UNIQUE KEY `id` (`id`)
 		)");
@@ -338,7 +343,7 @@ class BillmateUtils {
 					tep_db_query("INSERT INTO `".$table."` (`eid`, `id`, `description`, `nbrofmonths`, `startfee`, `handlingfee`, `minamount`, `maxamount`, `country`, 
 								  `type`, `expirydate`, `interestrate`, `currency`, `language`, `activated`) VALUES ('".$eid."', '".$pclass_id."','".$pclass['description']."', 
 								  '".$pclass['nbrofmonths']."', '".$pclass['startfee']."', '".$pclass['handlingfee']."', '".$pclass['minamount']."', '".$pclass['maxamount']."', 
-								  '209', '".$pclass['type']."', '".$pclass['expirydate']."', '".$pclass['interestrate']."', '', '', '')");
+								  '".$pclass['country']."', '".$pclass['type']."', '".$pclass['expirydate']."', '".$pclass['interestrate']."', '".$pclass['currency']."', '".$pclass['language']."', '')");
 				endif;
             }
         }
