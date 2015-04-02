@@ -328,7 +328,7 @@ class pcbillmate {
     }
 
     function pre_confirmation_check() {
-        global $pcbillmate_testmode, $order, $GA_OLD, $KRED_SE_PNO, $user_billing;
+        global $pcbillmate_testmode, $order, $GA_OLD, $KRED_SE_PNO, $user_billing,$languages_id;
 
         //Set the right Host and Port
         $livemode = $this->pcbillmate_testmode == false;
@@ -370,6 +370,8 @@ class pcbillmate {
         $pnoencoding = $KRED_SE_PNO;
 
         $type = $GA_OLD;
+	    $languageCode = tep_db_fetch_array(tep_db_query("select code from languages where languages_id = " . $languages_id));
+	    if(!defined('BILLMATE_LANGUAGE')) define('BILLMATE_LANGUAGE',$languageCode['code']);
 
 		$k = new Billmate($eid,$secret,true, $this->pcbillmate_testmode, false);
 		$result = (object)$k->GetAddress(array('pno'=>$pno));
@@ -622,7 +624,7 @@ class pcbillmate {
     }
 
     function before_process() {
-        global $order, $customer_id, $currency, $currencies, $sendto, $billto, $pcbillmate_ot, $pcbillmate_testmode;
+        global $order, $customer_id, $currency, $currencies, $sendto, $billto, $pcbillmate_ot, $pcbillmate_testmode,$languages_id;
 
 		//Assigning billing session
 		$billmate_ot = $_SESSION['billmate_ot'];
@@ -734,7 +736,7 @@ class pcbillmate {
 					{
 						$percent = $value / $totals;
 						$price_without_tax_out = $price_without_tax * $percent;
-						$temp = mk_goods_flags(1, "", ($name).' '.(int)$tax.'Moms', $price_without_tax_out, $tax, 0, 0);
+						$temp = mk_goods_flags(1, "", ($name).' '.(int)$tax.'% '.MODULE_PAYMENT_PCBILLMATE_VAT, $price_without_tax_out, $tax, 0, 0);
 						$totalValue += $temp['withouttax'];
 						$taxValue += $temp['tax'];
 						$goodsList[] = $temp;
@@ -790,7 +792,7 @@ class pcbillmate {
 			"street2" 	=> "",
 			"zip" 		=> $order->delivery['postcode'],
 			"city" 		=> $order->delivery['city'],
-			"country" 	=> $countryData['country'],
+			"country" 	=> $order->delivery['country']['iso_code_2'],
 			"phone" 	=> $order->customer['telephone'],
         );
 		
@@ -802,7 +804,7 @@ class pcbillmate {
 			"street2" 	=> "",
 			"zip" 		=> $order->billing['postcode'],
 			"city" 		=> $order->billing['city'],
-			"country" 	=> $countryData['country'],
+			"country" 	=> $order->billing['country']['iso_code_2'],
 			"phone" 	=> $order->customer['telephone'],
 			"email" 	=> $order->customer['email_address'],
         );
@@ -818,12 +820,14 @@ class pcbillmate {
    
 		$ssl = true;
 		$debug = false;
+	    $languageCode = tep_db_fetch_array(tep_db_query("select code from languages where languages_id = " . $languages_id));
+	    if(!defined('BILLMATE_LANGUAGE')) define('BILLMATE_LANGUAGE',$languageCode['code']);
 		$k = new Billmate($eid,$secret,$ssl,$this->pcbillmate_testmode,$debug);
 		$invoiceValues = array();
 		$invoiceValues['PaymentData'] = array(	"method" => "4",		//1=Factoring, 2=Service, 4=PartPayment, 8=Card, 16=Bank, 24=Card/bank and 32=Cash.
 												"paymentplanid" => $pclass,
 												"currency" => "SEK",
-												"language" => "sv",
+												"language" => $languageCode['code'],
 												"country" => "SE",
 												"autoactivate" => "0",
 												"orderid" => (string)time(),
@@ -918,7 +922,7 @@ class pcbillmate {
     }
 
     function after_process() {
-        global $insert_id, $order;
+        global $insert_id, $order, $languages_id;
 
         $find_st_optional_field_query =
                 tep_db_query("show columns from " . TABLE_ORDERS);
@@ -951,6 +955,10 @@ class pcbillmate {
         $secret = MODULE_PAYMENT_PCBILLMATE_SECRET;
         $eid = MODULE_PAYMENT_PCBILLMATE_EID;
         $invno = $order->billmateref;
+
+	    $languageCode = tep_db_fetch_array(tep_db_query("select code from languages where languages_id = " . $languages_id));
+	    if(!defined('BILLMATE_LANGUAGE')) define('BILLMATE_LANGUAGE',$languageCode['code']);
+
 		$k = new Billmate($eid,$secret,true,$this->pcbillmate_testmode,false);
 		$k->UpdatePayment( array('PaymentData'=> array("number"=>$invno, "orderid"=>(string)$insert_id)) );
         return false;

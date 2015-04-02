@@ -5,7 +5,7 @@
  * Date: 15-04-01
  * Time: 13:28
  */
-global $user_billing, $language;
+global $user_billing, $language, $languages_id;
 	chdir('../../../../');
 	require('includes/application_top.php');
 	require(DIR_FS_CATALOG . DIR_WS_CLASSES . 'billmate/Billmate.php');
@@ -30,6 +30,9 @@ global $user_billing, $language;
 	}
 	$ssl = true;
 	$debug = false;
+
+	$languageCode = tep_db_fetch_array(tep_db_query("select code from languages where languages_id = " . $languages_id));
+	if(!defined('BILLMATE_LANGUAGE')) define('BILLMATE_LANGUAGE',$languageCode['code']);
 
 	$billmate = new BillMate($eid,$secret,true,$testmode,false);
 	$address = $billmate->getAddress(array('pno' => $_POST[$method.'_pnum']));

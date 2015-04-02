@@ -104,6 +104,7 @@ define('MODULE_PAYMENT_PCBILLMATE_CORRECT_ADDRESS', 'Din bokföringsadress:');
 define('MODULE_PAYMENT_PCBILLMATE_CORRECT_ADDRESS_OPTION', 'Klicka på Ja för att fortsätta med den nya adressen, Nej för att välja ett annat betalningssätt');
 define('MODULE_PAYMENT_PCBILLMATE_YES', 'Ja');
 define('MODULE_PAYMENT_PCBILLMATE_NO', 'Nej');
+	define('MODULE_PAYMENT_PCBILLMATE_VAT','Moms');
 
 define('MODULE_PAYMENT_PCBILLMATE_CHOOSEALTERNATIVES', 'V&auml;lj alternativ adress nedan');
 define('MODULE_PAYMENT_PCBILLMATE_ERRORDIVIDE', 'Billmate Konto - fel');

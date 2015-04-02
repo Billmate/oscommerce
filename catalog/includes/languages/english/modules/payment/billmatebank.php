@@ -27,6 +27,7 @@
   define('MODULE_PAYMENT_BILLMATEBANK_LIVEMODE_DESC', 'Do you want to use Billmate Bank LIVE server (true) or BETA server (false)?');
   define('MODULE_PAYMENT_BILLMATEBANK_TESTMODE_TITLE', 'Testmode');
   define('MODULE_PAYMENT_BILLMATEBANK_TESTMODE_DESC', 'Do you want to activate the Testmode? We will not pay for the invoices created with the test persons nor companies and we will not collect any fees as well.');
+	define('MODULE_PAYMENT_BILLMATEBANK_VAT','VAT');
 
   define('MODULE_PAYMENT_BILLMATEBANK_TEXT_TITLE', 'Billmate Bank');
   define('MODULE_PAYMENT_BILLMATEBANK_LANG_TESTMODE', '(TESTMODE)');

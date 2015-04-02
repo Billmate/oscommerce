@@ -55,6 +55,7 @@
   define('MODULE_PAYMENT_BILLMATECARDPAY_LIVEMODE_DESC', 'Do you want to use Billmate Cardpay LIVE server (true) or BETA server (false)?');
   define('MODULE_PAYMENT_BILLMATECARDPAY_TESTMODE_TITLE', 'Testmode');
   define('MODULE_PAYMENT_BILLMATECARDPAY_TESTMODE_DESC', 'Do you want to activate the Testmode? We will not pay for the invoices created with the test persons nor companies and we will not collect any fees as well.');
+	define('MODULE_PAYMENT_BILLMATECARDPAY_VAT','Moms');
 
   define('MODULE_PAYMENT_BILLMATECARDPAY_TEXT_TITLE', 'Billmate Cardpay');
   define('MODULE_PAYMENT_BILLMATECARDPAY_LANG_TESTMODE', '(TESTMODE)');

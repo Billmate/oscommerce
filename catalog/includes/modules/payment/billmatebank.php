@@ -490,7 +490,7 @@ class billmatebank {
 	function doInvoice(){
 	
 		 global $order, $customer_id, $currency, $currencies, $sendto, $billto,
-				   $billmatebank_ot, $billmatebank_livemode, $billmatebank_testmode,$insert_id,$cart_billmate_bank_ID;
+				   $billmatebank_ot, $billmatebank_livemode, $billmatebank_testmode,$insert_id,$cart_billmate_bank_ID,$languages_id;
 
 		$billmatebank_ot = $_SESSION['billmatebank_ot'];
         $livemode = $this->billmatebank_livemode;
@@ -596,7 +596,7 @@ class billmatebank {
 	                {
 		                $percent = $value / $totals;
 		                $price_without_tax_out = $price_without_tax * $percent;
-		                $temp = mk_goods_flags(1, "", ($name).' '.(int)$tax.'Moms', $price_without_tax_out, $tax, 0, 0);
+		                $temp = mk_goods_flags(1, "", ($name).' '.(int)$tax.'% '.MODULE_PAYMENT_BILLMATEBANK_VAT, $price_without_tax_out, $tax, 0, 0);
 		                $totalValue += $temp['withouttax'];
 		                $taxValue += $temp['tax'];
 		                $goodsList[] = $temp;
@@ -610,7 +610,6 @@ class billmatebank {
         $eid = (int)MODULE_PAYMENT_BILLMATEBANK_EID;
 		$pclass = -1;
 		$ship_address = $bill_address = array();
-		$countryData = BillmateCountry::getSwedenData();
 		
         $ship_address = array(
 			"firstname" => $order->delivery['firstname'],
@@ -620,7 +619,7 @@ class billmatebank {
 			"street2" 	=> "",
 			"zip" 		=> $order->delivery['postcode'],
 			"city" 		=> $order->delivery['city'],
-			"country" 	=> $order->delivery['country']['title'],
+			"country" 	=> $order->delivery['country']['iso_code_2'],
 			"phone" 	=> $order->customer['telephone'],
         );
 		
@@ -632,7 +631,7 @@ class billmatebank {
 			"street2" 	=> "",
 			"zip" 		=> $order->billing['postcode'],
 			"city" 		=> $order->billing['city'],
-			"country" 	=> $order->billing['country']['title'],
+			"country" 	=> $order->billing['country']['iso_code_2'],
 			"phone" 	=> $order->customer['telephone'],
 			"email" 	=> $order->customer['email_address'],
         );
@@ -648,12 +647,14 @@ class billmatebank {
 
 		$ssl = true;
 		$debug = false;
+		$languageCode = tep_db_fetch_array(tep_db_query("select code from languages where languages_id = " . $languages_id));
+		if(!defined('BILLMATE_LANGUAGE')) define('BILLMATE_LANGUAGE',$languageCode['code']);
 		$k = new Billmate($eid,$secret,$ssl,$this->billmatebank_testmode,$debug);
 		$invoiceValues = array();
 		$invoiceValues['PaymentData'] = array(	"method" => "16",		//1=Factoring, 2=Service, 4=PartPayment, 8=Card, 16=Bank, 24=Card/bank and 32=Cash.
 												"paymentplanid" => $pclass,
 												"currency" => "SEK",
-												"language" => "sv",
+												"language" => $languageCode['code'],
 												"country" => "SE",
 												"autoactivate" => (MODULE_PAYMENT_BILLMATEBANK_AUTHENTICATION_MODE == 'sale')?1:0,
 												"orderid" => (string)$cart_billmate_bank_ID,
@@ -714,7 +715,7 @@ class billmatebank {
 	
     function before_process() {
 		global $order, $customer_id, $currency, $currencies, $sendto, $billto,$already_completed,
-               $billmatebank_ot, $billmatebank_livemode, $billmatebank_testmode,$insert_id, $cart_billmate_bank_ID,$payment;
+               $billmatebank_ot, $billmatebank_livemode, $billmatebank_testmode,$insert_id, $cart_billmate_bank_ID,$payment,$languages_id;
 		global $$payment,$cartID, $cart;;
 	
 		require(DIR_FS_CATALOG . DIR_WS_CLASSES . 'billmate/billmateutils.php');
@@ -790,6 +791,8 @@ class billmatebank {
 		{
 			if (MODULE_PAYMENT_BILLMATEBANK_AUTHENTICATION_MODE != 'sale')
 			{
+				$languageCode = tep_db_fetch_array(tep_db_query("select code from languages where languages_id = " . $languages_id));
+				if(!defined('BILLMATE_LANGUAGE')) define('BILLMATE_LANGUAGE',$languageCode['code']);
 				$k       = new Billmate($eid, $secret, $ssl, $this->billmatebank_testmode, $debug);
 				$result1 = (object)($k->UpdatePayment(array('PaymentData' => array("number"  => $_DATA['number'],
 				                                                                   "orderid" => (string)$_DATA['order_id']

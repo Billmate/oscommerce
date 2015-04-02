@@ -85,6 +85,7 @@ define('MODULE_PAYMENT_BILLMATE_CORRECT_ADDRESS', 'Correct Address is :');
 define('MODULE_PAYMENT_BILLMATE_CORRECT_ADDRESS_OPTION', 'Click Yes to continue with new address, No to choose other payment method');
 define('MODULE_PAYMENT_BILLMATE_YES', 'Yes');
 define('MODULE_PAYMENT_BILLMATE_NO', 'No');
+define('MODULE_PAYMENT_BILLMATE_VAT','VAT');
 define('MODULE_PAYMENT_BILLMATE_CHOOSEALTERNATIVES', 'Choose alternative address below');
 define('MODULE_PAYMENT_BILLMATE_ERRORINVOICE', 'Billmate - Failed');
 

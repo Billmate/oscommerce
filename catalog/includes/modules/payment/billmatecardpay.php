@@ -633,7 +633,7 @@ class billmatecardpay {
 	                {
 		                $percent = $value / $totals;
 		                $price_without_tax_out = $price_without_tax * $percent;
-		                $temp = mk_goods_flags(1, "", ($name).' '.(int)$tax.'Moms', $price_without_tax_out, $tax, 0, 0);
+		                $temp = mk_goods_flags(1, "", ($name).' '.(int)$tax.'% '.MODULE_PAYMENT_BILLMATECARDPAY_VAT, $price_without_tax_out, $tax, 0, 0);
 		                $totalValue += $temp['withouttax'];
 		                $taxValue += $temp['tax'];
 		                $goodsList[] = $temp;
@@ -657,7 +657,7 @@ class billmatecardpay {
 			"street2" 	=> "",
 			"zip" 		=> $order->delivery['postcode'],
 			"city" 		=> $order->delivery['city'],
-			"country" 	=> $order->delivery['country']['title'],
+			"country" 	=> $order->delivery['country']['iso_code_2'],
 			"phone" 	=> $order->customer['telephone'],
         );
 		
@@ -669,7 +669,7 @@ class billmatecardpay {
 			"street2" 	=> "",
 			"zip" 		=> $order->billing['postcode'],
 			"city" 		=> $order->billing['city'],
-			"country" 	=> $order->billing['country']['title'],
+			"country" 	=> $order->billing['country']['iso_code_2'],
 			"phone" 	=> $order->customer['telephone'],
 			"email" 	=> $order->customer['email_address'],
         );
@@ -685,12 +685,14 @@ class billmatecardpay {
    
 		$ssl = true;
 		$debug = false;
+		$languageCode = tep_db_fetch_array(tep_db_query("select code from languages where languages_id = " . $languages_id));
+		if(!defined('BILLMATE_LANGUAGE')) define('BILLMATE_LANGUAGE',$languageCode['code']);
 		$k = new Billmate($eid,$secret,$ssl,$this->billmatecardpay_testmode,$debug);
 		$invoiceValues = array();
 		$invoiceValues['PaymentData'] = array(	"method" => "8",		//1=Factoring, 2=Service, 4=PartPayment, 8=Card, 16=Bank, 24=Card/bank and 32=Cash.
 												"paymentplanid" => $pclass,
 												"currency" => $currency, //"SEK",
-												"language" => "sv",
+												"language" => $languageCode['code'],
 												"country" => "SE",
 												"autoactivate" => (MODULE_PAYMENT_BILLMATECARDPAY_AUTHENTICATION_MODE == 'sale')?1:0,
 												"orderid" => (string)$cart_billmate_card_ID,
@@ -832,6 +834,8 @@ class billmatecardpay {
 
 		if( (MODULE_PAYMENT_BILLMATECARDPAY_AUTHENTICATION_MODE != 'sale') ) {
 			if(!$already_completed ){
+				$languageCode = tep_db_fetch_array(tep_db_query("select code from languages where languages_id = " . $languages_id));
+				if(!defined('BILLMATE_LANGUAGE')) define('BILLMATE_LANGUAGE',$languageCode['code']);
 				$k = new Billmate($eid,$secret,$ssl, $this->billmatecardpay_testmode,$debug);
 				$result1 = (object)$k->UpdatePayment( array('PaymentData'=> array("number"=>$_DATA['number'], "orderid"=>(string)$_DATA['order_id'])));
 			}

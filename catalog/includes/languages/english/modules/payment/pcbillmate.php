@@ -109,6 +109,7 @@ define('MODULE_PAYMENT_PCBILLMATE_CONDITIONS','<a id="terms-delbetalning" href="
 		</script>');
 define('MODULE_PAYMENT_PCBILLMATE_ADDR_NOTICE','Your billing and shipping address will be automatically updated to your registered address.');
 define('MODULE_PAYMENT_PCBILLMATE_CHOOSECONSUMERCREDIT','Select installment');
+	define('MODULE_PAYMENT_PCBILLMATE_VAT','VAT');
 
 define('MODULE_PAYMENT_PCBILLMATE_TITLE', 'Billmate part payment from xx / month'); //replace xx with amount + currency (e.g. 100 kr)
 define('MODULE_PAYMENT_PCBILLMATE_WITHOUT_TAX', 'Prices are excluding VAT');

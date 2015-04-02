@@ -90,6 +90,7 @@ define('MODULE_PAYMENT_BILLMATE_CORRECT_ADDRESS', 'Din bokföringsadress:');
 define('MODULE_PAYMENT_BILLMATE_CORRECT_ADDRESS_OPTION', 'Klicka på Ja för att fortsätta med den nya adressen, Nej för att välja ett annat betalningssätt');
 define('MODULE_PAYMENT_BILLMATE_YES', 'Ja');
 define('MODULE_PAYMENT_BILLMATE_NO', 'Nej');
+define('MODULE_PAYMENT_BILLMATE_VAT','Moms');
 
 define('MODULE_PAYMENT_BILLMATE_CHOOSEALTERNATIVES', 'V&auml;lj alternativ adress nedan');
 define('MODULE_PAYMENT_BILLMATE_ERRORINVOICE', 'Billmate - misslyckades');
