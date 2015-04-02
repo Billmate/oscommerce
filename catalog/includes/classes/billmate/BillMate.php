@@ -38,7 +38,7 @@ class BillMate{
 	function BillMate($id,$key,$ssl=true,$test=false,$debug=false,$referer=array()){
 		$this->ID = $id;
 		$this->KEY = $key;
-        defined('BILLMATE_CLIENT') || define('BILLMATE_CLIENT',  "BillMate:2.1.6" );
+        defined('BILLMATE_CLIENT') || define('BILLMATE_CLIENT',  "BillMate:2.1.6:osCommerce:2.0" );
         defined('BILLMATE_SERVER') || define('BILLMATE_SERVER',  "2.0.6" );
         defined('BILLMATE_LANGUAGE') || define('BILLMATE_LANGUAGE',  "" );
 		$this->SSL = $ssl;
