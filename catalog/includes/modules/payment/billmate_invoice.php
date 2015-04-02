@@ -70,7 +70,7 @@ class billmate_invoice {
                 true : false);
 
         $currencyValid = array('SEK','EUR','USD','DKK','NOK','GBP');
-        $countryValid  = array('SE');
+        $countryValid  = array('se');
         $enabled_countries = explode(',',
                                 trim( 
                                     strtolower(MODULE_PAYMENT_BILLMATE_ENABLED_COUNTRYIES),
@@ -87,7 +87,7 @@ class billmate_invoice {
         }
         else {
             if(is_array($billing)) {
-                if(!in_array(strtoupper($billing['country']['iso_code_2']),$availablecountries)) {
+                if(!in_array(strtolower($billing['country']['iso_code_2']),$availablecountries)) {
                     $this->enabled = false;
                 }
             }
@@ -96,10 +96,10 @@ class billmate_invoice {
                 $result = tep_db_fetch_array($query);
         
                 if(is_array($result)) {
-                    if(!in_array(strtoupper($result['countries_iso_code_2']),$countryValid)) {
+                    if(!in_array(strtolower($result['countries_iso_code_2']),$countryValid)) {
                         $this->enabled = false;
                     }
-                    $this->enabled = $this->enabled && in_array(strtoupper($result['countries_iso_code_2']),$enabled_countries);
+                    $this->enabled = $this->enabled && in_array(strtolower($result['countries_iso_code_2']),$enabled_countries);
                 }
                 else {
                     $this->enabled = false;
