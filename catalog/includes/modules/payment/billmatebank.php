@@ -608,7 +608,7 @@ class billmatebank {
 
         $secret = (float)MODULE_PAYMENT_BILLMATEBANK_SECRET;
         $eid = (int)MODULE_PAYMENT_BILLMATEBANK_EID;
-		$pclass = -1;
+
 		$ship_address = $bill_address = array();
 		
         $ship_address = array(
@@ -652,7 +652,6 @@ class billmatebank {
 		$k = new Billmate($eid,$secret,$ssl,$this->billmatebank_testmode,$debug);
 		$invoiceValues = array();
 		$invoiceValues['PaymentData'] = array(	"method" => "16",		//1=Factoring, 2=Service, 4=PartPayment, 8=Card, 16=Bank, 24=Card/bank and 32=Cash.
-												"paymentplanid" => $pclass,
 												"currency" => "SEK",
 												"language" => $languageCode['code'],
 												"country" => "SE",

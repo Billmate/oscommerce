@@ -723,7 +723,7 @@ class billmate_invoice {
         $ready_date = "";
 
         $pno   = BillmateUtils::convertData($_POST['billmate_pnum1']);
-		$pclass = -1;
+
 		$ship_address = $bill_address = array();
         $countryData = BillmateCountry::getCountryData($order->billing['country']['iso_code_3']);
 	
@@ -773,7 +773,6 @@ class billmate_invoice {
 		$k = new Billmate($eid,$secret,$ssl,$this->billmate_testmode,$debug);
 		$invoiceValues = array();
 		$invoiceValues['PaymentData'] = array(	"method" => "1",		//1=Factoring, 2=Service, 4=PartPayment, 8=Card, 16=Bank, 24=Card/bank and 32=Cash.
-												"paymentplanid" => $pclass,
 												"currency" => strtoupper($currency),
 												"language" => $languageCode['code'],
 												"country" => "SE",
