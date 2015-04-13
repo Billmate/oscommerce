@@ -19,13 +19,13 @@ global $user_billing, $language, $languages_id;
 	if($method == 'billmate_invoice')
 	{
 		$method = 'billmate';
-		$secret   = (float)MODULE_PAYMENT_BILLMATE_SECRET;
-		$eid      = (int)MODULE_PAYMENT_BILLMATE_EID;
+		$secret   = MODULE_PAYMENT_BILLMATE_SECRET;
+		$eid      = MODULE_PAYMENT_BILLMATE_EID;
 		$testmode = ((MODULE_PAYMENT_BILLMATE_TESTMODE == 'True')) ? true : false;
 	}
 	if($method == 'pcbillmate'){
-		$secret   = (float)MODULE_PAYMENT_PCBILLMATE_SECRET;
-		$eid      = (int)MODULE_PAYMENT_PCBILLMATE_EID;
+		$secret   = MODULE_PAYMENT_PCBILLMATE_SECRET;
+		$eid      = MODULE_PAYMENT_PCBILLMATE_EID;
 		$testmode = ((MODULE_PAYMENT_PCBILLMATE_TESTMODE == 'True')) ? true : false;
 	}
 	$ssl = true;

@@ -324,8 +324,8 @@ class billmate_invoice {
         }
 
         $pno = $this->billmate_pnum = $_POST['billmate_pnum'];
-        $eid = (int)MODULE_PAYMENT_BILLMATE_EID;
-        $secret = (int)MODULE_PAYMENT_BILLMATE_SECRET;
+        $eid = MODULE_PAYMENT_BILLMATE_EID;
+        $secret = MODULE_PAYMENT_BILLMATE_SECRET;
 		$ssl = true;
 		$debug = false;
 
@@ -597,8 +597,8 @@ class billmate_invoice {
         $order->billing['city'] = $_POST['billmate_city'.$addr_num];
 		$order->billing['suburb'] = $order->delivery['suburb'] = '';
 
-        $eid = (int)MODULE_PAYMENT_BILLMATE_EID;
-        $secret = (int)MODULE_PAYMENT_BILLMATE_SECRET;
+        $eid = MODULE_PAYMENT_BILLMATE_EID;
+        $secret = MODULE_PAYMENT_BILLMATE_SECRET;
 
         $estoreUser = $customer_id;
         $goodsList = array();
@@ -772,9 +772,10 @@ class billmate_invoice {
 
 		$k = new Billmate($eid,$secret,$ssl,$this->billmate_testmode,$debug);
 		$invoiceValues = array();
+        $lang = $languageCode['code'] == 'se' ? 'sv' : $languageCode['code'];
 		$invoiceValues['PaymentData'] = array(	"method" => "1",		//1=Factoring, 2=Service, 4=PartPayment, 8=Card, 16=Bank, 24=Card/bank and 32=Cash.
 												"currency" => strtoupper($currency),
-												"language" => $languageCode['code'],
+												"language" => $lang,
 												"country" => "SE",
 												"autoactivate" => "0",
 												"orderid" => (string)time(),

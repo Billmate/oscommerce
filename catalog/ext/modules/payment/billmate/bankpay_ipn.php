@@ -33,8 +33,8 @@ if(!class_exists('Encoding',false)){
 	if(isset($_DATA['status']) || $_DATA['status'] == 'Paid'){
 		if (isset($_DATA['order_id']) && ($_DATA['order_id'] > 0)) {
 
-			$secret = (float)MODULE_PAYMENT_BILLMATEBANK_SECRET;
-			$eid = (int)MODULE_PAYMENT_BILLMATEBANK_EID;
+			$secret = MODULE_PAYMENT_BILLMATEBANK_SECRET;
+			$eid = MODULE_PAYMENT_BILLMATEBANK_EID;
 			$ssl = true;
 			$debug = false;
 			$testmode = ((MODULE_PAYMENT_BILLMATEBANK_TESTMODE == 'True')) ? true : false;

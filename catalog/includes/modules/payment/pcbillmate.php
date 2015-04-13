@@ -364,8 +364,8 @@ class pcbillmate {
 
         $pno = $this->pcbillmate_pnum = $_POST['pcbillmate_pnum'];
         $_SESSION['pcbillmate_pclass'] = $this->pcbillmate_pclass = $_POST['pcbillmate_pclass'];
-        $eid = (int)MODULE_PAYMENT_PCBILLMATE_EID;
-        $secret = (int)MODULE_PAYMENT_PCBILLMATE_SECRET;
+        $eid = MODULE_PAYMENT_PCBILLMATE_EID;
+        $secret = MODULE_PAYMENT_PCBILLMATE_SECRET;
 
         $pnoencoding = $KRED_SE_PNO;
 
@@ -634,7 +634,7 @@ class pcbillmate {
 
         require(DIR_FS_CATALOG . DIR_WS_CLASSES . 'billmate/billmateutils.php');
 
-        $eid = (int)MODULE_PAYMENT_PCBILLMATE_EID;
+        $eid = MODULE_PAYMENT_PCBILLMATE_EID;
         $estoreUser = $customer_id;
         $goodsList = array();
 		$shippingPrice = 0; $shippingTaxRate = 0;
@@ -824,10 +824,11 @@ class pcbillmate {
 	    if(!defined('BILLMATE_LANGUAGE')) define('BILLMATE_LANGUAGE',$languageCode['code']);
 		$k = new Billmate($eid,$secret,$ssl,$this->pcbillmate_testmode,$debug);
 		$invoiceValues = array();
+        $lang = $languageCode['code'] == 'se' ? 'sv' : $languageCode['code'];
 		$invoiceValues['PaymentData'] = array(	"method" => "4",		//1=Factoring, 2=Service, 4=PartPayment, 8=Card, 16=Bank, 24=Card/bank and 32=Cash.
 												"paymentplanid" => $pclass,
 												"currency" => "SEK",
-												"language" => $languageCode['code'],
+												"language" => $lang,
 												"country" => "SE",
 												"autoactivate" => "0",
 												"orderid" => (string)time(),
@@ -1036,8 +1037,8 @@ class pcbillmate {
         $filename = explode('?', basename($_SERVER['REQUEST_URI'], 0));//[0];
 
         if ($filename[0] == "modules.php") {
-                $eid = (int)MODULE_PAYMENT_PCBILLMATE_EID;
-                $secret = (int)MODULE_PAYMENT_PCBILLMATE_SECRET;
+                $eid = MODULE_PAYMENT_PCBILLMATE_EID;
+                $secret = MODULE_PAYMENT_PCBILLMATE_SECRET;
 
                 $result = false;
 				$additionalinfo['PaymentData'] = array(

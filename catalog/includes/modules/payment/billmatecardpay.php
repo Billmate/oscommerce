@@ -430,7 +430,7 @@ class billmatecardpay {
             }
           }
 
-          $cart_billmate_card_ID = $cartID . '-' . $insert_id;
+          $cart_billmate_card_ID = !empty($cartID) ?$cartID : substr(time(),0,2) . '-' . $insert_id;
           tep_session_register('cart_billmate_card_ID');
         }
         return array('title' => MODULE_PAYMENT_BILLMATECARDPAY_TEXT_CONFIRM_DESCRIPTION);
@@ -538,6 +538,7 @@ class billmatecardpay {
         $n = sizeof($order->products);
 		$totalValue = 0;
 		$taxValue = 0;
+    $codes = array();
 		$prepareDiscounts = array();
         // First all the ordinary items
         for ($i = 0 ; $i < $n ; $i++) {
@@ -625,8 +626,11 @@ class billmatecardpay {
                 if(DISPLAY_PRICE_WITH_TAX == 'true') {
 					$price_without_tax = $price_without_tax/(($tax+100)/100);
                 }
+
+                $codes[] = $code;
 				if( $code == 'ot_discount' ) { $price_without_tax = 0 - $price_without_tax; }
 				if( $code == 'ot_shipping' ){ $shippingPrice = $price_without_tax; $shippingTaxRate = $tax; continue; }
+
                 if ($value != "" && $value != 0) {
 	                $totals = $totalValue;
 	                foreach($prepareDiscounts as $tax => $value)
@@ -643,8 +647,8 @@ class billmatecardpay {
             }
         }
 
-        $secret = (float)MODULE_PAYMENT_BILLMATECARDPAY_SECRET;
-        $eid = (int)MODULE_PAYMENT_BILLMATECARDPAY_EID;
+        $secret = MODULE_PAYMENT_BILLMATECARDPAY_SECRET;
+        $eid = MODULE_PAYMENT_BILLMATECARDPAY_EID;
 
 		$ship_address = $bill_address = array();
 		$countryData = BillmateCountry::getSwedenData();
@@ -687,11 +691,12 @@ class billmatecardpay {
 		$debug = false;
 		$languageCode = tep_db_fetch_array(tep_db_query("select code from languages where languages_id = " . $languages_id));
 		if(!defined('BILLMATE_LANGUAGE')) define('BILLMATE_LANGUAGE',$languageCode['code']);
-		$k = new Billmate($eid,$secret,$ssl,$this->billmatecardpay_testmode,$debug);
+		$k = new Billmate($eid,$secret,$ssl,$this->billmatecardpay_testmode,$debug,$codes);
 		$invoiceValues = array();
+    $lang = $languageCode['code'] == 'se' ? 'sv' : $languageCode['code'];
 		$invoiceValues['PaymentData'] = array(	"method" => "8",		//1=Factoring, 2=Service, 4=PartPayment, 8=Card, 16=Bank, 24=Card/bank and 32=Cash.
 												"currency" => $currency, //"SEK",
-												"language" => $languageCode['code'],
+												"language" => $lang,
 												"country" => "SE",
 												"autoactivate" => (MODULE_PAYMENT_BILLMATECARDPAY_AUTHENTICATION_MODE == 'sale')?1:0,
 												"orderid" => (string)$cart_billmate_card_ID,
@@ -826,8 +831,8 @@ class billmatecardpay {
 		include_once(DIR_FS_CATALOG . DIR_WS_CLASSES."/billmate/lib/xmlrpc.inc");
 		include_once(DIR_FS_CATALOG . DIR_WS_CLASSES."/billmate/lib/xmlrpcs.inc");
 		
-        $secret = (float)MODULE_PAYMENT_BILLMATECARDPAY_SECRET;
-        $eid = (int)MODULE_PAYMENT_BILLMATECARDPAY_EID;
+        $secret = MODULE_PAYMENT_BILLMATECARDPAY_SECRET;
+        $eid = MODULE_PAYMENT_BILLMATECARDPAY_EID;
 		$ssl = true;
 		$debug = false;
 

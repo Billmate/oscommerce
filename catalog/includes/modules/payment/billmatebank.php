@@ -606,8 +606,8 @@ class billmatebank {
             }
         }
 
-        $secret = (float)MODULE_PAYMENT_BILLMATEBANK_SECRET;
-        $eid = (int)MODULE_PAYMENT_BILLMATEBANK_EID;
+        $secret = MODULE_PAYMENT_BILLMATEBANK_SECRET;
+        $eid = MODULE_PAYMENT_BILLMATEBANK_EID;
 
 		$ship_address = $bill_address = array();
 		
@@ -651,9 +651,10 @@ class billmatebank {
 		if(!defined('BILLMATE_LANGUAGE')) define('BILLMATE_LANGUAGE',$languageCode['code']);
 		$k = new Billmate($eid,$secret,$ssl,$this->billmatebank_testmode,$debug);
 		$invoiceValues = array();
+    $lang = $languageCode['code'] == 'se' ? 'sv' : $languageCode['code'];
 		$invoiceValues['PaymentData'] = array(	"method" => "16",		//1=Factoring, 2=Service, 4=PartPayment, 8=Card, 16=Bank, 24=Card/bank and 32=Cash.
 												"currency" => "SEK",
-												"language" => $languageCode['code'],
+												"language" => $lang,
 												"country" => "SE",
 												"autoactivate" => (MODULE_PAYMENT_BILLMATEBANK_AUTHENTICATION_MODE == 'sale')?1:0,
 												"orderid" => (string)$cart_billmate_bank_ID,
@@ -781,8 +782,8 @@ class billmatebank {
 		include_once(DIR_FS_CATALOG . DIR_WS_CLASSES."/billmate/lib/xmlrpc.inc");
 		include_once(DIR_FS_CATALOG . DIR_WS_CLASSES."/billmate/lib/xmlrpcs.inc");
 		
-		$secret = (float)MODULE_PAYMENT_BILLMATEBANK_SECRET;
-        $eid = (int)MODULE_PAYMENT_BILLMATEBANK_EID;
+		$secret = MODULE_PAYMENT_BILLMATEBANK_SECRET;
+        $eid = MODULE_PAYMENT_BILLMATEBANK_EID;
 		$ssl = true;
 		$debug = false;
 		
