@@ -297,7 +297,14 @@ class pcbillmate {
 
         $fields=array(
                 array('title' => BILLMATE_LANG_SE_IMGCONSUMERCREDIT,
-                        'field' => $js.$error),
+                        'field' => '<script type="text/javascript">
+                          if(!window.jQuery){
+	                          var jq = document.createElement("script");
+	                          jq.type = "text/javascript";
+	                          jq.src = "'.HTTP_SERVER.DIR_WS_HTTP_CATALOG.'jquery.js";
+	                          document.getElementsByTagName("head")[0].appendChild(jq);
+                          }
+</script>'.$js.$error),
                 array('title' => sprintf(MODULE_PAYMENT_PCBILLMATE_CONDITIONS, $eid),
 	                'field' => "<a href=\"#\" id=\"pcbillmate\" onclick=\"ShowBillmateInvoicePopup(event);return false;\"></a>"),
                 array('title' => MODULE_PAYMENT_PCBILLMATE_CHOOSECONSUMERCREDIT,

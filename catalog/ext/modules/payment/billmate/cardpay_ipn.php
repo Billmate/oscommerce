@@ -28,7 +28,7 @@ if(!class_exists('Encoding',false)){
 	$response = file_get_contents("php://input");
 	$input = json_decode($response, true);
 	$_DATA = $input['data'];
-	$_DATA['order_id'] = substr($_DATA['orderid'], strpos($_DATA['orderid'], '-')+1);
+	$_DATA['order_id']= $_DATA['orderid'];
 
 	if(isset($_DATA['status']) || $_DATA['status'] == 'Paid'){
 		if (isset($_DATA['order_id']) && ($_DATA['order_id'] > 0)) {

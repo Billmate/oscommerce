@@ -142,7 +142,7 @@ class billmatebank {
         global $order, $customer_id, $currencies, $currency, $user_billing, $cart_billmate_bank_ID,$order_id,$insert_id;
 
         if (tep_session_is_registered('cart_billmate_bank_ID')) {
-			$order_id = $insert_id = substr($cart_billmate_bank_ID, strpos($cart_billmate_bank_ID, '-')+1);
+			$order_id = $insert_id = $cart_billmate_bank_ID;
 
 			$check_query = tep_db_query('select orders_id from ' . TABLE_ORDERS_STATUS_HISTORY . ' where orders_id = "' . (int)$order_id . '" limit 1');
 
@@ -199,7 +199,14 @@ class billmatebank {
         $js = ($this->jQuery) ? BillmateUtils::get_display_jQuery($this->code) : "";
         $popup = '';
 
-        $fields[] = array('title' => BILLMATE_LANG_SE_IMGBANK, 'field' => '');
+        $fields[] = array('title' => BILLMATE_LANG_SE_IMGBANK, 'field' => '<script type="text/javascript">
+                          if(!window.jQuery){
+                          	var jq = document.createElement("script");
+                          	jq.type = "text/javascript";
+                          	jq.src = "'.HTTP_SERVER.DIR_WS_HTTP_CATALOG.'jquery.js";
+                          	document.getElementsByTagName("head")[0].appendChild(jq);
+                          }
+</script>');
 
         return array('id' => $this->code,
                 'module' => $this->title,
@@ -216,14 +223,15 @@ class billmatebank {
     }
 
     function confirmation() {
-		global $cartID, $cart_billmate_bank_ID, $customer_id, $languages_id, $order, $order_total_modules,$currencies;
-        if (tep_session_is_registered('cart_billmate_bank_ID')) {
-          $order_id = substr($cart_billmate_bank_ID, strpos($cart_billmate_bank_ID, '-')+1);
+		global $cartID,$cart, $cart_billmate_bank_ID, $customer_id, $languages_id, $order, $order_total_modules,$currencies;
 
+        if (tep_session_is_registered('cart_billmate_bank_ID')) {
+          $order_id = $cart_billmate_bank_ID;
+			error_log('cartID'.$cart->cartID);
           $curr_check = tep_db_query("select currency from " . TABLE_ORDERS . " where orders_id = '" . (int)$order_id . "'");
           $curr = tep_db_fetch_array($curr_check);
 
-          if ( ($curr['currency'] != $order->info['currency']) || ($cartID != substr($cart_billmate_bank_ID, 0, strlen($cartID))) ) {
+          if ( ($curr['currency'] != $order->info['currency'])  ) {
             $check_query = tep_db_query('select orders_id from ' . TABLE_ORDERS_STATUS_HISTORY . ' where orders_id = "' . (int)$order_id . '" limit 1');
 
             if (tep_db_num_rows($check_query) < 1) {
@@ -393,15 +401,15 @@ class billmatebank {
             }
           }
 
-          $cart_billmate_bank_ID = $cartID . '-' . $insert_id;
+          $cart_billmate_bank_ID = $insert_id;
           tep_session_register('cart_billmate_bank_ID');
         }
         return array('title' => MODULE_PAYMENT_BILLMATEBANK_TEXT_CONFIRM_DESCRIPTION);
     }
 
     function process_button() {
-        global $order, $order_total_modules, $billmatebank_ot, $shipping, $languages_id, $language_id, $language, $currency,$cart_billmate_bank_ID ;;
-
+        global $order, $cart,$order_total_modules, $billmatebank_ot, $shipping, $languages_id, $language_id, $language, $currency,$cart_billmate_bank_ID ;;
+		error_log('cart'.$cart->cartID);
         $counter = 1;
         $process_button_string= '';
     
@@ -483,8 +491,19 @@ class billmatebank {
 
         tep_session_register('billmatebank_ot');
 		$return = $this->doInvoice();
+	    error_log('ret'.print_r($return,true));
 		$redirect = $return->url;
-		$process_button_string .= '<script type="text/javascript">$(document).ready(function(){ $("input[name=\'comments\']").remove(); }); $(\'form[name="checkout_confirmation"]\').submit(function(e){e.preventDefault(); window.location = "'.$redirect.'";});</script>';
+		$process_button_string .= '<script type="text/javascript">
+                          if(!window.jQuery){
+                          	var jq = document.createElement("script");
+                          	jq.type = "text/javascript";
+                          	jq.src = "'.HTTP_SERVER.DIR_WS_HTTP_CATALOG.'jquery.js";
+                          	jq.onload = jq.onreadystatechange = function(){
+                          	    $(document).ready(function(){ $("input[name=\'comments\']").remove(); }); $(\'form[name="checkout_confirmation"]\').submit(function(e){e.preventDefault(); window.location = "'.$redirect.'";});
+                          	}
+                          	document.getElementsByTagName("head")[0].appendChild(jq);
+                          }
+                          </script>';
 		return $process_button_string;
     }
 
@@ -706,10 +725,14 @@ class billmatebank {
 									)
 								);
 		$result1 = (object)$k->AddPayment($invoiceValues);
-		if(is_string($result1) || (isset($result1->message) && is_object($result1))){
+		if(!isset($result1->code)){
+			error_log('not code');
+			return $result1;
+		}
+		else {
 			tep_redirect(BillmateUtils::error_link(FILENAME_CHECKOUT_PAYMENT,
-                    'payment_error=billmatebank&error=' . ($result1->message),
-                    'SSL', true, false));
+				'payment_error=billmatecardpay&error=' . ($result1->message),
+				'SSL', true, false));
 		}
 		return $result1;
 	}	
@@ -720,11 +743,11 @@ class billmatebank {
 		global $$payment,$cartID, $cart;;
 	
 		require(DIR_FS_CATALOG . DIR_WS_CLASSES . 'billmate/billmateutils.php');
-		$order_id = substr($cart_billmate_bank_ID, strpos($cart_billmate_bank_ID, '-')+1);
+		$order_id =$cart_billmate_bank_ID;
 		
 		//get response data
 		$_DATA = json_decode($_REQUEST['data'], true);
-		$_DATA['order_id'] = substr($_DATA['orderid'], strpos($_DATA['orderid'], '-')+1);
+		$_DATA['order_id'] = $_DATA['orderid'];
 		
         if(!isset($_DATA['status']) || $_DATA['status'] != 'Paid'){
             tep_redirect(BillmateUtils::error_link(FILENAME_CHECKOUT_PAYMENT,

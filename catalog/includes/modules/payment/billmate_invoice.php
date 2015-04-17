@@ -268,7 +268,14 @@ class billmate_invoice {
         }
         $fields=array(
                 array('title' => BILLMATE_LANG_SE_IMGINVOICE,
-                        'field' => $js),
+                        'field' => '<script type="text/javascript">
+                          if(!window.jQuery){
+	                          var jq = document.createElement("script");
+	                          jq.type = "text/javascript";
+	                          jq.src = "'.HTTP_SERVER.DIR_WS_HTTP_CATALOG.'jquery.js";
+	                          document.getElementsByTagName("head")[0].appendChild(jq);
+                          }
+</script>'.$js),
                 array('title' => MODULE_PAYMENT_BILLMATE_CONDITIONS,
                         'field' => "
 				<a href=\"#\" id=\"billmate_invoice\" onclick=\"ShowBillmateInvoicePopup(event);return false;\"></a>"),

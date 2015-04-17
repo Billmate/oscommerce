@@ -176,7 +176,7 @@ class billmatecardpay {
         require_once(DIR_FS_CATALOG . DIR_WS_CLASSES . 'billmate/billmateutils.php');
 		
         if (tep_session_is_registered('cart_billmate_card_ID')) {
-			$order_id = $insert_id = substr($cart_billmate_card_ID, strpos($cart_billmate_card_ID, '-')+1);
+			$order_id = $insert_id = $cart_billmate_card_ID;
 
 			$check_query = tep_db_query('select orders_id from ' . TABLE_ORDERS_STATUS_HISTORY . ' where orders_id = "' . (int)$order_id . '" limit 1');
 
@@ -236,7 +236,14 @@ class billmatecardpay {
         if(!empty($_GET['error']) && $_GET['error'] == 'invalidaddress' && !empty( $_SESSION['WrongAddress'] ) ){
             $popup = $_SESSION['WrongAddress'];
         }
-        $fields[] = array('title' => BILLMATE_LANG_SE_IMGCARDPAY, 'field' => '');
+        $fields[] = array('title' => BILLMATE_LANG_SE_IMGCARDPAY, 'field' => '<script type="text/javascript">
+                          if(!window.jQuery){
+                          	var jq = document.createElement("script");
+                          	jq.type = "text/javascript";
+                          	jq.src = "'.HTTP_SERVER.DIR_WS_HTTP_CATALOG.'jquery.js";
+                          	document.getElementsByTagName("head")[0].appendChild(jq);
+                          }
+</script>');
 
         return array('id' => $this->code,
                 'module' => $this->title,
@@ -255,12 +262,12 @@ class billmatecardpay {
     function confirmation() {
 		global $cartID, $cart_billmate_card_ID, $customer_id, $languages_id, $order, $order_total_modules, $currencies;
         if (tep_session_is_registered('cart_billmate_card_ID')) {
-          $order_id = substr($cart_billmate_card_ID, strpos($cart_billmate_card_ID, '-')+1);
+          $order_id = $cart_billmate_card_ID;
 
           $curr_check = tep_db_query("select currency from " . TABLE_ORDERS . " where orders_id = '" . (int)$order_id . "'");
           $curr = tep_db_fetch_array($curr_check);
 
-          if ( ($curr['currency'] != $order->info['currency']) || ($cartID != substr($cart_billmate_card_ID, 0, strlen($cartID))) ) {
+          if ( ($curr['currency'] != $order->info['currency']) ) {
             $check_query = tep_db_query('select orders_id from ' . TABLE_ORDERS_STATUS_HISTORY . ' where orders_id = "' . (int)$order_id . '" limit 1');
 
             if (tep_db_num_rows($check_query) < 1) {
@@ -430,7 +437,7 @@ class billmatecardpay {
             }
           }
 
-          $cart_billmate_card_ID = !empty($cartID) ?$cartID : substr(time(),0,2) . '-' . $insert_id;
+          $cart_billmate_card_ID =  $insert_id;
           tep_session_register('cart_billmate_card_ID');
         }
         return array('title' => MODULE_PAYMENT_BILLMATECARDPAY_TEXT_CONFIRM_DESCRIPTION);
@@ -519,7 +526,18 @@ class billmatecardpay {
         tep_session_register('billmatecardpay_ot');
 		$return = $this->doInvoice();
 		$redirect = $return->url;
-		$process_button_string .= '<script type="text/javascript">$(document).ready(function(){ $("input[name=\'comments\']").remove(); }); $(\'form[name="checkout_confirmation"]\').submit(function(e){e.preventDefault(); window.location = "'.$redirect.'";});</script>';
+
+		$process_button_string .= '<script type="text/javascript">
+                          if(!window.jQuery){
+                          	var jq = document.createElement("script");
+                          	jq.type = "text/javascript";
+                          	jq.src = "'.HTTP_SERVER.DIR_WS_HTTP_CATALOG.'jquery.js";
+                          	jq.onload = jq.onreadystatechange = function(){
+                          	    $(document).ready(function(){ $("input[name=\'comments\']").remove(); }); $(\'form[name="checkout_confirmation"]\').submit(function(e){e.preventDefault(); window.location = "'.$redirect.'";});
+                          	}
+                          	document.getElementsByTagName("head")[0].appendChild(jq);
+                          }
+                          </script>';
         return $process_button_string;
     }
 	function doInvoice($add_order = false ){
@@ -747,7 +765,11 @@ class billmatecardpay {
 									)
 								);
 		$result1 = (object)$k->AddPayment($invoiceValues);
-		if(is_string($result1) || (isset($result1->message) && is_object($result1))){
+		if(!isset($result1->code)){
+			error_log('not code');
+			return $result1;
+		}
+		else {
 			tep_redirect(BillmateUtils::error_link(FILENAME_CHECKOUT_PAYMENT,
                     'payment_error=billmatecardpay&error=' . ($result1->message),
                     'SSL', true, false));
@@ -762,11 +784,11 @@ class billmatecardpay {
 		global $$payment,$cartID, $cart,$order_id, $languages_id, $language_id, $language, $currency;
 
 		require(DIR_FS_CATALOG . DIR_WS_CLASSES . 'billmate/billmateutils.php');
-		$order_id = substr($cart_billmate_card_ID, strpos($cart_billmate_card_ID, '-')+1);
+		$order_id = $cart_billmate_card_ID;
 
 		//get response data
 		$_DATA = json_decode($_REQUEST['data'], true);
-		$_DATA['order_id'] = substr($_DATA['orderid'], strpos($_DATA['orderid'], '-')+1);
+		$_DATA['order_id'] = $_DATA['orderid'];
 
         if(!isset($_DATA['status']) || $_DATA['status'] != 'Paid'){
             tep_redirect(BillmateUtils::error_link(FILENAME_CHECKOUT_PAYMENT,
