@@ -461,7 +461,7 @@ class billmatecardpay {
         if (is_array($order_totals)) {
             reset($order_totals);
             $j = 0;
-            $table = preg_split("/[,]/", MODULE_PAYMENT_BILLMATE_ORDER_TOTAL_IGNORE);
+            $table = preg_split("/[,]/", MODULE_PAYMENT_BILLMATECARDPAY_ORDER_TOTAL_IGNORE);
 
             while (list(, $value) = each($order_totals)) {
                 $class = substr($value, 0, strrpos($value, '.'));
