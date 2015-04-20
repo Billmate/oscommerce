@@ -808,6 +808,7 @@ class billmate_invoice {
 	    $taxValue += $handlingPrice * ($handlingTaxRate/100);
 	    $totaltax = round($taxValue,0);
 		$totalwithtax = round($order->info['total']*100,0);
+	    $totalwithtax += $shippingPrice * ($shippingTaxRate/100);
 		$totalwithouttax = $totalValue;
 		$rounding = $totalwithtax - ($totalwithouttax+$totaltax);
 		

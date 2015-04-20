@@ -93,7 +93,6 @@ global $user_billing, $language, $languages_id;
 	if( $addressNotMatched || $shippingAndBilling ){
 
 		if(empty($_POST['geturl'])){
-			error_log(print_r($address,true));
 			$html = '<p><b>'.MODULE_PAYMENT_BILLMATE_CORRECT_ADDRESS.' </b></p>'.($address['firstname']).' '.$address['lastname'].'<br>'.$address['street'].'<br>'.$address['zip'].' '.$address['city'].'<div style="padding: 17px 0px;"> <i>'.MODULE_PAYMENT_BILLMATE_CORRECT_ADDRESS_OPTION.'</i></div> <input type="button" value="'.MODULE_PAYMENT_BILLMATE_YES.'" onclick="updateAddress();" class="button"/> <input type="button" value="'.MODULE_PAYMENT_BILLMATE_NO.'" onclick="closefunc(this)" class="button" style="float:right" />';
 			die(json_encode(array('success' => false, 'content' => utf8_encode($html),'popup' => true)));
 		} else {

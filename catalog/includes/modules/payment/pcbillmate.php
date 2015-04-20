@@ -170,7 +170,6 @@ class pcbillmate {
     function javascript_validation() {
 	    $script = '
 			if(payment_value == "'.$this->code.'"){
-				console.log("'.$this->code.'");
 				var formdata = $(\'form[name="checkout_payment"]\').serializeArray();
 
 				if($(\'input[name="success"]\') && $(\'input[name="success"]\').val() == "true"){
@@ -671,9 +670,10 @@ class pcbillmate {
                             $attr['value'];
                 }
             }
-
+			error_log('products'.print_r($order->products[$i],true));
             if (MODULE_PAYMENT_PCBILLMATE_ARTNO == 'id' ||
                     MODULE_PAYMENT_PCBILLMATE_ARTNO == '') {
+
                 $temp =
                         mk_goods_flags($order->products[$i]['qty'],
                         $order->products[$i]['id'],
@@ -860,6 +860,7 @@ class pcbillmate {
 	    $taxValue += $shippingPrice * ($shippingTaxRate/100);
 		$totaltax = round($taxValue,0);
 		$totalwithtax = round($order->info['total']*100,0);
+	    $totalwithtax += $shippingPrice * ($shippingTaxRate/100);
 		$totalwithouttax = $totalValue;
 		$rounding = $totalwithtax - ($totalwithouttax+$totaltax);
 
