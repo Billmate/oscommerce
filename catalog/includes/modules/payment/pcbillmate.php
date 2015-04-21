@@ -670,7 +670,6 @@ class pcbillmate {
                             $attr['value'];
                 }
             }
-			error_log('products'.print_r($order->products[$i],true));
             if (MODULE_PAYMENT_PCBILLMATE_ARTNO == 'id' ||
                     MODULE_PAYMENT_PCBILLMATE_ARTNO == '') {
 
@@ -761,13 +760,14 @@ class pcbillmate {
 
         // Fixes potential security problem
  
-		$pclass = $_POST['pcbillmate_pclass1'];
-		$pno    = $_POST['pcbillmate_pnum1'];
+
 		$ship_address = $bill_address = array();
 
         $countryData = BillmateCountry::getCountryData($order->billing['country']['iso_code_3']);
 
         $addr_num = $_POST['addr_num'];
+	    $pclass = $_POST['pcbillmate_pclass'.$addr_num];
+	    $pno    = $_POST['pcbillmate_pnum'.$addr_num];
         $order->delivery['firstname'] = $_POST['pcbillmate_fname'.$addr_num];
         $order->billing['firstname'] =  $_POST['pcbillmate_fname'.$addr_num];
         $order->delivery['lastname'] =  $_POST['pcbillmate_lname'.$addr_num];
@@ -827,6 +827,7 @@ class pcbillmate {
    
 		$ssl = true;
 		$debug = false;
+	    error_log(print_r($_POST,true));
 	    $languageCode = tep_db_fetch_array(tep_db_query("select code from languages where languages_id = " . $languages_id));
 	    if(!defined('BILLMATE_LANGUAGE')) define('BILLMATE_LANGUAGE',$languageCode['code']);
 		$k = new Billmate($eid,$secret,$ssl,$this->pcbillmate_testmode,$debug);

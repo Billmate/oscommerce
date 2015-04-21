@@ -45,8 +45,8 @@ global $user_billing, $language, $languages_id;
 
 	tep_session_register('user_billing');
 
-	if (isset($address['message']) || empty($address) || !is_array($address))
-		die(json_encode(array('success' => false, 'content' => $address['message'],'popup' => false)));
+	if (isset($address['code']) || empty($address) || !is_array($address))
+		die(json_encode(array('success' => false, 'content' => utf8_encode($address['message']),'popup' => false)));
 
 	foreach($address as $key => $value)
 		$address[$key] = utf8_encode($value);
