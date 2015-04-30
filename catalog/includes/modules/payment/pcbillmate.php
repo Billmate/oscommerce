@@ -640,6 +640,31 @@ class pcbillmate {
 
         require(DIR_FS_CATALOG . DIR_WS_CLASSES . 'billmate/billmateutils.php');
 
+        $addr_num = $_POST['addr_num'];
+        $pclass = $_POST['pcbillmate_pclass'.$addr_num];
+        $pno    = $_POST['pcbillmate_pnum'.$addr_num];
+        $order->delivery['firstname'] = $_POST['pcbillmate_fname'.$addr_num];
+        $order->billing['firstname'] =  $_POST['pcbillmate_fname'.$addr_num];
+        $order->delivery['lastname'] =  $_POST['pcbillmate_lname'.$addr_num];
+        $order->delivery['company'] =  $_POST['pcbillmate_company'.$addr_num];
+        $order->billing['company'] =   $_POST['pcbillmate_company'.$addr_num];
+        $order->billing['lastname'] =   $_POST['pcbillmate_lname'.$addr_num];
+        $order->delivery['street_address'] = $_POST['pcbillmate_street'.$addr_num];
+        $order->billing['street_address'] = $_POST['pcbillmate_street'.$addr_num];
+        $order->delivery['postcode'] = $_POST['pcbillmate_postno'.$addr_num];
+        $order->billing['postcode'] = $_POST['pcbillmate_postno'.$addr_num];
+        $order->delivery['city'] = $_POST['pcbillmate_city'.$addr_num];
+        $order->billing['city'] = $_POST['pcbillmate_city'.$addr_num];
+        $order->billing['suburb'] = $order->delivery['suburb'] = '';
+
+        $order->delivery['state'] = $order->billing['state'];
+        $order->delivery['zone_id'] = $order->billing['zone_id'];
+        $order->delivery['country_id'] = $order->billing['country_id'];
+        $order->delivery['country']['id'] = $order->billing['country']['id'];
+        $order->delivery['country']['title'] = $order->billing['country']['title'];
+        $order->delivery['country']['iso_code_2'] = $order->billing['country']['iso_code_2'];
+        $order->delivery['country']['iso_code_3'] = $order->billing['country']['iso_code_3'];
+
         $eid = MODULE_PAYMENT_PCBILLMATE_EID;
         $estoreUser = $customer_id;
         $goodsList = array();
@@ -765,31 +790,6 @@ class pcbillmate {
 
         $countryData = BillmateCountry::getCountryData($order->billing['country']['iso_code_3']);
 
-        $addr_num = $_POST['addr_num'];
-	    $pclass = $_POST['pcbillmate_pclass'.$addr_num];
-	    $pno    = $_POST['pcbillmate_pnum'.$addr_num];
-        $order->delivery['firstname'] = $_POST['pcbillmate_fname'.$addr_num];
-        $order->billing['firstname'] =  $_POST['pcbillmate_fname'.$addr_num];
-        $order->delivery['lastname'] =  $_POST['pcbillmate_lname'.$addr_num];
-        $order->delivery['company'] =  $_POST['pcbillmate_company'.$addr_num];
-        $order->billing['company'] =   $_POST['pcbillmate_company'.$addr_num];
-        $order->billing['lastname'] =   $_POST['pcbillmate_lname'.$addr_num];
-        $order->delivery['street_address'] = $_POST['pcbillmate_street'.$addr_num];
-        $order->billing['street_address'] = $_POST['pcbillmate_street'.$addr_num];
-        $order->delivery['postcode'] = $_POST['pcbillmate_postno'.$addr_num];
-        $order->billing['postcode'] = $_POST['pcbillmate_postno'.$addr_num];
-        $order->delivery['city'] = $_POST['pcbillmate_city'.$addr_num];
-        $order->billing['city'] = $_POST['pcbillmate_city'.$addr_num];
-		$order->billing['suburb'] = $order->delivery['suburb'] = '';
-
-        //Set same country information to delivery
-        $order->delivery['state'] = $order->billing['state'];
-        $order->delivery['zone_id'] = $order->billing['zone_id'];
-        $order->delivery['country_id'] = $order->billing['country_id'];
-        $order->delivery['country']['id'] = $order->billing['country']['id'];
-        $order->delivery['country']['title'] = $order->billing['country']['title'];
-        $order->delivery['country']['iso_code_2'] = $order->billing['country']['iso_code_2'];
-        $order->delivery['country']['iso_code_3'] = $order->billing['country']['iso_code_3'];
 
         $ship_address = array(
 			"firstname" => $order->delivery['firstname'],
