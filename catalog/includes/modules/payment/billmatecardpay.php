@@ -709,7 +709,9 @@ class billmatecardpay {
 		$debug = false;
 		$languageCode = tep_db_fetch_array(tep_db_query("select code from languages where languages_id = " . $languages_id));
 		if(!defined('BILLMATE_LANGUAGE')) define('BILLMATE_LANGUAGE',$languageCode['code']);
-		$k = new Billmate($eid,$secret,$ssl,$this->billmatecardpay_testmode,$debug,$codes);
+        if(!defined('BILLMATE_SERVER')) define('BILLMATE_SERVER','2.1.7');
+
+        $k = new Billmate($eid,$secret,$ssl,$this->billmatecardpay_testmode,$debug,$codes);
 		$invoiceValues = array();
     $lang = $languageCode['code'] == 'se' ? 'sv' : $languageCode['code'];
 		$invoiceValues['PaymentData'] = array(	"method" => "8",		//1=Factoring, 2=Service, 4=PartPayment, 8=Card, 16=Bank, 24=Card/bank and 32=Cash.
@@ -863,7 +865,9 @@ class billmatecardpay {
 			if(!$already_completed ){
 				$languageCode = tep_db_fetch_array(tep_db_query("select code from languages where languages_id = " . $languages_id));
 				if(!defined('BILLMATE_LANGUAGE')) define('BILLMATE_LANGUAGE',$languageCode['code']);
-				$k = new Billmate($eid,$secret,$ssl, $this->billmatecardpay_testmode,$debug);
+                if(!defined('BILLMATE_SERVER')) define('BILLMATE_SERVER','2.1.7');
+
+                $k = new Billmate($eid,$secret,$ssl, $this->billmatecardpay_testmode,$debug);
 				$result1 = (object)$k->UpdatePayment( array('PaymentData'=> array("number"=>$_DATA['number'], "orderid"=>(string)$_DATA['order_id'])));
 			}
 		} else {
@@ -1041,13 +1045,13 @@ class billmatecardpay {
 
         tep_db_query("insert into " . TABLE_CONFIGURATION . " (configuration_title, configuration_key, configuration_value, configuration_description, configuration_group_id, sort_order, set_function, date_added) values ('Testmode', 'MODULE_PAYMENT_BILLMATECARDPAY_TESTMODE', 'False', 'Do you want to activate the Testmode? We will not pay for the invoices created with the test persons nor companies and we will not collect any fees as well.', '6', '0', 'tep_cfg_select_option(array(\'True\', \'False\'), ', now())");
 
-        tep_db_query("insert into " . TABLE_CONFIGURATION . " (configuration_title, configuration_key, configuration_value, configuration_description, configuration_group_id, sort_order, set_function, date_added) values ('Authentication Mode', 'MODULE_PAYMENT_BILLMATECARDPAY_AUTHENTICATION_MODE', 'sale', '', '7', '0', 'tep_cfg_select_option(array(\'sale\', \'authentication\'), ', now())");
+        tep_db_query("insert into " . TABLE_CONFIGURATION . " (configuration_title, configuration_key, configuration_value, configuration_description, configuration_group_id, sort_order, set_function, date_added) values ('Authentication Mode', 'MODULE_PAYMENT_BILLMATECARDPAY_AUTHENTICATION_MODE', 'sale', '', '6', '0', 'tep_cfg_select_option(array(\'sale\', \'authentication\'), ', now())");
 		
-       tep_db_query("insert into " . TABLE_CONFIGURATION . " (configuration_title, configuration_key, configuration_value, configuration_description, configuration_group_id, sort_order, set_function, date_added) values ('Enable 3d Secure', 'MODULE_PAYMENT_BILLMATECARDPAY_DO_3D_SECURE', 'YES', '', '8', '0', 'tep_cfg_select_option(array(\'YES\', \'NO\'), ', now())");
+       tep_db_query("insert into " . TABLE_CONFIGURATION . " (configuration_title, configuration_key, configuration_value, configuration_description, configuration_group_id, sort_order, set_function, date_added) values ('Enable 3d Secure', 'MODULE_PAYMENT_BILLMATECARDPAY_DO_3D_SECURE', 'YES', '', '6', '0', 'tep_cfg_select_option(array(\'YES\', \'NO\'), ', now())");
 		
-       tep_db_query("insert into " . TABLE_CONFIGURATION . " (configuration_title, configuration_key, configuration_value, configuration_description, configuration_group_id, sort_order, set_function, date_added) values ('Enable Display Name', 'MODULE_PAYMENT_BILLMATECARDPAY_PROMPT_NAME_ENTRY', 'NO', '', '9', '0', 'tep_cfg_select_option(array(\'YES\', \'NO\'), ', now())");
+       tep_db_query("insert into " . TABLE_CONFIGURATION . " (configuration_title, configuration_key, configuration_value, configuration_description, configuration_group_id, sort_order, set_function, date_added) values ('Enable Display Name', 'MODULE_PAYMENT_BILLMATECARDPAY_PROMPT_NAME_ENTRY', 'NO', '', '6', '0', 'tep_cfg_select_option(array(\'YES\', \'NO\'), ', now())");
 
-        tep_db_query("insert into " . TABLE_CONFIGURATION . " (configuration_title, configuration_key, configuration_value, configuration_description, configuration_group_id, sort_order, date_added) values ('Disabled countries', 'MODULE_PAYMENT_BILLMATECARDPAY_DISABLED_COUNTRYIES', 'se,fi,dk,no', 'Disable in these countries<br/>Enter country ISO Code of two characters <br/>se = Sweden<br/>fi = Finland<br/>dk = Denmark<br/>no = Norway', '10', '0', now())");
+        tep_db_query("insert into " . TABLE_CONFIGURATION . " (configuration_title, configuration_key, configuration_value, configuration_description, configuration_group_id, sort_order, date_added) values ('Disabled countries', 'MODULE_PAYMENT_BILLMATECARDPAY_DISABLED_COUNTRYIES', 'se,fi,dk,no', 'Disable in these countries<br/>Enter country ISO Code of two characters <br/>se = Sweden<br/>fi = Finland<br/>dk = Denmark<br/>no = Norway', '6', '0', now())");
 
     }
 

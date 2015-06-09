@@ -378,7 +378,7 @@ class pcbillmate {
         $type = $GA_OLD;
 	    $languageCode = tep_db_fetch_array(tep_db_query("select code from languages where languages_id = " . $languages_id));
 	    if(!defined('BILLMATE_LANGUAGE')) define('BILLMATE_LANGUAGE',$languageCode['code']);
-
+        if(!defined('BILLMATE_SERVER')) define('BILLMATE_SERVER','2.1.7');
 		$k = new Billmate($eid,$secret,true, $this->pcbillmate_testmode, false);
 		$result = (object)$k->GetAddress(array('pno'=>$pno));
 
@@ -419,7 +419,7 @@ class pcbillmate {
 		$addressNotMatched = !isEqual($result->street, $order->billing['street_address'] ) ||
 		    !isEqual($result->zip, $order->billing['postcode']) || 
 		    !isEqual($result->city, $order->billing['city']) || 
-		    !isEqual($result[0][5], BillmateCountry::fromCode($order->billing['country']['iso_code_3']));
+		    !isEqual($result->country, $order->billing['country']['iso_code_2']);
 
         $shippingAndBilling =  !$apiMatchedName ||
 		    !isEqual($order->billing['street_address'],  $order->delivery['street_address'] ) ||
@@ -495,8 +495,7 @@ class pcbillmate {
                 $this->pcbillmate_street = $result->street;
                 $this->pcbillmate_postno = $result->zip;
                 $this->pcbillmate_city = $result->city;
-                $countryCode = BillmateCountry::getCode($result->country);
-                $country_query = tep_db_query("select countries_id from " . TABLE_COUNTRIES . " where countries_iso_code_2 = '" .$countryCode . "'");
+                $country_query = tep_db_query("select countries_id from " . TABLE_COUNTRIES . " where countries_iso_code_2 = '" .$result->country . "'");
                 $country = tep_db_fetch_array($country_query);
                 global $customer_id;
                 $data = array(
@@ -537,8 +536,7 @@ class pcbillmate {
                 $order->delivery['country']['title'] = $order->billing['country']['title'];
                 $order->delivery['country']['iso_code_2'] = $order->billing['country']['iso_code_2'];
                 $order->delivery['country']['iso_code_3'] = $order->billing['country']['iso_code_3'];
-                global $sendto;
-                $sendto = $this->delivery;
+
 	        }
         }
     }
@@ -830,7 +828,9 @@ class pcbillmate {
 	    error_log(print_r($_POST,true));
 	    $languageCode = tep_db_fetch_array(tep_db_query("select code from languages where languages_id = " . $languages_id));
 	    if(!defined('BILLMATE_LANGUAGE')) define('BILLMATE_LANGUAGE',$languageCode['code']);
-		$k = new Billmate($eid,$secret,$ssl,$this->pcbillmate_testmode,$debug);
+        if(!defined('BILLMATE_SERVER')) define('BILLMATE_SERVER','2.1.7');
+
+        $k = new Billmate($eid,$secret,$ssl,$this->pcbillmate_testmode,$debug);
 		$invoiceValues = array();
         $lang = $languageCode['code'] == 'se' ? 'sv' : $languageCode['code'];
 		$invoiceValues['PaymentData'] = array(	"method" => "4",		//1=Factoring, 2=Service, 4=PartPayment, 8=Card, 16=Bank, 24=Card/bank and 32=Cash.

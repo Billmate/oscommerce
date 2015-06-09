@@ -669,7 +669,9 @@ class billmatebank {
 		$debug = false;
 		$languageCode = tep_db_fetch_array(tep_db_query("select code from languages where languages_id = " . $languages_id));
 		if(!defined('BILLMATE_LANGUAGE')) define('BILLMATE_LANGUAGE',$languageCode['code']);
-		$k = new Billmate($eid,$secret,$ssl,$this->billmatebank_testmode,$debug);
+        if(!defined('BILLMATE_SERVER')) define('BILLMATE_SERVER','2.1.7');
+
+        $k = new Billmate($eid,$secret,$ssl,$this->billmatebank_testmode,$debug);
 		$invoiceValues = array();
     $lang = $languageCode['code'] == 'se' ? 'sv' : $languageCode['code'];
 		$invoiceValues['PaymentData'] = array(	"method" => "16",		//1=Factoring, 2=Service, 4=PartPayment, 8=Card, 16=Bank, 24=Card/bank and 32=Cash.
@@ -819,7 +821,9 @@ class billmatebank {
 			{
 				$languageCode = tep_db_fetch_array(tep_db_query("select code from languages where languages_id = " . $languages_id));
 				if(!defined('BILLMATE_LANGUAGE')) define('BILLMATE_LANGUAGE',$languageCode['code']);
-				$k       = new Billmate($eid, $secret, $ssl, $this->billmatebank_testmode, $debug);
+                if(!defined('BILLMATE_SERVER')) define('BILLMATE_SERVER','2.1.7');
+
+                $k       = new Billmate($eid, $secret, $ssl, $this->billmatebank_testmode, $debug);
 				$result1 = (object)($k->UpdatePayment(array('PaymentData' => array("number"  => $_DATA['number'],
 				                                                                   "orderid" => (string)$_DATA['order_id']
 				)
@@ -1005,10 +1009,10 @@ class billmatebank {
 
         tep_db_query("insert into " . TABLE_CONFIGURATION . " (configuration_title, configuration_key, configuration_value, configuration_description, configuration_group_id, sort_order, set_function, date_added) values ('Testmode', 'MODULE_PAYMENT_BILLMATEBANK_TESTMODE', 'False', 'Do you want to activate the Testmode? We will not pay for the invoices created with the test persons nor companies and we will not collect any fees as well.', '6', '0', 'tep_cfg_select_option(array(\'True\', \'False\'), ', now())");
 
-	    tep_db_query("insert into " . TABLE_CONFIGURATION . " (configuration_title, configuration_key, configuration_value, configuration_description, configuration_group_id, sort_order, set_function, date_added) values ('Authentication Mode', 'MODULE_PAYMENT_BILLMATEBANK_AUTHENTICATION_MODE', 'sale', '', '7', '0', 'tep_cfg_select_option(array(\'sale\', \'authentication\'), ', now())");
+	    tep_db_query("insert into " . TABLE_CONFIGURATION . " (configuration_title, configuration_key, configuration_value, configuration_description, configuration_group_id, sort_order, set_function, date_added) values ('Authentication Mode', 'MODULE_PAYMENT_BILLMATEBANK_AUTHENTICATION_MODE', 'sale', '', '6', '0', 'tep_cfg_select_option(array(\'sale\', \'authentication\'), ', now())");
 
 
-	    tep_db_query("insert into " . TABLE_CONFIGURATION . " (configuration_title, configuration_key, configuration_value, configuration_description, configuration_group_id, sort_order, date_added) values ('Disabled countries', 'MODULE_PAYMENT_BILLMATEBANK_DISABLED_COUNTRYIES', 'se,fi,dk,no', 'Disable in these countries<br/>Enter country ISO Code of two characters <br/>se = Sweden<br/>fi = Finland<br/>dk = Denmark<br/>no = Norway', '10', '0', now())");
+	    tep_db_query("insert into " . TABLE_CONFIGURATION . " (configuration_title, configuration_key, configuration_value, configuration_description, configuration_group_id, sort_order, date_added) values ('Disabled countries', 'MODULE_PAYMENT_BILLMATEBANK_DISABLED_COUNTRYIES', 'se,fi,dk,no', 'Disable in these countries<br/>Enter country ISO Code of two characters <br/>se = Sweden<br/>fi = Finland<br/>dk = Denmark<br/>no = Norway', '6', '0', now())");
 
     }
 

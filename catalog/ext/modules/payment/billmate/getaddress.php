@@ -82,7 +82,7 @@ global $user_billing, $language, $languages_id;
 	$addressNotMatched = !isEqual($address['street'], $billing['street_address'] ) ||
 	                     !isEqual($address['zip'], $billing['postcode']) ||
 	                     !isEqual($address['city'], $billing['city']) ||
-	                     !isEqual($address['country'], BillmateCountry::fromCode($billing['country']['iso_code_3']));
+	                     !isEqual($address['country'], $billing['country']['iso_code_2']);
 
 	$shippingAndBilling =  !$apiMatchedName ||
 	                       !isEqual($billing['street_address'],  $delivery['street_address'] ) ||

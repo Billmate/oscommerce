@@ -93,7 +93,6 @@ if(!class_exists('Encoding',false)){
 		while (list($key, $value) = each($_DATA)) {
 			$email_body .= $key . '=' . $value . "\n";
 		}
-		tep_mail('', 'gagan.eminence@gmail.com', 'Billmate IPN Invalid Process', $email_body, STORE_OWNER, STORE_OWNER_EMAIL_ADDRESS);
 	}
 	exit;
 	

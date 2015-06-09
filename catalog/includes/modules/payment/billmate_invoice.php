@@ -341,6 +341,7 @@ class billmate_invoice {
 
 	    $languageCode = tep_db_fetch_array(tep_db_query("select code from languages where languages_id = " . $languages_id));
 	    if(!defined('BILLMATE_LANGUAGE')) define('BILLMATE_LANGUAGE',$languageCode['code']);
+        if(!defined('BILLMATE_SERVER')) define('BILLMATE_SERVER','2.1.7');
 
 		$k = new Billmate($eid,$secret,$ssl,$this->billmate_testmode,$debug);
 		$result = (object)$k->GetAddress(array('pno'=>$pno));
@@ -385,7 +386,7 @@ class billmate_invoice {
 		$addressNotMatched = !isEqual($result->street, $order->billing['street_address'] ) ||
 		    !isEqual($result->zip, $order->billing['postcode']) || 
 		    !isEqual($result->city, $order->billing['city']) || 
-		    !isEqual($result->country, BillmateCountry::fromCode($order->billing['country']['iso_code_3']));
+		    !isEqual($result->country, $order->billing['country']['iso_code_2']);
 
         $shippingAndBilling =  !$apiMatchedName ||
 		    !isEqual($order->billing['street_address'],  $order->delivery['street_address'] ) ||
@@ -776,6 +777,7 @@ class billmate_invoice {
 		$debug = false;
 	    $languageCode = tep_db_fetch_array(tep_db_query("select code from languages where languages_id = " . $languages_id));
 	    if(!defined('BILLMATE_LANGUAGE')) define('BILLMATE_LANGUAGE',$languageCode['code']);
+        if(!defined('BILLMATE_SERVER')) define('BILLMATE_SERVER','2.1.7');
 
 		$k = new Billmate($eid,$secret,$ssl,$this->billmate_testmode,$debug);
 		$invoiceValues = array();
@@ -975,7 +977,7 @@ class billmate_invoice {
 
         tep_db_query("insert into " . TABLE_CONFIGURATION . " (configuration_title, configuration_key, configuration_value, configuration_description, configuration_group_id, sort_order, set_function, date_added) values ('Testmode', 'MODULE_PAYMENT_BILLMATE_TESTMODE', 'False', 'Do you want to activate the Testmode? We will not pay for the invoices created with the test persons nor companies and we will not collect any fees as well.', '6', '0', 'tep_cfg_select_option(array(\'True\', \'False\'), ', now())");
 
-        tep_db_query("insert into " . TABLE_CONFIGURATION . " (configuration_title, configuration_key, configuration_value, configuration_description, configuration_group_id, sort_order, date_added) values ('Countries', 'MODULE_PAYMENT_BILLMATE_ENABLED_COUNTRYIES', 'se,fi,dk,no', 'Available in selected countries<br/>se = Sweden<br/>fi = Finland<br/>dk = Denmark<br/>no = Norway', '9', '0', now())");
+        tep_db_query("insert into " . TABLE_CONFIGURATION . " (configuration_title, configuration_key, configuration_value, configuration_description, configuration_group_id, sort_order, date_added) values ('Countries', 'MODULE_PAYMENT_BILLMATE_ENABLED_COUNTRYIES', 'se,fi,dk,no', 'Available in selected countries<br/>se = Sweden<br/>fi = Finland<br/>dk = Denmark<br/>no = Norway', '6', '0', now())");
 
     }
 
