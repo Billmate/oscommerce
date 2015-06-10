@@ -60,7 +60,7 @@ class billmate_invoice {
         $this->billmate_testmode = false;
 		$this->billmate_livemode = true;
         if ((MODULE_PAYMENT_BILLMATE_TESTMODE == 'True')) {
-            $this->title .= ' '.MODULE_PAYMENT_BILLMATE_TESTMODE;
+            $this->title .= ' '.MODULE_PAYMENT_BILLMATE_TEXT_TESTMODE_TITLE;
             $this->billmate_testmode = true;
 			$this->billmate_livemode = false;
         }

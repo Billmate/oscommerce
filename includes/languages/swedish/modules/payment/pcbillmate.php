@@ -55,7 +55,7 @@
   define('MODULE_PAYMENT_PCBILLMATE_SORT_ORDER_DESC', 'Sortera ordningen på displayen. Lägst visas först.');
   define('MODULE_PAYMENT_PCBILLMATE_LIVEMODE_TITLE', 'Live Server');
   define('MODULE_PAYMENT_PCBILLMATE_LIVEMODE_DESC', 'Vill du använda Billmate LIVE server (true) eller BETA-servern (falskt)?');
-  define('MODULE_PAYMENT_PCBILLMATE_TESTMODE_TITLE', 'Testläget');
+  define('MODULE_PAYMENT_PCBILLMATE_TESTMODE_TITLE', '(TESTLÄGE)');
   define('MODULE_PAYMENT_PCBILLMATE_TESTMODE_DESC', 'Vill du aktivera testläget? Vi kommer inte att betala för de fakturor som skapas med testpersonerna eller företag, och vi kommer inte att samla in några avgifter också.');
   define('MODULE_PAYMENT_PCBILLMATE_PCLASS_TITLE', 'Ställ Pclass ID för kampanjer');
   define('MODULE_PAYMENT_PCBILLMATE_PCLASS_DESC', 'Semikolon separerad lista, utan mellanslag.');

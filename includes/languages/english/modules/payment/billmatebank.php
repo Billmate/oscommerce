@@ -25,7 +25,7 @@
   define('MODULE_PAYMENT_BILLMATEBANK_SORT_ORDER_DESC', 'Sort order of display. Lowest is displayed first.');
   define('MODULE_PAYMENT_BILLMATEBANK_LIVEMODE_TITLE', 'Live Server');
   define('MODULE_PAYMENT_BILLMATEBANK_LIVEMODE_DESC', 'Do you want to use Billmate Bank LIVE server (true) or BETA server (false)?');
-  define('MODULE_PAYMENT_BILLMATEBANK_TESTMODE_TITLE', 'Testmode');
+  define('MODULE_PAYMENT_BILLMATEBANK_TESTMODE_TITLE', '(Testmode)');
   define('MODULE_PAYMENT_BILLMATEBANK_TESTMODE_DESC', 'Do you want to activate the Testmode? We will not pay for the invoices created with the test persons nor companies and we will not collect any fees as well.');
 	define('MODULE_PAYMENT_BILLMATEBANK_VAT','VAT');
 

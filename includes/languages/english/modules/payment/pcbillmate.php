@@ -59,7 +59,7 @@
   define('MODULE_PAYMENT_PCBILLMATE_SORT_ORDER_DESC', 'Sort order of display. Lowest is displayed first.');
   define('MODULE_PAYMENT_PCBILLMATE_LIVEMODE_TITLE', 'Live Server');
   define('MODULE_PAYMENT_PCBILLMATE_LIVEMODE_DESC', 'Do you want to use Billmate LIVE server (true) or BETA server (false)?');
-  define('MODULE_PAYMENT_PCBILLMATE_TESTMODE_TITLE', 'Testmode');
+  define('MODULE_PAYMENT_PCBILLMATE_TESTMODE_TITLE', '(TESTMODE)');
   define('MODULE_PAYMENT_PCBILLMATE_TESTMODE_DESC', 'Do you want to activate the Testmode? We will not pay for the invoices created with the test persons nor companies and we will not collect any fees as well.');
   define('MODULE_PAYMENT_PCBILLMATE_PCLASS_TITLE', 'Set Pclass ID for campaigns');
   define('MODULE_PAYMENT_PCBILLMATE_PCLASS_DESC', 'Semicolon separated list, with no spaces.');

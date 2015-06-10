@@ -55,7 +55,7 @@
   define('MODULE_PAYMENT_BILLMATECARDPAY_SORT_ORDER_DESC', 'Sortera ordningen på displayen. Lägst visas först.');
   define('MODULE_PAYMENT_BILLMATECARDPAY_LIVEMODE_TITLE', 'Live Server');
   define('MODULE_PAYMENT_BILLMATECARDPAY_LIVEMODE_DESC', 'Vill du använda Billmate Kort LIVE server (true) eller BETA-servern (falskt)?');
-  define('MODULE_PAYMENT_BILLMATECARDPAY_TESTMODE_TITLE', 'Test-läge');
+  define('MODULE_PAYMENT_BILLMATECARDPAY_TESTMODE_TITLE', '(Test-läge)');
   define('MODULE_PAYMENT_BILLMATECARDPAY_TESTMODE_DESC', 'Vill du aktivera testläget? Vi kommer inte att betala för de fakturor som skapas med testpersonerna eller företag, och vi kommer inte att samla in några avgifter också.');
 	define('MODULE_PAYMENT_BILLMATECARDPAY_VAT','Moms');
 
