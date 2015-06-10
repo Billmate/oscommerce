@@ -1,6 +1,6 @@
 <?php
 /**
- *  Copyright 2010 BILLMATE AB. All rights reserved.
+ *  Copyright 2015 Billmate AB. All rights reserved.
  *
  *  Redistribution and use in source and binary forms, with or without modification, are
  *  permitted provided that the following conditions are met:
@@ -24,7 +24,7 @@
  *
  *  The views and conclusions contained in the software and documentation are those of the
  *  authors and should not be interpreted as representing official policies, either expressed
- *  or implied, of BILLMATE AB.
+ *  or implied, of Billmate AB.
  *
  */
 
@@ -60,6 +60,7 @@
   define('MODULE_PAYMENT_PCBILLMATE_PCLASS_TITLE', 'Ställ Pclass ID för kampanjer');
   define('MODULE_PAYMENT_PCBILLMATE_PCLASS_DESC', 'Semikolon separerad lista, utan mellanslag.');
   define('MODULE_PAYMENT_PCBILLMATE_MONTH_TITLE', 'Ställ Månad');
+  define('MODULE_PAYMENT_PCBILLMATE_MONTH','Månad');
   define('MODULE_PAYMENT_PCBILLMATE_MONTH_DESC', 'Semikolon separerad lista, utan mellanslag.');
   define('MODULE_PAYMENT_PCBILLMATE_MONTH_FEE_TITLE', 'Ställ Månadsavgift');
   define('MODULE_PAYMENT_PCBILLMATE_MONTH_FEE_DESC', 'Semikolon separerad lista, utan mellanslag.');
@@ -69,33 +70,34 @@
   define('MODULE_PAYMENT_PCBILLMATE_START_FEE_DESC', 'Semikolon separerad lista, utan mellanslag.');
   define('MODULE_PAYMENT_PCBILLMATE_PCLASS_DEFAULT_TITLE', 'Pclass för Konto');
   define('MODULE_PAYMENT_PCBILLMATE_PCLASS_DEFAULT_DESC', 'Pclass för \"konto\"');
-  
+
   define('MODULE_PAYMENT_PCBILLMATE_TEXT_TITLE', 'Billmate Delbetalning');
   define('MODULE_PAYMENT_PCBILLMATE_TEXT_DESCRIPTION', 'Delbetalning Sverige från Billmate');
   define('MODULE_PAYMENT_PCBILLMATE_TEXT_CONFIRM_DESCRIPTION', 'www.billmate.se');
-  
-  define('MODULE_PAYMENT_PCBILLMATE_PERSON_NUMBER','Persnr / Orgnr');
-  define('MODULE_PAYMENT_PCBILLMATE_EMAIL','Min e-postadress %s är korrekt och får användas för fakturering.');
-  define('MODULE_PAYMENT_PCBILLMATE_ADDR_TITLE','Observera');
-  define('MODULE_PAYMENT_PCBILLMATE_CONDITIONS','<a id="terms-delbetalning" href="javascript:;">Köpvillkor</a> 
-  	  <script>
-		if (typeof jQuery == \'undefined\') {
-			var script = document.createElement(\'script\');
-			script.type = "text/javascript";
-			script.src = "http://code.jquery.com/jquery-1.9.1.js";
-			document.getElementsByTagName(\'head\')[0].appendChild(script);
-		}
-	  </script>
-		<script type="text/javascript">
-			var eid = "%s";
-			jQuery(function(){
-			  $.getScript("https://billmate.se/billmate/base.js", function(){
-				$("#terms-delbetalning").Terms("villkor_delbetalning",{eid: eid,effectiverate:34});
-			  });
-			});
-		</script>');
-  define('MODULE_PAYMENT_PCBILLMATE_ADDR_NOTICE','Din faktura- och leveransadress kommer att uppdateras automatiskt till din folkbokförda adress.');
-  define('MODULE_PAYMENT_PCBILLMATE_CHOOSECONSUMERCREDIT','Välj delbetalning');
+
+  define('MODULE_PAYMENT_PCBILLMATE_PERSON_NUMBER','Personnummer / Organisationsnummer:');
+  //define('MODULE_PAYMENT_PCBILLMATE_EMAIL','Min e-postadress %s är korrekt och får användas för fakturering.');
+  define('MODULE_PAYMENT_PCBILLMATE_ADDR_TITLE','');
+  define('MODULE_PAYMENT_PCBILLMATE_CONDITIONS','');
+  define('MODULE_PAYMENT_PCBILLMATE_EMAIL','Min e-postadress är korrekt och får användas för fakturering.<br/>Jag bekräftar även <a style="text-decoration: underline !important;" id="terms-delbetalning" href="javascript:;">k&ouml;pvillkoren</a>  och accepterar betalningsansvaret.
+    <script>
+    if (typeof jQuery == \'undefined\') {
+      var script = document.createElement(\'script\');
+      script.type = "text/javascript";
+      script.src = "http://code.jquery.com/jquery-1.9.1.js";
+      document.getElementsByTagName(\'head\')[0].appendChild(script);
+    }
+    </script>
+    <script type="text/javascript">
+      var eid = "%s";
+      jQuery(function(){
+        $.getScript("https://efinance.se/billmate/base.js", function(){
+        $("#terms-delbetalning").Terms("villkor_delbetalning",{eid: eid,effectiverate:34});
+        });
+      });
+    </script>');
+  define('MODULE_PAYMENT_PCBILLMATE_ADDR_NOTICE','<br/>Observera: Din faktura- och leveransadress kommer att automatiskt uppdateras till din folkbokförda adress.');
+  define('MODULE_PAYMENT_PCBILLMATE_CHOOSECONSUMERCREDIT','Betalningsalternativ');
   define('MODULE_PAYMENT_PCBILLMATE_WITHOUT_TAX', 'Priser exkl. moms');
   define('MODULE_PAYMENT_PCBILLMATE_TITLE', 'Billmate Delbetalning fr&aring;n xx/m&aring;n'); //replace xx with amount + currency (e.g. 100 kr)
 

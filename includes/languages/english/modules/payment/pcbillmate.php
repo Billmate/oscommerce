@@ -74,44 +74,44 @@
   define('MODULE_PAYMENT_PCBILLMATE_PCLASS_DEFAULT_TITLE', 'Pclass for Account');
   define('MODULE_PAYMENT_PCBILLMATE_PCLASS_DEFAULT_DESC', 'Pclass for \"Account\"');
 
-  define('MODULE_PAYMENT_PCBILLMATE_TEXT_TITLE', 'Billmate Part Payment');
-  define('MODULE_PAYMENT_PCBILLMATE_TEXT_DESCRIPTION', 'Part Payment Sweden from Billmate');
+  define('MODULE_PAYMENT_PCBILLMATE_TEXT_TITLE', 'Billmate Part Paym');
+  define('MODULE_PAYMENT_PCBILLMATE_TEXT_DESCRIPTION', 'Part Pay from Billmate');
   define('MODULE_PAYMENT_PCBILLMATE_TEXT_CONFIRM_DESCRIPTION', 'www.billmate.se');
 
 
-define('MODULE_PAYMENT_PCBILLMATE_ADDRESS_WRONG', 'Your Billing address is wrong.');
-define('MODULE_PAYMENT_PCBILLMATE_CORRECT_ADDRESS', 'Correct Address is :');
-define('MODULE_PAYMENT_PCBILLMATE_CORRECT_ADDRESS_OPTION', 'Click Yes to continue with new address, No to choose other payment method');
-define('MODULE_PAYMENT_PCBILLMATE_YES', 'Yes');
-define('MODULE_PAYMENT_PCBILLMATE_NO', 'No');
-define('MODULE_PAYMENT_PCBILLMATE_CHOOSEALTERNATIVES', 'Choose alternative address below');
-define('MODULE_PAYMENT_PCBILLMATE_ERRORDIVIDE', 'Billmate Account - error');
+  define('MODULE_PAYMENT_PCBILLMATE_ADDRESS_WRONG', 'Your Billing address is wrong.');
+  define('MODULE_PAYMENT_PCBILLMATE_CORRECT_ADDRESS', 'Correct Address is :');
+  define('MODULE_PAYMENT_PCBILLMATE_CORRECT_ADDRESS_OPTION', 'Click Yes to continue with new address, No to choose other payment method');
+  define('MODULE_PAYMENT_PCBILLMATE_YES', 'Yes');
+  define('MODULE_PAYMENT_PCBILLMATE_NO', 'No');
+  define('MODULE_PAYMENT_PCBILLMATE_CHOOSEALTERNATIVES', 'Choose alternative address below');
+  define('MODULE_PAYMENT_PCBILLMATE_ERRORDIVIDE', 'Billmate Account - error');
 
-define('MODULE_PAYMENT_PCBILLMATE_PERSON_NUMBER','Social Security Number / Corporate Registration Number');
-define('MODULE_PAYMENT_PCBILLMATE_EMAIL','My email %s is accurate and can be used for billing');
-define('MODULE_PAYMENT_PCBILLMATE_ADDR_TITLE','Note');
-define('MODULE_PAYMENT_PCBILLMATE_CONDITIONS','<!--<a id="terms-delbetalning" href="javascript:;">Terms and conditions</a>
-  	  <script>
-		if (typeof jQuery == \'undefined\') {
-			var script = document.createElement(\'script\');
-			script.type = "text/javascript";
-			script.src = "http://code.jquery.com/jquery-1.9.1.js";
-			document.getElementsByTagName(\'head\')[0].appendChild(script);
-		}
-	  </script>
-		<script type="text/javascript">
-			var eid = "%s";
-			jQuery(function(){
-			  $.getScript("https://billmate.se/billmate/base.js", function(){
-				$("#terms-delbetalning").Terms("villkor_delbetalning",{eid: eid,effectiverate:34});
-			  });
-			});
-		</script>-->');
-define('MODULE_PAYMENT_PCBILLMATE_ADDR_NOTICE','Your billing and shipping address will be automatically updated to your registered address.');
-define('MODULE_PAYMENT_PCBILLMATE_CHOOSECONSUMERCREDIT','Select installment');
+  define('MODULE_PAYMENT_PCBILLMATE_PERSON_NUMBER','Social Security Number / Corporate Registration Number:');
+  define('MODULE_PAYMENT_PCBILLMATE_EMAIL','My email is accurate and can be used for invoicing.<br/>I also confirm the <a style="text-decoration: underline !important;" id="terms-delbetalning" href="javascript:;">terms and conditions</a> and accept the liability.
+    <script>
+    if (typeof jQuery == \'undefined\') {
+      var script = document.createElement(\'script\');
+      script.type = "text/javascript";
+      script.src = "http://code.jquery.com/jquery-1.9.1.js";
+      document.getElementsByTagName(\'head\')[0].appendChild(script);
+    }
+    </script>
+    <script type="text/javascript">
+      var eid = "%s";
+      jQuery(function(){
+        $.getScript("https://efinance.se/billmate/base.js", function(){
+        $("#terms-delbetalning").Terms("villkor_delbetalning",{eid: eid,effectiverate:34});
+        });
+      });
+    </script>');
+  define('MODULE_PAYMENT_PCBILLMATE_ADDR_TITLE','');
+  define('MODULE_PAYMENT_PCBILLMATE_CONDITIONS','');
+  define('MODULE_PAYMENT_PCBILLMATE_ADDR_NOTICE','<br/>Note: Your billing and shipping address will<br/>automatically be updated to your registered address.');
+  define('MODULE_PAYMENT_PCBILLMATE_CHOOSECONSUMERCREDIT','Payment Options');
 	define('MODULE_PAYMENT_PCBILLMATE_VAT','VAT');
 
-define('MODULE_PAYMENT_PCBILLMATE_TITLE', 'Billmate Part Payment from xx / month'); //replace xx with amount + currency (e.g. 100 kr)
-define('MODULE_PAYMENT_PCBILLMATE_WITHOUT_TAX', 'Prices are excluding VAT');
+  define('MODULE_PAYMENT_PCBILLMATE_TITLE', 'Billmate Part Pay from xx / month'); //replace xx with amount + currency (e.g. 100 kr)
+  define('MODULE_PAYMENT_PCBILLMATE_WITHOUT_TAX', 'Prices are excluding VAT');
 
 

@@ -42,26 +42,26 @@
   define('MODULE_PAYMENT_BILLMATE_ARTNO_TITLE', 'Produkt art nr attribut (id eller modell)');
   define('MODULE_PAYMENT_BILLMATE_ARTNO_DESC', 'Använd följande produkt attribut för artnr.');
 
-  define('MODULE_PAYMENT_BILLMATE_PERSON_NUMBER','Persnr / Orgnr');
-  define('MODULE_PAYMENT_BILLMATE_EMAIL','Min e-postadress %s är korrekt och får användas för fakturering.');
-  define('MODULE_PAYMENT_BILLMATE_ADDR_TITLE','Observera');
-  define('MODULE_PAYMENT_BILLMATE_CONDITIONS','<a id="terms" href="javascript:;">Köpvillkor</a>
-  	  <script>
-		if (typeof jQuery == \'undefined\') {
-			var script = document.createElement(\'script\');
-			script.type = "text/javascript";
-			script.src = "http://code.jquery.com/jquery-1.9.1.js";
-			document.getElementsByTagName(\'head\')[0].appendChild(script);
-		}
-	  </script>
-		<script type="text/javascript">
-			jQuery(function(){
-			  $.getScript("https://billmate.se/billmate/base.js", function(){
-				$("#terms").Terms("villkor",{invoicefee: 0});
-			  });
-			});
-		</script>');
-  define('MODULE_PAYMENT_BILLMATE_ADDR_NOTICE','Din faktura- och leveransadress kommer att uppdateras automatiskt till din folkbokförda adress.');
+  define('MODULE_PAYMENT_BILLMATE_PERSON_NUMBER','Personnummer / Organisationsnummer:');
+  define('MODULE_PAYMENT_BILLMATE_EMAIL','Min e-postadress är korrekt och får användas för fakturering.<br/>Jag bekräftar även <a style="text-decoration: underline !important;" id="terms" href="javascript:;">k&ouml;pvillkoren</a>  och accepterar betalningsansvaret.
+    <script>
+    if (typeof jQuery == \'undefined\') {
+      var script = document.createElement(\'script\');
+      script.type = "text/javascript";
+      script.src = "http://code.jquery.com/jquery-1.9.1.js";
+      document.getElementsByTagName(\'head\')[0].appendChild(script);
+    }
+    </script>
+    <script type="text/javascript">
+      jQuery(function(){
+        $.getScript("https://billmate.se/billmate/base.js", function(){
+        $("#terms").Terms("villkor",{invoicefee: 0});
+        });
+      });
+    </script>');
+  define('MODULE_PAYMENT_BILLMATE_ADDR_TITLE','');
+  define('MODULE_PAYMENT_BILLMATE_CONDITIONS','');
+  define('MODULE_PAYMENT_BILLMATE_ADDR_NOTICE','<br/>Observera: Din faktura- och leveransadress kommer att<br/>automatiskt uppdateras till din folkbokförda adress.');
 
   define('MODULE_PAYMENT_BILLMATE_ORDER_LIMIT_TITLE', 'kreditgräns');
   define('MODULE_PAYMENT_BILLMATE_MIN_ORDER_LIMIT_TITLE', 'Minsta Ordervärde');

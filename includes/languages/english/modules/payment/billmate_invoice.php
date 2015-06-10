@@ -41,7 +41,7 @@
   define('MODULE_PAYMENT_BILLMATE_SECRET_DESC', 'Shared secret to use with the Billmate service (provided by Billmate)');
   define('MODULE_PAYMENT_BILLMATE_ARTNO_TITLE', 'Product artno attribute (id or model)');
   define('MODULE_PAYMENT_BILLMATE_ARTNO_DESC', 'Use the following product attribute for ArtNo.');
-  define('MODULE_PAYMENT_BILLMATE_PERSON_NUMBER','Social Security Number / Corporate Registration Number');
+  define('MODULE_PAYMENT_BILLMATE_PERSON_NUMBER','Social Security Number / Corporate Registration Number:');
   define('MODULE_PAYMENT_BILLMATE_EMAIL','My email is accurate and can be used for invoicing.<br/>I also confirm the <a style="text-decoration: underline !important;" id="terms" href="javascript:;">terms and conditions</a> and accept the liability.
     <script>
     if (typeof jQuery == \'undefined\') {

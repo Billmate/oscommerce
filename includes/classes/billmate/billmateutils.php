@@ -151,7 +151,7 @@ class BillmateUtils {
      * @param  int    $flags
      * @return array
      */
-    public static function calc_monthly_cost($total, $table, $country, $flags, $language) {
+    public static function calc_monthly_cost($total, $table, $country, $flags, $language, $month_text) {
         global $KRED_ISO3166_NO, $currencies;
 
         $lowest_pp = false;
@@ -167,7 +167,7 @@ class BillmateUtils {
                     $pclass['minpay'] = ceil(BillmateCalc::calc_monthly_cost($total, $pclass, $flags));
 
                     $pclass['description'] = htmlentities($pclass['description']);
-                    $pclass['text'] = $pclass['description']." - ".$currencies->format($pclass['minpay'], false);
+                    $pclass['text'] = $pclass['description']." - ".$currencies->format($pclass['minpay'], false).'/'.$month_text;
 
                     //Norway only
                     if($country === $KRED_ISO3166_NO) {
