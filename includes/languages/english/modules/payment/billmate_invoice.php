@@ -79,8 +79,9 @@
   define('MODULE_PAYMENT_BILLMATE_TEXT_TITLE', 'Invoice');
   define('MODULE_PAYMENT_BILLMATE_TEXT_DESCRIPTION', 'Invoice Payment method, by Billmate');
   define('MODULE_PAYMENT_BILLMATE_TEXT_CONFIRM_DESCRIPTION', 'www.billmate.se');
+  define('MODULE_PAYMENT_BILLMATE_EXTRA_FEE',' - %s invoice fee is added to the order.');
 
-  define('MODULE_PAYMENT_BILLMATE_ADDRESS_WRONG', 'Pay with invoice can only be made with a registered adress. Would you like to make the purchase with the following registered address:');
+define('MODULE_PAYMENT_BILLMATE_ADDRESS_WRONG', 'Pay with invoice can only be made with a registered adress. Would you like to make the purchase with the following registered address:');
   define('MODULE_PAYMENT_BILLMATE_CORRECT_ADDRESS', 'Correct Address is :');
   define('MODULE_PAYMENT_BILLMATE_CORRECT_ADDRESS_OPTION', 'Click Yes to continue with new address, No to choose other payment method');
   define('MODULE_PAYMENT_BILLMATE_YES', 'Yes, make purchase with this address.');

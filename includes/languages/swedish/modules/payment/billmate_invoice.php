@@ -91,7 +91,7 @@
   define('MODULE_PAYMENT_BILLMATE_YES', 'Ja, genomför köp med denna adress');
   define('MODULE_PAYMENT_BILLMATE_NO', 'Nej jag vill ange ett annat personnummer eller byta betalsätt');
   define('MODULE_PAYMENT_BILLMATE_VAT','Moms');
-  define('MODULE_PAYMENT_BILLMATE_EXTRA_FEE','Fakturaavgift på %s tillkommer på ordern.');
+  define('MODULE_PAYMENT_BILLMATE_EXTRA_FEE',' - Fakturaavgift på %s tillkommer på ordern.');
 
   define('MODULE_PAYMENT_BILLMATE_CHOOSEALTERNATIVES', 'V&auml;lj alternativ adress nedan');
   define('MODULE_PAYMENT_BILLMATE_ERRORINVOICE', 'Billmate - misslyckades');
