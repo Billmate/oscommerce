@@ -469,7 +469,7 @@ class BillmateUtils {
     }
 
     /**
-     * @author   "Sebasti�n Grignoli" <grignoli@framework2.com.ar>
+     * @author   "Sebasti?n Grignoli" <grignoli@framework2.com.ar>
      * @package  forceUTF8
      * @version  1.1
      * @link     http://www.framework2.com.ar/dzone/forceUTF8-es/
@@ -483,15 +483,15 @@ class BillmateUtils {
          *
          * It may fail to convert characters to unicode if they fall into one of these scenarios:
          *
-         * 1) when any of these characters:   ��������������������������������
+         * 1) when any of these characters:   ????????????????????????????????
          *    are followed by any of these:  ("group B")
-         *                                    ����������������������?��������
-         * For example:   %ABREPRESENT%C9%BB. �REPRESENTɻ
-         * The "�" (%AB) character will be converted, but the "�" followed by "�" (%C9%BB)
+         *                                    ???????????????????????????????
+         * For example:   %ABREPRESENT%C9%BB. ?REPRESENT?
+         * The "?" (%AB) character will be converted, but the "?" followed by "?" (%C9%BB)
          * is also a valid unicode character, and will be left unchanged.
          *
-         * 2) when any of these: ����������������  are followed by TWO chars from group B,
-         * 3) when any of these: ����  are followed by THREE chars from group B.
+         * 2) when any of these: ????????????????  are followed by TWO chars from group B,
+         * 3) when any of these: ????  are followed by THREE chars from group B.
          *
          * @name forceUTF8
          * @param string $text  Any string.

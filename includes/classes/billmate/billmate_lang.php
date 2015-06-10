@@ -51,9 +51,9 @@ define('BILLMATE_LANG_CORRECT_ADDRESS_OPTION', 'Click Yes to continue with new a
 define('BILLMATE_LANG_YES', 'Yes');
 define('BILLMATE_LANG_NO', 'No');
 define('BILLMATECARDPAY_LANG_SE_ERRORINVOICE','');
-define('BILLMATE_LANG_SE_ADDRESS_WRONG', 'Din angivna adress kan inte anvÃ¤ndas. KÃ¶p mot faktura kan bara faktureras och levereras till din bokfÃ¶ringsadress.');
-define('BILLMATE_LANG_SE_CORRECT_ADDRESS', 'Din bokfÃ¶ringsadress:');
-define('BILLMATE_LANG_SE_CORRECT_ADDRESS_OPTION', 'Klicka pÃ¥ Ja fÃ¶r att fortsÃ¤tta med den nya adressen, Nej fÃ¶r att vÃ¤lja ett annat betalningssÃ¤tt');
+define('BILLMATE_LANG_SE_ADDRESS_WRONG', 'Din angivna adress kan inte användas. Köp mot faktura kan bara faktureras och levereras till din bokföringsadress.');
+define('BILLMATE_LANG_SE_CORRECT_ADDRESS', 'Din bokföringsadress:');
+define('BILLMATE_LANG_SE_CORRECT_ADDRESS_OPTION', 'Klicka på Ja för att fortsätta med den nya adressen, Nej för att välja ett annat betalningssätt');
 define('BILLMATE_LANG_SE_YES', 'Ja');
 define('BILLMATE_LANG_SE_NO', 'Nej');
 
@@ -64,7 +64,7 @@ define('BILLMATE_LANG_SE_STREETADDRESS', 'Adress');
 define('BILLMATE_LANG_SE_POSTCODE', 'Postnummer');
 define('BILLMATE_LANG_SE_CITY', 'Ort');
 define('BILLMATE_LANG_SE_PHONENUMBER', 'Telefonnummer');
-define('BILLMATE_LANG_SE_EMAIL', 'Min e-postadress %s Ã¤r korrekt och fÃ¥r anvÃ¤ndas fÃ¶r fakturering.');
+define('BILLMATE_LANG_SE_EMAIL', 'Min e-postadress %s är korrekt och får användas för fakturering.');
 define('BILLMATE_LANG_SE_CONDITIONS', 'K&ouml;pvillkor');
 define('BILLMATE_LANG_SE_PERSONALNUMBER', 'Persnr / Orgnr');
 define('BILLMATE_LANG_SE_ADDR_TITLE', 'Observera');

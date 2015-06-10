@@ -961,15 +961,15 @@ class Encoding {
    *
    * It may fail to convert characters to UTF-8 if they fall into one of these scenarios:
    *
-   * 1) when any of these characters:   Ã€ÃÃ‚ÃƒÃ„Ã…Ã†Ã‡ÃˆÃ‰ÃŠÃ‹ÃŒÃÃÃÃÃ‘Ã’Ã“Ã”Ã•Ã–Ã—Ã˜Ã™ÃšÃ›ÃœÃÃÃŸ
+   * 1) when any of these characters:   ÀÁÂÃÄÅÆÇÈÉÊËÌÍÎÏĞÑÒÓÔÕÖ×ØÙÚÛÜİŞß
    *    are followed by any of these:  ("group B")
-   *                                    Â¡Â¢Â£Â¤Â¥Â¦Â§Â¨Â©ÂªÂ«Â¬Â­Â®Â¯Â°Â±Â²Â³Â´ÂµÂ¶â€¢Â¸Â¹ÂºÂ»Â¼Â½Â¾Â¿
-   * For example:   %ABREPRESENT%C9%BB. Â«REPRESENTÃ‰Â»
-   * The "Â«" (%AB) character will be converted, but the "Ã‰" followed by "Â»" (%C9%BB) 
+   *                                    ¡¢£¤¥¦§¨©ª«¬­®¯°±²³´µ¶?¸¹º»¼½¾¿
+   * For example:   %ABREPRESENT%C9%BB. «REPRESENTÉ»
+   * The "«" (%AB) character will be converted, but the "É" followed by "»" (%C9%BB) 
    * is also a valid unicode character, and will be left unchanged.
    *
-   * 2) when any of these: Ã Ã¡Ã¢Ã£Ã¤Ã¥Ã¦Ã§Ã¨Ã©ÃªÃ«Ã¬Ã­Ã®Ã¯  are followed by TWO chars from group B,
-   * 3) when any of these: Ã°Ã±Ã²Ã³  are followed by THREE chars from group B.
+   * 2) when any of these: àáâãäåæçèéêëìíîï  are followed by TWO chars from group B,
+   * 3) when any of these: ğñòó  are followed by THREE chars from group B.
    *
    * @name toUTF8
    * @param string $text  Any string.

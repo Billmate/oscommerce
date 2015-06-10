@@ -29,57 +29,57 @@
  */
 
   // Translations in installer
-  define('MODULE_PAYMENT_PCBILLMATE_ALLOWED_TITLE', 'L√§mna det tomt!');
+  define('MODULE_PAYMENT_PCBILLMATE_ALLOWED_TITLE', 'L‰mna det tomt!');
   define('MODULE_PAYMENT_PCBILLMATE_ALLOWED_DESC', '');
   define('MODULE_PAYMENT_PCBILLMATE_STATUS_TITLE', 'Aktivera Billmate Delbetalning');
   define('MODULE_PAYMENT_PCBILLMATE_STATUS_DESC', 'Vill du ta emot Billmate betalningar?');
-  define('MODULE_PAYMENT_PCBILLMATE_ORDER_STATUS_ID_TITLE', 'St√§ll Orderstatus');
-  define('MODULE_PAYMENT_PCBILLMATE_ORDER_STATUS_ID_DESC', 'St√§ll status f√∂r best√§llningar som g√∂rs med denna betalningsmetod modul till detta v√§rde');
+  define('MODULE_PAYMENT_PCBILLMATE_ORDER_STATUS_ID_TITLE', 'St‰ll Orderstatus');
+  define('MODULE_PAYMENT_PCBILLMATE_ORDER_STATUS_ID_DESC', 'St‰ll status fˆr best‰llningar som gˆrs med denna betalningsmetod modul till detta v‰rde');
   define('MODULE_PAYMENT_PCBILLMATE_EID_TITLE', 'Merchant ID');
-  define('MODULE_PAYMENT_PCBILLMATE_EID_DESC', 'Merchant ID (eStore id) som ska anv√§ndas f√∂r Billmate tj√§nst (som tillhandah√•lls av Billmate)');
+  define('MODULE_PAYMENT_PCBILLMATE_EID_DESC', 'Merchant ID (eStore id) som ska anv‰ndas fˆr Billmate tj‰nst (som tillhandahÂlls av Billmate)');
   define('MODULE_PAYMENT_PCBILLMATE_SECRET_TITLE', 'delad hemlighet');
-  define('MODULE_PAYMENT_PCBILLMATE_SECRET_DESC', 'Delad hemlighet att anv√§nda med Billmate tj√§nst (som tillhandah√•lls av Billmate)');
+  define('MODULE_PAYMENT_PCBILLMATE_SECRET_DESC', 'Delad hemlighet att anv‰nda med Billmate tj‰nst (som tillhandahÂlls av Billmate)');
   define('MODULE_PAYMENT_PCBILLMATE_ARTNO_TITLE', 'Produkt art nr attribut (id eller modell)');
-  define('MODULE_PAYMENT_PCBILLMATE_ARTNO_DESC', 'Anv√§nd f√∂ljande produkt attribut f√∂r artnr.');
-  define('MODULE_PAYMENT_PCBILLMATE_ORDER_LIMIT_TITLE', 'kreditgr√§ns');
-  define('MODULE_PAYMENT_PCBILLMATE_MIN_ORDER_LIMIT_TITLE', 'Minsta orderv√§rde');
-  define('MODULE_PAYMENT_PCBILLMATE_ORDER_LIMIT_DESC', 'Visa endast denna betalning alternativ f√∂r best√§llningar med f√§rre √§n v√§rdet nedan.');
-  define('MODULE_PAYMENT_PCBILLMATE_MIN_ORDER_LIMIT_DESC', 'Visa endast denna betalning alternativ f√∂r best√§llningar med st√∂rre √§n v√§rdet nedan.');
+  define('MODULE_PAYMENT_PCBILLMATE_ARTNO_DESC', 'Anv‰nd fˆljande produkt attribut fˆr artnr.');
+  define('MODULE_PAYMENT_PCBILLMATE_ORDER_LIMIT_TITLE', 'kreditgr‰ns');
+  define('MODULE_PAYMENT_PCBILLMATE_MIN_ORDER_LIMIT_TITLE', 'Minsta orderv‰rde');
+  define('MODULE_PAYMENT_PCBILLMATE_ORDER_LIMIT_DESC', 'Visa endast denna betalning alternativ fˆr best‰llningar med f‰rre ‰n v‰rdet nedan.');
+  define('MODULE_PAYMENT_PCBILLMATE_MIN_ORDER_LIMIT_DESC', 'Visa endast denna betalning alternativ fˆr best‰llningar med stˆrre ‰n v‰rdet nedan.');
   define('MODULE_PAYMENT_PCBILLMATE_ORDER_TOTAL_IGNORE_TITLE', 'Ignorera tabell');
-  define('MODULE_PAYMENT_PCBILLMATE_ORDER_TOTAL_IGNORE_DESC', 'Ignorera dessa poster fr√•n den totala ordersumman listan n√§r de sammanst√§ller fakturaunderlag');
+  define('MODULE_PAYMENT_PCBILLMATE_ORDER_TOTAL_IGNORE_DESC', 'Ignorera dessa poster frÂn den totala ordersumman listan n‰r de sammanst‰ller fakturaunderlag');
   define('MODULE_PAYMENT_PCBILLMATE_ZONE_TITLE', 'Betalning Zone');
-  define('MODULE_PAYMENT_PCBILLMATE_ZONE_DESC', 'Om en zon √§r markerad, endast aktivera denna betalningsmetod f√∂r den zonen.');
+  define('MODULE_PAYMENT_PCBILLMATE_ZONE_DESC', 'Om en zon ‰r markerad, endast aktivera denna betalningsmetod fˆr den zonen.');
   define('MODULE_PAYMENT_PCBILLMATE_TAX_CLASS_TITLE', 'Tax Class');
-  define('MODULE_PAYMENT_PCBILLMATE_TAX_CLASS_DESC', 'Anv√§nd f√∂ljande skatteklass p√• betalning laddning.');
-  define('MODULE_PAYMENT_PCBILLMATE_SORT_ORDER_TITLE', 'Sortera ordningen p√• displayen.');
-  define('MODULE_PAYMENT_PCBILLMATE_SORT_ORDER_DESC', 'Sortera ordningen p√• displayen. L√§gst visas f√∂rst.');
+  define('MODULE_PAYMENT_PCBILLMATE_TAX_CLASS_DESC', 'Anv‰nd fˆljande skatteklass pÂ betalning laddning.');
+  define('MODULE_PAYMENT_PCBILLMATE_SORT_ORDER_TITLE', 'Sortera ordningen pÂ displayen.');
+  define('MODULE_PAYMENT_PCBILLMATE_SORT_ORDER_DESC', 'Sortera ordningen pÂ displayen. L‰gst visas fˆrst.');
   define('MODULE_PAYMENT_PCBILLMATE_LIVEMODE_TITLE', 'Live Server');
-  define('MODULE_PAYMENT_PCBILLMATE_LIVEMODE_DESC', 'Vill du anv√§nda Billmate LIVE server (true) eller BETA-servern (falskt)?');
-  define('MODULE_PAYMENT_PCBILLMATE_TESTMODE_TITLE', '(TESTL√ÑGE)');
-  define('MODULE_PAYMENT_PCBILLMATE_TESTMODE_DESC', 'Vill du aktivera testl√§get? Vi kommer inte att betala f√∂r de fakturor som skapas med testpersonerna eller f√∂retag, och vi kommer inte att samla in n√•gra avgifter ocks√•.');
-  define('MODULE_PAYMENT_PCBILLMATE_PCLASS_TITLE', 'St√§ll Pclass ID f√∂r kampanjer');
+  define('MODULE_PAYMENT_PCBILLMATE_LIVEMODE_DESC', 'Vill du anv‰nda Billmate LIVE server (true) eller BETA-servern (falskt)?');
+  define('MODULE_PAYMENT_PCBILLMATE_TESTMODE_TITLE', '(TESTLƒGE)');
+  define('MODULE_PAYMENT_PCBILLMATE_TESTMODE_DESC', 'Vill du aktivera testl‰get? Vi kommer inte att betala fˆr de fakturor som skapas med testpersonerna eller fˆretag, och vi kommer inte att samla in nÂgra avgifter ocksÂ.');
+  define('MODULE_PAYMENT_PCBILLMATE_PCLASS_TITLE', 'St‰ll Pclass ID fˆr kampanjer');
   define('MODULE_PAYMENT_PCBILLMATE_PCLASS_DESC', 'Semikolon separerad lista, utan mellanslag.');
-  define('MODULE_PAYMENT_PCBILLMATE_MONTH_TITLE', 'St√§ll M√•nad');
-  define('MODULE_PAYMENT_PCBILLMATE_MONTH','M√•nad');
+  define('MODULE_PAYMENT_PCBILLMATE_MONTH_TITLE', 'St‰ll MÂnad');
+  define('MODULE_PAYMENT_PCBILLMATE_MONTH','MÂnad');
   define('MODULE_PAYMENT_PCBILLMATE_MONTH_DESC', 'Semikolon separerad lista, utan mellanslag.');
-  define('MODULE_PAYMENT_PCBILLMATE_MONTH_FEE_TITLE', 'St√§ll M√•nadsavgift');
+  define('MODULE_PAYMENT_PCBILLMATE_MONTH_FEE_TITLE', 'St‰ll MÂnadsavgift');
   define('MODULE_PAYMENT_PCBILLMATE_MONTH_FEE_DESC', 'Semikolon separerad lista, utan mellanslag.');
-  define('MODULE_PAYMENT_PCBILLMATE_RATE_TITLE', 'St√§ll Rate');
+  define('MODULE_PAYMENT_PCBILLMATE_RATE_TITLE', 'St‰ll Rate');
   define('MODULE_PAYMENT_PCBILLMATE_RATE_DESC', 'Semikolon separerad lista, utan mellanslag.');
-  define('MODULE_PAYMENT_PCBILLMATE_START_FEE_TITLE', 'St√§ll startavgift');
+  define('MODULE_PAYMENT_PCBILLMATE_START_FEE_TITLE', 'St‰ll startavgift');
   define('MODULE_PAYMENT_PCBILLMATE_START_FEE_DESC', 'Semikolon separerad lista, utan mellanslag.');
-  define('MODULE_PAYMENT_PCBILLMATE_PCLASS_DEFAULT_TITLE', 'Pclass f√∂r Konto');
-  define('MODULE_PAYMENT_PCBILLMATE_PCLASS_DEFAULT_DESC', 'Pclass f√∂r \"konto\"');
+  define('MODULE_PAYMENT_PCBILLMATE_PCLASS_DEFAULT_TITLE', 'Pclass fˆr Konto');
+  define('MODULE_PAYMENT_PCBILLMATE_PCLASS_DEFAULT_DESC', 'Pclass fˆr \"konto\"');
 
   define('MODULE_PAYMENT_PCBILLMATE_TEXT_TITLE', 'Billmate Delbetalning');
-  define('MODULE_PAYMENT_PCBILLMATE_TEXT_DESCRIPTION', 'Delbetalning Sverige fr√•n Billmate');
+  define('MODULE_PAYMENT_PCBILLMATE_TEXT_DESCRIPTION', 'Delbetalning Sverige frÂn Billmate');
   define('MODULE_PAYMENT_PCBILLMATE_TEXT_CONFIRM_DESCRIPTION', 'www.billmate.se');
 
   define('MODULE_PAYMENT_PCBILLMATE_PERSON_NUMBER','Personnummer / Organisationsnummer:');
-  //define('MODULE_PAYMENT_PCBILLMATE_EMAIL','Min e-postadress %s √§r korrekt och f√•r anv√§ndas f√∂r fakturering.');
+  //define('MODULE_PAYMENT_PCBILLMATE_EMAIL','Min e-postadress %s ‰r korrekt och fÂr anv‰ndas fˆr fakturering.');
   define('MODULE_PAYMENT_PCBILLMATE_ADDR_TITLE','');
   define('MODULE_PAYMENT_PCBILLMATE_CONDITIONS','');
-  define('MODULE_PAYMENT_PCBILLMATE_EMAIL','Min e-postadress √§r korrekt och f√•r anv√§ndas f√∂r fakturering.<br/>Jag bekr√§ftar √§ven <a style="text-decoration: underline !important;" id="terms-delbetalning" href="javascript:;">k&ouml;pvillkoren</a>  och accepterar betalningsansvaret.
+  define('MODULE_PAYMENT_PCBILLMATE_EMAIL','Min e-postadress ‰r korrekt och fÂr anv‰ndas fˆr fakturering.<br/>Jag bekr‰ftar ‰ven <a style="text-decoration: underline !important;" id="terms-delbetalning" href="javascript:;">k&ouml;pvillkoren</a>  och accepterar betalningsansvaret.
     <script>
     if (!window.jQuery) {
       var script = document.createElement(\'script\');
@@ -98,14 +98,14 @@
         });
       },1000);
     </script>');
-  define('MODULE_PAYMENT_PCBILLMATE_ADDR_NOTICE','<br/>Observera: Din faktura- och leveransadress kommer att automatiskt uppdateras till din folkbokf√∂rda adress.');
+  define('MODULE_PAYMENT_PCBILLMATE_ADDR_NOTICE','<br/>Observera: Din faktura- och leveransadress kommer att automatiskt uppdateras till din folkbokfˆrda adress.');
   define('MODULE_PAYMENT_PCBILLMATE_CHOOSECONSUMERCREDIT','Betalningsalternativ');
   define('MODULE_PAYMENT_PCBILLMATE_WITHOUT_TAX', 'Priser exkl. moms');
   define('MODULE_PAYMENT_PCBILLMATE_TITLE', 'Billmate Delbetalning fr&aring;n xx/m&aring;n'); //replace xx with amount + currency (e.g. 100 kr)
 
-define('MODULE_PAYMENT_PCBILLMATE_ADDRESS_WRONG', 'Din angivna adress kan inte anv√§ndas. K√∂p mot faktura kan bara faktureras och levereras till din bokf√∂ringsadress.');
-define('MODULE_PAYMENT_PCBILLMATE_CORRECT_ADDRESS', 'Din bokf√∂ringsadress:');
-define('MODULE_PAYMENT_PCBILLMATE_CORRECT_ADDRESS_OPTION', 'Klicka p√• Ja f√∂r att forts√§tta med den nya adressen, Nej f√∂r att v√§lja ett annat betalningss√§tt');
+define('MODULE_PAYMENT_PCBILLMATE_ADDRESS_WRONG', 'Din angivna adress kan inte anv‰ndas. Kˆp mot faktura kan bara faktureras och levereras till din bokfˆringsadress.');
+define('MODULE_PAYMENT_PCBILLMATE_CORRECT_ADDRESS', 'Din bokfˆringsadress:');
+define('MODULE_PAYMENT_PCBILLMATE_CORRECT_ADDRESS_OPTION', 'Klicka pÂ Ja fˆr att forts‰tta med den nya adressen, Nej fˆr att v‰lja ett annat betalningss‰tt');
 define('MODULE_PAYMENT_PCBILLMATE_YES', 'Ja');
 define('MODULE_PAYMENT_PCBILLMATE_NO', 'Nej');
 	define('MODULE_PAYMENT_PCBILLMATE_VAT','Moms');

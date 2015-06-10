@@ -476,7 +476,7 @@ class BillmateCalc {
     /**
      * Calculates the monthly cost for the specified pclass.
      *
-     * @param  int   $sum          The sum for the order/product in �ren/cents
+     * @param  int   $sum          The sum for the order/product in ?ren/cents
      * @param  int   $months       Number of months.
      * @param  int   $fee          fee for the pclass.
      * @param  int   $startfee     Starting fee for the pclass.
