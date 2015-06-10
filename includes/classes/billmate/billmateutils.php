@@ -200,9 +200,9 @@ class BillmateUtils {
             }
         }
 
-        if(count($listarray) > 0) {
+        /*if(count($listarray) > 0) {
             usort($listarray, "pck_cmp");
-        }
+        }*/
 
         return $listarray;
     }
