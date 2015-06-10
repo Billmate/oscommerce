@@ -1,6 +1,6 @@
 <?php
 /**
- *  Copyright 2010 BILLMATE AB. All rights reserved.
+ *  Copyright 2015 Billmate AB. All rights reserved.
  *
  *  Redistribution and use in source and binary forms, with or without modification, are
  *  permitted provided that the following conditions are met:
@@ -24,14 +24,14 @@
  *
  *  The views and conclusions contained in the software and documentation are those of the
  *  authors and should not be interpreted as representing official policies, either expressed
- *  or implied, of BILLMATE AB.
+ *  or implied, of Billmate AB.
  *
  */
 
   // Translations in installer
   define('MODULE_PAYMENT_PCBILLMATE_ALLOWED_TITLE', 'Leave this blank!');
   define('MODULE_PAYMENT_PCBILLMATE_ALLOWED_DESC', '');
-  define('MODULE_PAYMENT_PCBILLMATE_STATUS_TITLE', 'Enable Billmate module');
+  define('MODULE_PAYMENT_PCBILLMATE_STATUS_TITLE', 'Enable Billmate Part Payment Module');
   define('MODULE_PAYMENT_PCBILLMATE_STATUS_DESC', 'Do you want to accept Billmate payments?');
   define('MODULE_PAYMENT_PCBILLMATE_ORDER_STATUS_ID_TITLE', 'Set Order Status');
   define('MODULE_PAYMENT_PCBILLMATE_ORDER_STATUS_ID_DESC', 'Set the status of orders made with this payment module to this value');
@@ -73,12 +73,12 @@
   define('MODULE_PAYMENT_PCBILLMATE_START_FEE_DESC', 'Semicolon separated list, with no spaces.');
   define('MODULE_PAYMENT_PCBILLMATE_PCLASS_DEFAULT_TITLE', 'Pclass for Account');
   define('MODULE_PAYMENT_PCBILLMATE_PCLASS_DEFAULT_DESC', 'Pclass for \"Account\"');
-  
-  define('MODULE_PAYMENT_PCBILLMATE_TEXT_TITLE', 'Billmate part payment');
-  define('MODULE_PAYMENT_PCBILLMATE_TEXT_DESCRIPTION', 'Part payment Sweden from Billmate');
+
+  define('MODULE_PAYMENT_PCBILLMATE_TEXT_TITLE', 'Billmate Part Payment');
+  define('MODULE_PAYMENT_PCBILLMATE_TEXT_DESCRIPTION', 'Part Payment Sweden from Billmate');
   define('MODULE_PAYMENT_PCBILLMATE_TEXT_CONFIRM_DESCRIPTION', 'www.billmate.se');
-  
-  
+
+
 define('MODULE_PAYMENT_PCBILLMATE_ADDRESS_WRONG', 'Your Billing address is wrong.');
 define('MODULE_PAYMENT_PCBILLMATE_CORRECT_ADDRESS', 'Correct Address is :');
 define('MODULE_PAYMENT_PCBILLMATE_CORRECT_ADDRESS_OPTION', 'Click Yes to continue with new address, No to choose other payment method');
@@ -87,10 +87,10 @@ define('MODULE_PAYMENT_PCBILLMATE_NO', 'No');
 define('MODULE_PAYMENT_PCBILLMATE_CHOOSEALTERNATIVES', 'Choose alternative address below');
 define('MODULE_PAYMENT_PCBILLMATE_ERRORDIVIDE', 'Billmate Account - error');
 
-define('MODULE_PAYMENT_PCBILLMATE_PERSON_NUMBER','Personal Number');
+define('MODULE_PAYMENT_PCBILLMATE_PERSON_NUMBER','Social Security Number / Corporate Registration Number');
 define('MODULE_PAYMENT_PCBILLMATE_EMAIL','My email %s is accurate and can be used for billing');
 define('MODULE_PAYMENT_PCBILLMATE_ADDR_TITLE','Note');
-define('MODULE_PAYMENT_PCBILLMATE_CONDITIONS','<a id="terms-delbetalning" href="javascript:;">Terms and conditions</a> 
+define('MODULE_PAYMENT_PCBILLMATE_CONDITIONS','<!--<a id="terms-delbetalning" href="javascript:;">Terms and conditions</a>
   	  <script>
 		if (typeof jQuery == \'undefined\') {
 			var script = document.createElement(\'script\');
@@ -106,12 +106,12 @@ define('MODULE_PAYMENT_PCBILLMATE_CONDITIONS','<a id="terms-delbetalning" href="
 				$("#terms-delbetalning").Terms("villkor_delbetalning",{eid: eid,effectiverate:34});
 			  });
 			});
-		</script>');
+		</script>-->');
 define('MODULE_PAYMENT_PCBILLMATE_ADDR_NOTICE','Your billing and shipping address will be automatically updated to your registered address.');
 define('MODULE_PAYMENT_PCBILLMATE_CHOOSECONSUMERCREDIT','Select installment');
 	define('MODULE_PAYMENT_PCBILLMATE_VAT','VAT');
 
-define('MODULE_PAYMENT_PCBILLMATE_TITLE', 'Billmate part payment from xx / month'); //replace xx with amount + currency (e.g. 100 kr)
+define('MODULE_PAYMENT_PCBILLMATE_TITLE', 'Billmate Part Payment from xx / month'); //replace xx with amount + currency (e.g. 100 kr)
 define('MODULE_PAYMENT_PCBILLMATE_WITHOUT_TAX', 'Prices are excluding VAT');
 
 

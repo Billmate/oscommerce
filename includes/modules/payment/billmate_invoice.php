@@ -202,7 +202,7 @@ class billmate_invoice {
 
     function selection() {
 
-        global $order, $customer_id, $currencies, $currency, $user_billing;
+        global $order, $customer_id, $currencies, $currency, $user_billing, $languages_id;
 
         require_once(DIR_FS_CATALOG . DIR_WS_CLASSES . 'billmate/billmateutils.php');
 
@@ -266,8 +266,12 @@ class billmate_invoice {
         if(!empty($_GET['error']) && $_GET['error'] == 'invalidaddress' && !empty( $_SESSION['WrongAddress'] ) ){
             $popup = $_SESSION['WrongAddress'];
         }
+
+        $languageCode = tep_db_fetch_array(tep_db_query("select code from languages where languages_id = " . $languages_id));
+        if(!in_array($languageCode['code'],array('sv','en')))
+            $languageCode['code'] = 'en';
         $fields=array(
-                array('title' => BILLMATE_LANG_SE_IMGINVOICE,
+                array('title' => '<img src="'.HTTP_SERVER.DIR_WS_HTTP_CATALOG.'/images/billmate/'.$languageCode['code'].'/invoice.png" />',
                         'field' => '<script type="text/javascript">
                           if(!window.jQuery){
 	                          var jq = document.createElement("script");
@@ -277,19 +281,19 @@ class billmate_invoice {
                           }
 </script>'.$js),
                 array('title' => MODULE_PAYMENT_BILLMATE_CONDITIONS,
-                        'field' => "
-				<a href=\"#\" id=\"billmate_invoice\" onclick=\"ShowBillmateInvoicePopup(event);return false;\"></a>"),
-                array('title' => "",
+                        'field' => "<a href=\"#\" id=\"billmate_invoice\" onclick=\"ShowBillmateInvoicePopup(event);return false;\"></a>"),
+                array('title' => "<link rel='stylesheet' href='".HTTP_SERVER.DIR_WS_HTTP_CATALOG."/billmatestyle.css'/>",
                         'field' => $popup),				
                 array('title' => MODULE_PAYMENT_BILLMATE_PERSON_NUMBER,
                         'field' => tep_draw_input_field('billmate_pnum',
                         $billmate_pnum)),
-                array('title' => sprintf(MODULE_PAYMENT_BILLMATE_EMAIL , $order->customer['email_address']),
-                        'field' => tep_draw_checkbox_field('billmate_email',
-                        $order->customer['email_address'],true)));
+                array('title' =>tep_draw_checkbox_field('billmate_email',
+                    $order->customer['email_address'],true).sprintf(MODULE_PAYMENT_BILLMATE_EMAIL , $order->customer['email_address']),
+                        'field' =>  '')
+        );
 
         //Shipping/billing address notice
-        $fields[] = array('title' => MODULE_PAYMENT_BILLMATE_ADDR_TITLE, 'field' => MODULE_PAYMENT_BILLMATE_ADDR_NOTICE);
+        $fields[] = array('title' => MODULE_PAYMENT_BILLMATE_ADDR_TITLE.' '.MODULE_PAYMENT_BILLMATE_ADDR_NOTICE, 'field' => '');
 
         return array('id' => $this->code,
                 'module' => $this->title,
@@ -808,8 +812,9 @@ class billmate_invoice {
 	    $taxValue += $handlingPrice * ($handlingTaxRate/100);
 	    $totaltax = round($taxValue,0);
 		$totalwithtax = round($order->info['total']*100,0);
-	    $totalwithtax += $shippingPrice * ($shippingTaxRate/100);
+
 		$totalwithouttax = $totalValue;
+
 		$rounding = $totalwithtax - ($totalwithouttax+$totaltax);
 		
 		$invoiceValues['Cart'] = array(

@@ -151,14 +151,14 @@ class BillmateUtils {
      * @param  int    $flags
      * @return array
      */
-    public static function calc_monthly_cost($total, $table, $country, $flags) {
+    public static function calc_monthly_cost($total, $table, $country, $flags, $language) {
         global $KRED_ISO3166_NO, $currencies;
 
         $lowest_pp = false;
         $listarray = array();
         $special = array();
 
-        $pclasses = self::get_pclasses($table, $country);
+        $pclasses = self::get_pclasses($table, $country,$language);
         foreach($pclasses as &$pclass) {
 			$pclass['description'] = utf8_decode($pclass['description']);
 
@@ -216,7 +216,7 @@ class BillmateUtils {
      */
     public static function display_pclasses($table, $country) {
 
-        $pclasses = self::get_pclasses($table, $country);
+        $pclasses = self::get_pclasses($table, $country,false);
 
 		if( sizeof($pclasses) == 0 ) return false;
 		?>
@@ -273,10 +273,13 @@ class BillmateUtils {
      * @param  int    $country
      * @return array
      */
-    public static function get_pclasses($table, $country) {
+    public static function get_pclasses($table, $country,$language = false) {
         if(strlen(trim($table)) > 0) {
             self::create_db($table); //incase it doesn't exist, below will not cause an error.
-            $query = tep_db_query("SELECT * FROM `".$table."`");
+            if($language)
+                $query = tep_db_query("SELECT * FROM `".$table."` WHERE `language` ='".strtolower($language)."'");
+            else
+                $query = tep_db_query("SELECT * FROM `".$table."`");
             $tmp = array();
             while($row = tep_db_fetch_array($query)) {
                 $tmp[] = $row;
@@ -324,22 +327,23 @@ class BillmateUtils {
      * @param string $table
      * @param array  $pclasses
      */
-    public static function update_pclasses($table, $pclasses) {
+    public static function update_pclasses($table, $pclasses,$language) {
         if(strlen(trim($table)) > 0) {
             //Create table, will not do anything if it exists.
+            error_log(print_r($pclasses,true));
+            error_log($language);
+            tep_db_query("DELETE FROM `".$table."` WHERE `language` = '".$language."'");
 
-            BillmateUtils::remove_db($table);
-            BillmateUtils::create_db($table);
 			$eid = $pclasses['eid'];
             foreach((array)$pclasses as $key=>$pclass) {
 				if( is_array($pclass) ) :
 					//Delete existing pclass
 					$pclass_id = $key+1;
 					$pclass['startfee'] /= 100; $pclass['handlingfee'] /= 100; $pclass['minamount'] /= 100; $pclass['maxamount'] /= 100;
-					tep_db_query("DELETE FROM `".$table."` WHERE `eid` = '".$eid."' and `id` = '".$pclass_id."'");
+
 					//Insert new pclass (replace into only exists for MySQL...)
 					tep_db_query("INSERT INTO `".$table."` (`eid`, `id`, `description`, `nbrofmonths`, `startfee`, `handlingfee`, `minamount`, `maxamount`, `country`, 
-								  `type`, `expirydate`, `interestrate`, `currency`, `language`, `activated`) VALUES ('".$eid."', '".$pclass_id."','".$pclass['description']."', 
+								  `type`, `expirydate`, `interestrate`, `currency`, `language`, `activated`) VALUES ('".$eid."', '".$pclass['paymentplanid']."','".$pclass['description']."',
 								  '".$pclass['nbrofmonths']."', '".$pclass['startfee']."', '".$pclass['handlingfee']."', '".$pclass['minamount']."', '".$pclass['maxamount']."', 
 								  '".$pclass['country']."', '".$pclass['type']."', '".$pclass['expirydate']."', '".$pclass['interestrate']."', '".$pclass['currency']."', '".$pclass['language']."', '')");
 				endif;

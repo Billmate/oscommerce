@@ -201,7 +201,7 @@ class pcbillmate {
     }
 
     function selection() {
-        global $pcbillmate_testmode, $order, $customer_id, $currencies, $KRED_ISO3166_SE, $currency, $user_billing, $shipping;
+        global $pcbillmate_testmode, $order, $customer_id, $currencies, $KRED_ISO3166_SE, $currency, $user_billing, $shipping,$languages_id;
 
         //Set the right Host and Port
         $livemode = $this->pcbillmate_testmode == false;
@@ -264,7 +264,10 @@ class pcbillmate {
 			$total += $order->info['shipping_cost'] * ($shipp[0]['tax']/100);
 	    }
         //Get and calculate monthly costs for all pclasses
-        $pclasses = BillmateUtils::calc_monthly_cost($total, MODULE_PAYMENT_PCBILLMATE_PCLASS_TABLE, $order->billing['country']['iso_code_2'], 0);
+        $languageCode = tep_db_fetch_array(tep_db_query("select code from languages where languages_id = " . $languages_id));
+        if(!in_array($languageCode['code'],array('sv','en')))
+            $languageCode['code'] = 'en';
+        $pclasses = BillmateUtils::calc_monthly_cost($total, MODULE_PAYMENT_PCBILLMATE_PCLASS_TABLE, $order->billing['country']['iso_code_2'], 0,$languageCode['code']);
         
         $lowest = BillmateUtils::get_cheapest_pclass($pclasses,$total);
 
@@ -292,8 +295,9 @@ class pcbillmate {
         //Fade in/fade out code for the module
         $js = ($this->jQuery) ? BillmateUtils::get_display_jQuery($this->code) : "";
 
+
         $fields=array(
-                array('title' => BILLMATE_LANG_SE_IMGCONSUMERCREDIT,
+                array('title' => '<img src="'.HTTP_SERVER.DIR_WS_HTTP_CATALOG.'/images/billmate/'.$languageCode['code'].'/partpayment.png" />',
                         'field' => '<script type="text/javascript">
                           if(!window.jQuery){
 	                          var jq = document.createElement("script");
@@ -309,18 +313,18 @@ class pcbillmate {
                 array('title' => MODULE_PAYMENT_PCBILLMATE_PERSON_NUMBER,
                         'field' => tep_draw_input_field('pcbillmate_pnum',
                         $pcbillmate_pnum)),
-                array('title' => '',
+                array('title' => "<link rel='stylesheet' href='".HTTP_SERVER.DIR_WS_HTTP_CATALOG."/billmatestyle.css'/>",
                         'field' => tep_draw_hidden_field('pcbillmate_phone',
                         $pcbillmate_phone)),
-                array('title' => sprintf(MODULE_PAYMENT_PCBILLMATE_EMAIL, $user_billing['billmate_email']),
-                        'field' => tep_draw_checkbox_field('pcbillmate_email',
-                        $order->customer['email_address'], !empty($pcbillmate_email) || $user_billing['pcbillmate_pnum'] == NULL)));
+                array('title' => tep_draw_checkbox_field('pcbillmate_email',
+                    $order->customer['email_address'], !empty($pcbillmate_email) || $user_billing['pcbillmate_pnum'] == NULL).sprintf(MODULE_PAYMENT_PCBILLMATE_EMAIL, $user_billing['billmate_email']),
+                        'field' =>  ''));
 
         //Show yearly salary if order total is above set "limit".
         
 
         //Shipping/billing address notice
-        $fields[] = array('title' => MODULE_PAYMENT_PCBILLMATE_ADDR_TITLE, 'field' => MODULE_PAYMENT_PCBILLMATE_ADDR_NOTICE);
+        $fields[] = array('title' => MODULE_PAYMENT_PCBILLMATE_ADDR_TITLE.' '.MODULE_PAYMENT_PCBILLMATE_ADDR_NOTICE, 'field' => '');
 
         if(DISPLAY_PRICE_WITH_TAX != 'true') {
             $fields[] = array('title' => '', 'field' => '<font color="red">'.MODULE_PAYMENT_PCBILLMATE_WITHOUT_TAX.'</font>');
@@ -823,7 +827,6 @@ class pcbillmate {
    
 		$ssl = true;
 		$debug = false;
-	    error_log(print_r($_POST,true));
 	    $languageCode = tep_db_fetch_array(tep_db_query("select code from languages where languages_id = " . $languages_id));
 	    if(!defined('BILLMATE_LANGUAGE')) define('BILLMATE_LANGUAGE',$languageCode['code']);
         if(!defined('BILLMATE_SERVER')) define('BILLMATE_SERVER','2.1.7');
@@ -859,7 +862,6 @@ class pcbillmate {
 	    $taxValue += $shippingPrice * ($shippingTaxRate/100);
 		$totaltax = round($taxValue,0);
 		$totalwithtax = round($order->info['total']*100,0);
-	    $totalwithtax += $shippingPrice * ($shippingTaxRate/100);
 		$totalwithouttax = $totalValue;
 		$rounding = $totalwithtax - ($totalwithouttax+$totaltax);
 
@@ -1048,17 +1050,23 @@ class pcbillmate {
                 $secret = MODULE_PAYMENT_PCBILLMATE_SECRET;
 
                 $result = false;
-				$additionalinfo['PaymentData'] = array(
-					"currency"=>'SEK',//SEK
-					"country"=>'se',//Sweden
-					"language"=>'sv',//Swedish
-				);
-				$k = new BillMate($eid,$secret,true,$this->pcbillmate_testmode,false);
-				$result= $k->GetPaymentPlans($additionalinfo);
+            $langs = tep_db_query("select code from languages");
+            while($lang = tep_db_fetch_array($langs)) {
+                if (in_array($lang['code'], array('sv', 'en'))) {
+                    $additionalinfo['PaymentData'] = array(
+                        "currency" => 'SEK',//SEK
+                        "country" => 'se',//Sweden
+                        "language" => $lang['code'],//Swedish
+                    );
+                    $k = new BillMate($eid, $secret, true, $this->pcbillmate_testmode, false);
+                    $result = $k->GetPaymentPlans($additionalinfo);
 
-                BillmateUtils::update_pclasses(MODULE_PAYMENT_PCBILLMATE_PCLASS_TABLE, $result);
-	            error_log($KRED_ISO3166_SE);
+                    BillmateUtils::update_pclasses(MODULE_PAYMENT_PCBILLMATE_PCLASS_TABLE, $result,$lang['code']);
+                }
+            }
+                error_log($KRED_ISO3166_SE);
                 BillmateUtils::display_pclasses(MODULE_PAYMENT_PCBILLMATE_PCLASS_TABLE, $KRED_ISO3166_SE);
+
         }
 
         return array('MODULE_PAYMENT_PCBILLMATE_STATUS',

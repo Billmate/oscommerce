@@ -1,6 +1,6 @@
 ﻿<?php
 /**
- *  Copyright 2010 BILLMATE AB. All rights reserved.
+ *  Copyright 2015 Billmate AB. All rights reserved.
  *
  *  Redistribution and use in source and binary forms, with or without modification, are
  *  permitted provided that the following conditions are met:
@@ -24,7 +24,7 @@
  *
  *  The views and conclusions contained in the software and documentation are those of the
  *  authors and should not be interpreted as representing official policies, either expressed
- *  or implied, of BILLMATE AB.
+ *  or implied, of Billmate AB.
  *
  */
 
@@ -45,7 +45,7 @@
   define('MODULE_PAYMENT_BILLMATE_PERSON_NUMBER','Persnr / Orgnr');
   define('MODULE_PAYMENT_BILLMATE_EMAIL','Min e-postadress %s är korrekt och får användas för fakturering.');
   define('MODULE_PAYMENT_BILLMATE_ADDR_TITLE','Observera');
-  define('MODULE_PAYMENT_BILLMATE_CONDITIONS','<a id="terms" href="javascript:;">Köpvillkor</a> 
+  define('MODULE_PAYMENT_BILLMATE_CONDITIONS','<a id="terms" href="javascript:;">Köpvillkor</a>
   	  <script>
 		if (typeof jQuery == \'undefined\') {
 			var script = document.createElement(\'script\');
@@ -62,7 +62,7 @@
 			});
 		</script>');
   define('MODULE_PAYMENT_BILLMATE_ADDR_NOTICE','Din faktura- och leveransadress kommer att uppdateras automatiskt till din folkbokförda adress.');
-  
+
   define('MODULE_PAYMENT_BILLMATE_ORDER_LIMIT_TITLE', 'kreditgräns');
   define('MODULE_PAYMENT_BILLMATE_MIN_ORDER_LIMIT_TITLE', 'Minsta Ordervärde');
 
@@ -84,13 +84,13 @@
   define('MODULE_PAYMENT_BILLMATE_TEXT_TITLE', 'Faktura - Betala 14 dagar efter leverans');
   define('MODULE_PAYMENT_BILLMATE_TEXT_DESCRIPTION', 'Svensk faktura från Billmate');
   define('MODULE_PAYMENT_BILLMATE_TEXT_CONFIRM_DESCRIPTION', 'www.billmate.se');
-  
-define('MODULE_PAYMENT_BILLMATE_ADDRESS_WRONG', 'Din angivna adress kan inte användas. Köp mot faktura kan bara faktureras och levereras till din bokföringsadress.');
-define('MODULE_PAYMENT_BILLMATE_CORRECT_ADDRESS', 'Din bokföringsadress:');
-define('MODULE_PAYMENT_BILLMATE_CORRECT_ADDRESS_OPTION', 'Klicka på Ja för att fortsätta med den nya adressen, Nej för att välja ett annat betalningssätt');
-define('MODULE_PAYMENT_BILLMATE_YES', 'Ja');
-define('MODULE_PAYMENT_BILLMATE_NO', 'Nej');
-define('MODULE_PAYMENT_BILLMATE_VAT','Moms');
 
-define('MODULE_PAYMENT_BILLMATE_CHOOSEALTERNATIVES', 'V&auml;lj alternativ adress nedan');
-define('MODULE_PAYMENT_BILLMATE_ERRORINVOICE', 'Billmate - misslyckades');
+  define('MODULE_PAYMENT_BILLMATE_ADDRESS_WRONG', 'Köp mot faktura kan bara göras till den adress som är angiven i folkbokföringen. Vill du genomföra köpet med adressen:');
+  define('MODULE_PAYMENT_BILLMATE_CORRECT_ADDRESS', 'Din bokföringsadress:');
+  define('MODULE_PAYMENT_BILLMATE_CORRECT_ADDRESS_OPTION', 'Klicka på Ja för att fortsätta med den nya adressen, Nej för att välja ett annat betalningssätt');
+  define('MODULE_PAYMENT_BILLMATE_YES', 'Ja, genomför köp med denna adress');
+  define('MODULE_PAYMENT_BILLMATE_NO', 'Nej jag vill ange ett annat personnummer eller byta betalsätt');
+  define('MODULE_PAYMENT_BILLMATE_VAT','Moms');
+
+  define('MODULE_PAYMENT_BILLMATE_CHOOSEALTERNATIVES', 'V&auml;lj alternativ adress nedan');
+  define('MODULE_PAYMENT_BILLMATE_ERRORINVOICE', 'Billmate - misslyckades');

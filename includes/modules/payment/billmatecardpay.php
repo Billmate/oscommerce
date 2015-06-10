@@ -171,7 +171,7 @@ class billmatecardpay {
 
     function selection() {
 
-        global $order, $customer_id, $currencies, $currency, $user_billing, $cart_billmate_card_ID;
+        global $order, $customer_id, $currencies, $currency, $user_billing, $cart_billmate_card_ID, $languages_id;
 
         require_once(DIR_FS_CATALOG . DIR_WS_CLASSES . 'billmate/billmateutils.php');
 		
@@ -236,7 +236,11 @@ class billmatecardpay {
         if(!empty($_GET['error']) && $_GET['error'] == 'invalidaddress' && !empty( $_SESSION['WrongAddress'] ) ){
             $popup = $_SESSION['WrongAddress'];
         }
-        $fields[] = array('title' => BILLMATE_LANG_SE_IMGCARDPAY, 'field' => '<script type="text/javascript">
+
+        $languageCode = tep_db_fetch_array(tep_db_query("select code from languages where languages_id = " . $languages_id));
+        if(!in_array($languageCode['code'],array('sv','en')))
+            $languageCode['code'] = 'en';
+        $fields[] = array('title' => '<img src="'.HTTP_SERVER.DIR_WS_HTTP_CATALOG.'/images/billmate/'.$languageCode['code'].'/cardpay.png" />', 'field' => '<script type="text/javascript">
                           if(!window.jQuery){
                           	var jq = document.createElement("script");
                           	jq.type = "text/javascript";
@@ -532,11 +536,10 @@ class billmatecardpay {
                           	var jq = document.createElement("script");
                           	jq.type = "text/javascript";
                           	jq.src = "'.HTTP_SERVER.DIR_WS_HTTP_CATALOG.'jquery.js";
-                          	jq.onload = jq.onreadystatechange = function(){
-                          	    $(document).ready(function(){ $("input[name=\'comments\']").remove(); }); $(\'form[name="checkout_confirmation"]\').submit(function(e){e.preventDefault(); window.location = "'.$redirect.'";});
-                          	}
+
                           	document.getElementsByTagName("head")[0].appendChild(jq);
                           }
+                          $(document).ready(function(){ $("input[name=\'comments\']").remove(); }); $(\'form[name="checkout_confirmation"]\').submit(function(e){e.preventDefault(); window.location = "'.$redirect.'";});
                           </script>';
         return $process_button_string;
     }
@@ -784,7 +787,7 @@ class billmatecardpay {
 
 		global $order, $customer_id, $currency, $currencies, $sendto, $billto,
 			   $billmatecardpay_ot, $billmatecardpay_livemode, $billmatecardpay_testmode,$insert_id, $cart_billmate_card_ID,$payment;
-		global $$payment,$cartID, $cart,$order_id, $languages_id, $language_id, $language, $currency;
+		global $payment,$cartID, $cart,$order_id, $languages_id, $language_id, $language, $currency;
 
 		require(DIR_FS_CATALOG . DIR_WS_CLASSES . 'billmate/billmateutils.php');
 		$order_id = $cart_billmate_card_ID;
@@ -800,11 +803,11 @@ class billmatecardpay {
             return;
         }
         
-		$status = tep_db_query("select orders_status from ".TABLE_ORDERS." where orders_id = {$_DATA['order_id']}");
+		$status = tep_db_query("select orders_status from ".TABLE_ORDERS." where orders_id = {$_DATA['orderid']}");
         $status_array = tep_db_fetch_array( $status );
 
 		$status_history = tep_db_query("select orders_status_history_id from ".TABLE_ORDERS_STATUS_HISTORY.
-					" where orders_id = {$_DATA['order_id']} and comments='Billmate_IPN'");
+					" where orders_id = {$_DATA['orderid']} and comments='Billmate_IPN'");
 		
 		$status_history_a = tep_db_fetch_array($status_history);
 
@@ -866,7 +869,7 @@ class billmatecardpay {
                 if(!defined('BILLMATE_SERVER')) define('BILLMATE_SERVER','2.1.7');
 
                 $k = new BillMate($eid,$secret,$ssl, $this->billmatecardpay_testmode,$debug);
-				$result1 = (object)$k->UpdatePayment( array('PaymentData'=> array("number"=>$_DATA['number'], "orderid"=>(string)$_DATA['order_id'])));
+				$result1 = (object)$k->UpdatePayment( array('PaymentData'=> array("number"=>$_DATA['number'], "orderid"=>(string)$_DATA['orderid'])));
 			}
 		} else {
 			$result1 = (object)$_DATA;

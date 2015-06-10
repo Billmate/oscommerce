@@ -139,7 +139,7 @@ class billmatebank {
 
     function selection() {
 
-        global $order, $customer_id, $currencies, $currency, $user_billing, $cart_billmate_bank_ID,$order_id,$insert_id;
+        global $order, $customer_id, $currencies, $currency, $user_billing, $cart_billmate_bank_ID,$order_id,$insert_id,$languages_id;
 
         if (tep_session_is_registered('cart_billmate_bank_ID')) {
 			$order_id = $insert_id = $cart_billmate_bank_ID;
@@ -199,7 +199,10 @@ class billmatebank {
         $js = ($this->jQuery) ? BillmateUtils::get_display_jQuery($this->code) : "";
         $popup = '';
 
-        $fields[] = array('title' => BILLMATE_LANG_SE_IMGBANK, 'field' => '<script type="text/javascript">
+        $languageCode = tep_db_fetch_array(tep_db_query("select code from languages where languages_id = " . $languages_id));
+        if(!in_array($languageCode['code'],array('sv','en')))
+            $languageCode['code'] = 'en';
+        $fields[] = array('title' => '<img src="'.HTTP_SERVER.DIR_WS_HTTP_CATALOG.'/images/billmate/'.$languageCode['code'].'/bankpay.png" />', 'field' => '<script type="text/javascript">
                           if(!window.jQuery){
                           	var jq = document.createElement("script");
                           	jq.type = "text/javascript";
@@ -498,11 +501,10 @@ class billmatebank {
                           	var jq = document.createElement("script");
                           	jq.type = "text/javascript";
                           	jq.src = "'.HTTP_SERVER.DIR_WS_HTTP_CATALOG.'jquery.js";
-                          	jq.onload = jq.onreadystatechange = function(){
-                          	    $(document).ready(function(){ $("input[name=\'comments\']").remove(); }); $(\'form[name="checkout_confirmation"]\').submit(function(e){e.preventDefault(); window.location = "'.$redirect.'";});
-                          	}
+
                           	document.getElementsByTagName("head")[0].appendChild(jq);
                           }
+                          $(document).ready(function(){ $("input[name=\'comments\']").remove(); }); $(\'form[name="checkout_confirmation"]\').submit(function(e){e.preventDefault(); window.location = "'.$redirect.'";});
                           </script>';
 		return $process_button_string;
     }
@@ -743,8 +745,8 @@ class billmatebank {
 	
     function before_process() {
 		global $order, $customer_id, $currency, $currencies, $sendto, $billto,$already_completed,
-               $billmatebank_ot, $billmatebank_livemode, $billmatebank_testmode,$insert_id, $cart_billmate_bank_ID,$payment,$languages_id;
-		global $$payment,$cartID, $cart;;
+               $billmatebank_ot, $billmatebank_livemode, $billmatebank_testmode,$insert_id, $cart_billmate_bank_ID,$payment,$languages_id,$cartID, $cart;
+
 	
 		require(DIR_FS_CATALOG . DIR_WS_CLASSES . 'billmate/billmateutils.php');
 		$order_id =$cart_billmate_bank_ID;

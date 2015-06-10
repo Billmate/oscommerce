@@ -93,7 +93,7 @@ global $user_billing, $language, $languages_id;
 	if( $addressNotMatched || $shippingAndBilling ){
 
 		if(empty($_POST['geturl'])){
-			$html = '<p><b>'.MODULE_PAYMENT_BILLMATE_CORRECT_ADDRESS.' </b></p>'.($address['firstname']).' '.$address['lastname'].'<br>'.$address['street'].'<br>'.$address['zip'].' '.$address['city'].'<div style="padding: 17px 0px;"> <i>'.MODULE_PAYMENT_BILLMATE_CORRECT_ADDRESS_OPTION.'</i></div> <input type="button" value="'.MODULE_PAYMENT_BILLMATE_YES.'" onclick="updateAddress();" class="button"/> <input type="button" value="'.MODULE_PAYMENT_BILLMATE_NO.'" onclick="closefunc(this)" class="button" style="float:right" />';
+			$html = '<span style="line-height: 1.4em;">'.($address['firstname']).' '.$address['lastname'].'<br>'.$address['street'].'<br>'.$address['zip'].' '.$address['city'].'</span><div style="margin-top:1em;"><input type="button" value="'.MODULE_PAYMENT_BILLMATE_YES.'" onclick="updateAddress();" class="billmate_button"/> <a onclick="closefunc(this)" class="linktag"/>'.MODULE_PAYMENT_BILLMATE_NO.'</a></div> ';
 			die(json_encode(array('success' => false, 'content' => utf8_encode($html),'popup' => true)));
 		} else {
 			if($address->firstname == "") {
