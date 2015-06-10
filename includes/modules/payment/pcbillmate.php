@@ -265,8 +265,10 @@ class pcbillmate {
 	    }
         //Get and calculate monthly costs for all pclasses
         $languageCode = tep_db_fetch_array(tep_db_query("select code from languages where languages_id = " . $languages_id));
-        if(!in_array($languageCode['code'],array('sv','en')))
+        $languageCode = tep_db_fetch_array(tep_db_query("select code from languages where languages_id = " . $languages_id));
+        if(!in_array($languageCode['code'],array('sv','en','se')))
             $languageCode['code'] = 'en';
+        $languageCode['code'] = $languageCode['code'] == 'se' ? 'sv' : 'se';
         $pclasses = BillmateUtils::calc_monthly_cost($total, MODULE_PAYMENT_PCBILLMATE_PCLASS_TABLE, $order->billing['country']['iso_code_2'], 0,$languageCode['code'],MODULE_PAYMENT_PCBILLMATE_MONTH);
         
         $lowest = BillmateUtils::get_cheapest_pclass($pclasses,$total);

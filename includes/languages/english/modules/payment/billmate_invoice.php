@@ -44,7 +44,7 @@
   define('MODULE_PAYMENT_BILLMATE_PERSON_NUMBER','Social Security Number / Corporate Registration Number:');
   define('MODULE_PAYMENT_BILLMATE_EMAIL','My email is accurate and can be used for invoicing.<br/>I also confirm the <a style="text-decoration: underline !important;" id="terms" href="javascript:;">terms and conditions</a> and accept the liability.
     <script>
-    if (typeof jQuery == \'undefined\') {
+    if (!window.jQuery) {
       var script = document.createElement(\'script\');
       script.type = "text/javascript";
       script.src = "http://code.jquery.com/jquery-1.9.1.js";
@@ -52,11 +52,13 @@
     }
     </script>
     <script type="text/javascript">
-      jQuery(function(){
-        $.getScript("https://billmate.se/billmate/base.js", function(){
-        $("#terms").Terms("villkor",{invoicefee: 0});
+      setTimeout(function(){
+        jQuery(function(){
+          $.getScript("https://billmate.se/billmate/base.js", function(){
+            $("#terms").Terms("villkor",{invoicefee: 0});
+          });
         });
-      });
+      },1000);
     </script>');
   define('MODULE_PAYMENT_BILLMATE_ADDR_TITLE','<br/>Note: Your billing and shipping address will<br/>automatically be updated to your registered address.');
   define('MODULE_PAYMENT_BILLMATE_CONDITIONS','');

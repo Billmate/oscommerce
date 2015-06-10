@@ -238,8 +238,9 @@ class billmatecardpay {
         }
 
         $languageCode = tep_db_fetch_array(tep_db_query("select code from languages where languages_id = " . $languages_id));
-        if(!in_array($languageCode['code'],array('sv','en')))
+        if(!in_array($languageCode['code'],array('sv','en','se')))
             $languageCode['code'] = 'en';
+        $languageCode['code'] = $languageCode['code'] == 'se' ? 'sv' : 'se';
         $fields[] = array('title' => '<img src="'.HTTP_SERVER.DIR_WS_HTTP_CATALOG.'/images/billmate/'.$languageCode['code'].'/cardpay.png" />', 'field' => '<script type="text/javascript">
                           if(!window.jQuery){
                           	var jq = document.createElement("script");

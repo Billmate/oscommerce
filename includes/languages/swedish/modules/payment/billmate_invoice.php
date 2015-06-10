@@ -45,7 +45,7 @@
   define('MODULE_PAYMENT_BILLMATE_PERSON_NUMBER','Personnummer / Organisationsnummer:');
   define('MODULE_PAYMENT_BILLMATE_EMAIL','Min e-postadress är korrekt och får användas för fakturering.<br/>Jag bekräftar även <a style="text-decoration: underline !important;" id="terms" href="javascript:;">k&ouml;pvillkoren</a>  och accepterar betalningsansvaret.
     <script>
-    if (typeof jQuery == \'undefined\') {
+    if (!window.jQuery) {
       var script = document.createElement(\'script\');
       script.type = "text/javascript";
       script.src = "http://code.jquery.com/jquery-1.9.1.js";
@@ -53,11 +53,13 @@
     }
     </script>
     <script type="text/javascript">
-      jQuery(function(){
-        $.getScript("https://billmate.se/billmate/base.js", function(){
-        $("#terms").Terms("villkor",{invoicefee: 0});
+      setTimeout(function(){
+        jQuery(function(){
+          $.getScript("https://billmate.se/billmate/base.js", function(){
+            $("#terms").Terms("villkor",{invoicefee: 0});
+          });
         });
-      });
+      },1000);
     </script>');
   define('MODULE_PAYMENT_BILLMATE_ADDR_TITLE','');
   define('MODULE_PAYMENT_BILLMATE_CONDITIONS','');

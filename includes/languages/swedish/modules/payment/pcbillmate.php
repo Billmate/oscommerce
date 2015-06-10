@@ -81,7 +81,7 @@
   define('MODULE_PAYMENT_PCBILLMATE_CONDITIONS','');
   define('MODULE_PAYMENT_PCBILLMATE_EMAIL','Min e-postadress är korrekt och får användas för fakturering.<br/>Jag bekräftar även <a style="text-decoration: underline !important;" id="terms-delbetalning" href="javascript:;">k&ouml;pvillkoren</a>  och accepterar betalningsansvaret.
     <script>
-    if (typeof jQuery == \'undefined\') {
+    if (!window.jQuery) {
       var script = document.createElement(\'script\');
       script.type = "text/javascript";
       script.src = "http://code.jquery.com/jquery-1.9.1.js";
@@ -89,12 +89,14 @@
     }
     </script>
     <script type="text/javascript">
+      setTimeout(function(){
       var eid = "%s";
-      jQuery(function(){
-        $.getScript("https://efinance.se/billmate/base.js", function(){
-        $("#terms-delbetalning").Terms("villkor_delbetalning",{eid: eid,effectiverate:34});
+        jQuery(function(){
+          $.getScript("https://efinance.se/billmate/base.js", function(){
+          $("#terms-delbetalning").Terms("villkor_delbetalning",{eid: eid,effectiverate:34});
+          });
         });
-      });
+      },1000);
     </script>');
   define('MODULE_PAYMENT_PCBILLMATE_ADDR_NOTICE','<br/>Observera: Din faktura- och leveransadress kommer att automatiskt uppdateras till din folkbokförda adress.');
   define('MODULE_PAYMENT_PCBILLMATE_CHOOSECONSUMERCREDIT','Betalningsalternativ');
