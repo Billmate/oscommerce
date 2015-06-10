@@ -255,6 +255,14 @@ class billmate_invoice {
         else
             $billmate_fee = 0;
 
+        if($billmate_fee > 0) {
+            $tax_rate =tep_get_tax_rate(MODULE_BILLMATE_FEE_TAX_CLASS);
+            $billmate_fee = $billmate_fee *( 1+($tax_rate/100));
+            $billmate_fee = number_format($billmate_fee,2);
+            $billmate_fee = $currencies->format($billmate_fee);
+
+            $this->title .= sprintf(MODULE_PAYMENT_BILLMATE_EXTRA_FEE, $billmate_fee);
+        }
         $user_billing = $_SESSION['user_billing'];
 		
         empty($user_billing['billmate_pnum']) ? $billmate_pnum = $personnummer : $billmate_pnum = $user_billing['billmate_pnum'];
