@@ -79,6 +79,7 @@
   define('MODULE_PAYMENT_BILLMATE_TEXT_TESTMODE_DESC', 'Do you want to activate the Testmode? We will not pay for the invoices created with the test persons nor companies and we will not collect any fees as well.');
 
   define('MODULE_PAYMENT_BILLMATE_TEXT_TITLE', 'Invoice');
+  define('MODULE_PAYMENT_BILLMATE_FRONTEND_TEXT_TITLE', 'Invoice');
   define('MODULE_PAYMENT_BILLMATE_TEXT_DESCRIPTION', 'Invoice Payment method, by Billmate');
   define('MODULE_PAYMENT_BILLMATE_TEXT_CONFIRM_DESCRIPTION', 'www.billmate.se');
   define('MODULE_PAYMENT_BILLMATE_EXTRA_FEE',' - %s invoice fee is added to the order.');

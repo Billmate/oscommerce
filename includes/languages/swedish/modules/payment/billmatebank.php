@@ -30,6 +30,7 @@
   define('MODULE_PAYMENT_BILLMATEBANK_TESTMODE_DESC', 'Vill du aktivera testläget? Vi kommer inte att betala för de fakturor som skapas med testpersonerna eller företag, och vi kommer inte att samla in några avgifter också.');
 define('MODULE_PAYMENT_BILLMATEBANK_VAT','Moms');
   define('MODULE_PAYMENT_BILLMATEBANK_TEXT_TITLE', 'Billmate Bank');
+  define('MODULE_PAYMENT_BILLMATEBANK_FRONTEND_TEXT_TITLE', 'Billmate Bank');
   define('MODULE_PAYMENT_BILLMATEBANK_LANG_TESTMODE', '(TESTLÄGE)');
   define('MODULE_PAYMENT_BILLMATEBANK_TEXT_DESCRIPTION', 'Bankköp från Billmate Bank');
   define('MODULE_PAYMENT_BILLMATEBANK_TEXT_CONFIRM_DESCRIPTION', 'www.billmate.se');

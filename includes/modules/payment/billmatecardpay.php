@@ -46,8 +46,13 @@ class billmatecardpay {
         $this->jQuery = true;
         $this->code = 'billmatecardpay';
 
+        if(strpos($_SERVER['SCRIPT_FILENAME'],'admin')) {
+            $this->title = MODULE_PAYMENT_BILLMATECARDPAY_TEXT_TITLE;
+        }
+        else {
+            $this->title = MODULE_PAYMENT_BILLMATECARDPAY_FRONTEND_TEXT_TITLE;
+        }
 
-		$this->title = MODULE_PAYMENT_BILLMATECARDPAY_TEXT_TITLE;
 
         $this->billmatecardpay_testmode = false;
         if ((MODULE_PAYMENT_BILLMATECARDPAY_TESTMODE == 'True')) {

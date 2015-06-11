@@ -20,7 +20,7 @@ class billmatebank {
             $this->title = MODULE_PAYMENT_BILLMATEBANK_TEXT_TITLE;
         }
         else {
-            $this->title = MODULE_PAYMENT_BILLMATEBANK_TEXT_TITLE;
+            $this->title = MODULE_PAYMENT_BILLMATEBANK_FRONTEND_TEXT_TITLE;
         }
 
         $this->billmatebank_testmode = false;

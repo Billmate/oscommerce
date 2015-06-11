@@ -48,7 +48,7 @@ class billmate_invoice {
             $this->title = MODULE_PAYMENT_BILLMATE_TEXT_TITLE;
         }
         else {
-            $this->title = MODULE_PAYMENT_BILLMATE_TEXT_TITLE;
+            $this->title = MODULE_PAYMENT_BILLMATE_FRONTEND_TEXT_TITLE;
         }
 
 		if( $order->billing == null ){

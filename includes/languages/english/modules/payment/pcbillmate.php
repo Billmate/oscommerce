@@ -74,7 +74,8 @@
   define('MODULE_PAYMENT_PCBILLMATE_PCLASS_DEFAULT_TITLE', 'Pclass for Account');
   define('MODULE_PAYMENT_PCBILLMATE_PCLASS_DEFAULT_DESC', 'Pclass for \"Account\"');
 
-  define('MODULE_PAYMENT_PCBILLMATE_TEXT_TITLE', 'Billmate Part Paym');
+  define('MODULE_PAYMENT_PCBILLMATE_TEXT_TITLE', 'Billmate Part Payment');
+  define('MODULE_PAYMENT_PCBILLMATE_FRONTEND_TEXT_TITLE', 'Billmate Part Payment');
   define('MODULE_PAYMENT_PCBILLMATE_TEXT_DESCRIPTION', 'Part Pay from Billmate');
   define('MODULE_PAYMENT_PCBILLMATE_TEXT_CONFIRM_DESCRIPTION', 'www.billmate.se');
 

@@ -52,7 +52,7 @@ class pcbillmate {
         else {
             //$tmp = explode('Billmate', MODULE_PAYMENT_PCBILLMATE_TEXT_TITLE);
             //$this->title = $tmp[0] . 'Billmate';
-			$this->title = MODULE_PAYMENT_PCBILLMATE_TEXT_TITLE;
+			$this->title = MODULE_PAYMENT_PCBILLMATE_FRONTEND_TEXT_TITLE;
         }
 
         $this->sort_order = MODULE_PAYMENT_PCBILLMATE_SORT_ORDER;

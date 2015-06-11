@@ -71,7 +71,9 @@
   define('MODULE_PAYMENT_PCBILLMATE_PCLASS_DEFAULT_TITLE', 'Pclass för Konto');
   define('MODULE_PAYMENT_PCBILLMATE_PCLASS_DEFAULT_DESC', 'Pclass för \"konto\"');
 
-  define('MODULE_PAYMENT_PCBILLMATE_TEXT_TITLE', 'Billmate Delbetalning');
+
+define('MODULE_PAYMENT_PCBILLMATE_TEXT_TITLE', 'Billmate Delbetalning');
+  define('MODULE_PAYMENT_PCBILLMATE_FRONTEND_TEXT_TITLE', 'Billmate Delbetalning');
   define('MODULE_PAYMENT_PCBILLMATE_TEXT_DESCRIPTION', 'Delbetalning Sverige från Billmate');
   define('MODULE_PAYMENT_PCBILLMATE_TEXT_CONFIRM_DESCRIPTION', 'www.billmate.se');
 

@@ -84,6 +84,7 @@
   define('MODULE_PAYMENT_BILLMATE_TEXT_TESTMODE_DESC', 'Vill du aktivera testläget? Vi kommer inte att betala för de fakturor som skapas med testpersonerna eller företag, och vi kommer inte att samla in några avgifter också.');
 
   define('MODULE_PAYMENT_BILLMATE_TEXT_TITLE', 'Faktura - Betala 14 dagar efter leverans');
+  define('MODULE_PAYMENT_BILLMATE_FRONTEND_TEXT_TITLE', 'Faktura - Betala 14 dagar efter leverans');
   define('MODULE_PAYMENT_BILLMATE_TEXT_DESCRIPTION', 'Svensk faktura från Billmate');
   define('MODULE_PAYMENT_BILLMATE_TEXT_CONFIRM_DESCRIPTION', 'www.billmate.se');
 
