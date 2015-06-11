@@ -268,7 +268,8 @@ class pcbillmate {
         $languageCode = tep_db_fetch_array(tep_db_query("select code from languages where languages_id = " . $languages_id));
         if(!in_array($languageCode['code'],array('sv','en','se')))
             $languageCode['code'] = 'en';
-        $languageCode['code'] = $languageCode['code'] == 'se' ? 'sv' : 'se';
+        $languageCode['code'] = $languageCode['code'] == 'se' ? 'sv' : $languageCode['code'];
+
         $pclasses = BillmateUtils::calc_monthly_cost($total, MODULE_PAYMENT_PCBILLMATE_PCLASS_TABLE, $order->billing['country']['iso_code_2'], 0,$languageCode['code'],MODULE_PAYMENT_PCBILLMATE_MONTH);
         
         $lowest = BillmateUtils::get_cheapest_pclass($pclasses,$total);
@@ -859,14 +860,22 @@ class pcbillmate {
 											'Shipping'=> $ship_address
 										);
 		$invoiceValues['Articles'] = $goodsList;
+        $temp = 0;
+        $temptax = 0;
+        $totalValue +=  $shippingPrice;
+        $temptax =  $shippingPrice * ($shippingTaxRate/100);
+        $taxValue += $temptax;
+        $totaltax = round($taxValue,0);
+        $totalwithtax = round($order->info['total']*100,0);
 
-	    $totalValue += $shippingPrice;
-	    $taxValue += $shippingPrice * ($shippingTaxRate/100);
-		$totaltax = round($taxValue,0);
-		$totalwithtax = round($order->info['total']*100,0);
-		$totalwithouttax = $totalValue;
-		$rounding = $totalwithtax - ($totalwithouttax+$totaltax);
+        $totalwithouttax = $totalValue;
 
+        $rounding = $totalwithtax - ($totalwithouttax+$totaltax);
+
+        if(abs($rounding) == ($temptax)){
+            $totalwithtax += abs($rounding);
+            $rounding = 0;
+        }
 		$invoiceValues['Cart'] = array(
 									"Handling" => array(
 										"withouttax" => 0,

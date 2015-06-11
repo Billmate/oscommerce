@@ -278,7 +278,7 @@ class billmate_invoice {
         $languageCode = tep_db_fetch_array(tep_db_query("select code from languages where languages_id = " . $languages_id));
         if(!in_array($languageCode['code'],array('sv','en','se')))
             $languageCode['code'] = 'en';
-        $languageCode['code'] = $languageCode['code'] == 'se' ? 'sv' : 'se';
+        $languageCode['code'] = $languageCode['code'] == 'se' ? 'sv' : $languageCode['code'];
         $fields=array(
                 array('title' => '<img src="'.HTTP_SERVER.DIR_WS_HTTP_CATALOG.'/images/billmate/'.$languageCode['code'].'/invoice.png" />',
                         'field' => '<script type="text/javascript">
@@ -815,17 +815,25 @@ class billmate_invoice {
 											'Shipping'=> $ship_address
 										);
 		$invoiceValues['Articles'] = $goodsList;
-	    $totalValue += $shippingPrice;
-	    $taxValue += $shippingPrice * ($shippingTaxRate/100);
+        $temp = 0;
+        $temptax = 0;
+	    $totalValue +=  $shippingPrice;
+        $temptax =  $shippingPrice * ($shippingTaxRate/100);
+	    $taxValue += $temptax;
 	    $totalValue += $handlingPrice;
-	    $taxValue += $handlingPrice * ($handlingTaxRate/100);
+        $handlingTax = $handlingPrice * ($handlingTaxRate/100);
+	    $taxValue += $handlingTax;
 	    $totaltax = round($taxValue,0);
 		$totalwithtax = round($order->info['total']*100,0);
 
 		$totalwithouttax = $totalValue;
 
 		$rounding = $totalwithtax - ($totalwithouttax+$totaltax);
-		
+
+		if(abs($rounding) == ($handlingTax + $temptax + $handlingPrice)){
+            $totalwithtax += abs($rounding);
+            $rounding = 0;
+        }
 		$invoiceValues['Cart'] = array(
 									"Handling" => array(
 										"withouttax" => ($handlingPrice)?$handlingPrice:0,

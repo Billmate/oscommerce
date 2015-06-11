@@ -202,7 +202,8 @@ class billmatebank {
         $languageCode = tep_db_fetch_array(tep_db_query("select code from languages where languages_id = " . $languages_id));
         if(!in_array($languageCode['code'],array('sv','en','se')))
             $languageCode['code'] = 'en';
-        $languageCode['code'] = $languageCode['code'] == 'se' ? 'sv' : 'se';
+        $languageCode['code'] = $languageCode['code'] == 'se' ? 'sv' : $languageCode['code'];
+
         $fields[] = array('title' => '<img src="'.HTTP_SERVER.DIR_WS_HTTP_CATALOG.'/images/billmate/'.$languageCode['code'].'/bankpay.png" />', 'field' => '<script type="text/javascript">
                           if(!window.jQuery){
                           	var jq = document.createElement("script");
@@ -495,7 +496,6 @@ class billmatebank {
 
         tep_session_register('billmatebank_ot');
 		$return = $this->doInvoice();
-	    error_log('ret'.print_r($return,true));
 		$redirect = $return->url;
 		$process_button_string .= '<script type="text/javascript">
                           if(!window.jQuery){
@@ -505,7 +505,10 @@ class billmatebank {
 
                           	document.getElementsByTagName("head")[0].appendChild(jq);
                           }
-                          $(document).ready(function(){ $("input[name=\'comments\']").remove(); }); $(\'form[name="checkout_confirmation"]\').submit(function(e){e.preventDefault(); window.location = "'.$redirect.'";});
+                          setTimeout(function(){
+                                $(document).ready(function(){ $("input[name=\'comments\']").remove(); }); $(\'form[name="checkout_confirmation"]\').submit(function(e){e.preventDefault(); window.location = "'.$redirect.'";});
+                            },200);
+
                           </script>';
 		return $process_button_string;
     }
