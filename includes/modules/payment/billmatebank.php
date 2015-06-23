@@ -62,6 +62,9 @@ class billmatebank {
         {
             if(is_array($billing))
             {
+                if(!in_array(strtoupper($billing['country']['iso_code_2']),$countryValid)) {
+                    $this->enabled = false;
+                }
                 if(in_array(strtoupper($billing['country']['iso_code_2']),$disabled_countries)) {
                     $this->enabled = false;
                 }
