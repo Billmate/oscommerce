@@ -29,77 +29,81 @@ class billmatebank {
             $this->billmatebank_testmode = true;
         }
 
-		if (!tep_session_is_registered('admin')) {
-			if( $order->billing == null ){
-				$billing = $_SESSION['billmate_billing'];
-			}else{
-				$billing = $_SESSION['billmate_billing'] = $order->billing;
-			}
+		//if (!tep_session_is_registered('admin')) {
+        if( $order->billing == null ){
+            $billing = $_SESSION['billmate_billing'];
+        }else{
+            $billing = $_SESSION['billmate_billing'] = $order->billing;
+        }
 
 
-			(MODULE_PAYMENT_BILLMATEBANK_TESTMODE != 'True') ? $this->billmatebank_livemode = true : $this->billmatebank_livemode = false;
+        (MODULE_PAYMENT_BILLMATEBANK_TESTMODE != 'True') ? $this->billmatebank_livemode = true : $this->billmatebank_livemode = false;
 
-			$this->description = MODULE_PAYMENT_BILLMATEBANK_TEXT_DESCRIPTION . "<br />Version: ".BILLPLUGIN_VERSION;
-			$this->enabled = ((MODULE_PAYMENT_BILLMATEBANK_STATUS == 'True') ?
-					true : false);
+        $this->description = MODULE_PAYMENT_BILLMATEBANK_TEXT_DESCRIPTION . "<br />Version: ".BILLPLUGIN_VERSION;
+        $this->enabled = ((MODULE_PAYMENT_BILLMATEBANK_STATUS == 'True') ? true : false);
 
-			$currencyValid = array('SEK');
-			$countryValid  = array('SE');
-			$disabled_countries = explode(',',
-									trim( 
-										strtolower(MODULE_PAYMENT_BILLMATEBANK_DISABLED_COUNTRYIES),
-										','
-									).','.
-									trim( 
-										strtoupper(MODULE_PAYMENT_BILLMATEBANK_DISABLED_COUNTRYIES),
-										','
-									 )
-								  );
+        $currencyValid = array('SEK');
+        $countryValid  = array('SE');
+        $disabled_countries = explode(',',
+                                trim(
+                                    strtolower(MODULE_PAYMENT_BILLMATEBANK_DISABLED_COUNTRYIES),
+                                    ','
+                                ).','.
+                                trim(
+                                    strtoupper(MODULE_PAYMENT_BILLMATEBANK_DISABLED_COUNTRYIES),
+                                    ','
+                                 )
+                              );
 
-			if (!in_array(strtoupper($currency),$currencyValid)) {
-				$this->enabled = false;
-			}
-			else {
-				if(is_array($billing)) {
-					if(!in_array(strtoupper($billing['country']['iso_code_2']),$countryValid)) {
-						$this->enabled = false;
-					}
-				}
-				else {
-					$query = tep_db_query("SELECT countries_iso_code_2 FROM countries WHERE countries_id = " . (int)$_SESSION['customer_country_id']);
-					$result = tep_db_fetch_array($query);
-			
-					if(is_array($result)) {
-						if(in_array(strtoupper($result['countries_iso_code_2']),$disabled_countries)) {
-							$this->enabled = false;
-						}
-						$this->enabled = $this->enabled && !in_array(strtoupper($result['countries_iso_code_2']),$disabled_countries);
-					}
-					else {
-						$this->enabled = false;
-					}
-				}
-			}
-			
-		
-			if(is_object($currencies)) {
-				$er = $currencies->get_value($currency);
-			}
-			else {
-				$er = 1;
-			}
+        if (!in_array(strtoupper($currency),$currencyValid)) {
+            $this->enabled = false;
+        }
+        else
+        {
+            if(is_array($billing))
+            {
+                if(in_array(strtoupper($billing['country']['iso_code_2']),$disabled_countries)) {
+                    $this->enabled = false;
+                }
+            }
+            else
+            {
+                $query = tep_db_query("SELECT countries_iso_code_2 FROM countries WHERE countries_id = " . (int)$_SESSION['customer_country_id']);
+                $result = tep_db_fetch_array($query);
 
-			if ($order->info['total']*$er > MODULE_PAYMENT_BILLMATEBANK_ORDER_LIMIT)
-				$this->enabled = false;
+                if(is_array($result)) {
+                    if(in_array(strtoupper($result['countries_iso_code_2']),$disabled_countries)) {
+                        $this->enabled = false;
+                    }
+                    $this->enabled = $this->enabled && !in_array(strtoupper($result['countries_iso_code_2']),$disabled_countries);
 
-			if ($order->info['total'] * $er < MODULE_PAYMENT_BILLMATEBANK_MIN_ORDER_LIMIT)
-				$this->enabled = false;
-			
-			$this->order_status = DEFAULT_ORDERS_STATUS_ID;
+                }
+                else
+                {
+                    $this->enabled = false;
+                }
+            }
+        }
 
-			if (is_object($order))
-				$this->update_status();
-		}
+
+        if(is_object($currencies)) {
+            $er = $currencies->get_value($currency);
+        }
+        else {
+            $er = 1;
+        }
+
+        if ($order->info['total']*$er > MODULE_PAYMENT_BILLMATEBANK_ORDER_LIMIT)
+            $this->enabled = false;
+
+        if ($order->info['total'] * $er < MODULE_PAYMENT_BILLMATEBANK_MIN_ORDER_LIMIT)
+            $this->enabled = false;
+
+        $this->order_status = DEFAULT_ORDERS_STATUS_ID;
+
+        if (is_object($order))
+            $this->update_status();
+		//}
 		$this->sort_order = MODULE_PAYMENT_BILLMATEBANK_SORT_ORDER;
     }
 
