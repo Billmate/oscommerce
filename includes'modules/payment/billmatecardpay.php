@@ -1,56 +1,93 @@
 <?php
-#ini_set('display_errors', 1);
-#error_reporting(E_ALL);
+/**
+ *  Copyright 2010 BILLMATECARDPAY AB. All rights reserved.
+ *
+ *  Redistribution and use in source and binary forms, with or without modification, are
+ *  permitted provided that the following conditions are met:
+ *
+ *     1. Redistributions of source code must retain the above copyright notice, this list of
+ *        conditions and the following disclaimer.
+ *
+ *     2. Redistributions in binary form must reproduce the above copyright notice, this list
+ *        of conditions and the following disclaimer in the documentation and/or other materials
+ *        provided with the distribution.
+ *
+ *  THIS SOFTWARE IS PROVIDED BY BILLMATECARDPAY AB "AS IS" AND ANY EXPRESS OR IMPLIED
+ *  WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
+ *  FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL BILLMATECARDPAY AB OR
+ *  CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ *  CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+ *  SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON
+ *  ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
+ *  NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
+ *  ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ *
+ *  The views and conclusions contained in the software and documentation are those of the
+ *  authors and should not be interpreted as representing official policies, either expressed
+ *  or implied, of BILLMATECARDPAY AB.
+ *
+ */
+
+
 @include_once(DIR_FS_CATALOG . DIR_WS_CLASSES . 'billmate/billmate_lang.php');
 if(!class_exists('Encoding',false)){
     require_once DIR_FS_CATALOG . DIR_WS_CLASSES.'billmate/utf8.php';
     require_once DIR_FS_CATALOG . DIR_WS_CLASSES.'billmate/commonfunctions.php';
 }
 
-class billmatebank {
-    var $code, $title, $description, $enabled, $billmatebank_livemode, $billmatebank_testmode, $jQuery, $form_action_url;
+//error_report();
+
+class billmatecardpay {
+    var $code, $title, $description, $enabled, $billmatecardpay_livemode, $billmatecardpay_testmode, $jQuery, $form_action_url;
 
     // class constructor
-    function billmatebank() {
-        global $order, $currency, $currencies, $customer_id, $customer_country_id, $billmatebank_livemode, $billmatebank_testmode;
+    function billmatecardpay() {
+        global $order, $currency, $currencies, $customer_id, $customer_country_id, $billmatecardpay_livemode, $billmatecardpay_testmode;
         $this->jQuery = true;
-        $this->code = 'billmatebank';
+        $this->code = 'billmatecardpay';
 
         if(strpos($_SERVER['SCRIPT_FILENAME'],'admin')) {
-            $this->title = MODULE_PAYMENT_BILLMATEBANK_TEXT_TITLE;
+            $this->title = MODULE_PAYMENT_BILLMATECARDPAY_TEXT_TITLE;
         }
         else {
-            $this->title = MODULE_PAYMENT_BILLMATEBANK_FRONTEND_TEXT_TITLE;
-        }
-
-        $this->billmatebank_testmode = false;
-        if ((MODULE_PAYMENT_BILLMATEBANK_TESTMODE == 'True')) {
-            $this->title .= ' '.MODULE_PAYMENT_BILLMATEBANK_LANG_TESTMODE;
-            $this->billmatebank_testmode = true;
-        }
-
-		//if (!tep_session_is_registered('admin')) {
-        if( $order->billing == null ){
-            $billing = $_SESSION['billmate_billing'];
-        }else{
-            $billing = $_SESSION['billmate_billing'] = $order->billing;
+            $this->title = MODULE_PAYMENT_BILLMATECARDPAY_FRONTEND_TEXT_TITLE;
         }
 
 
-        (MODULE_PAYMENT_BILLMATEBANK_TESTMODE != 'True') ? $this->billmatebank_livemode = true : $this->billmatebank_livemode = false;
+        $this->billmatecardpay_testmode = false;
+        if ((MODULE_PAYMENT_BILLMATECARDPAY_TESTMODE == 'True')) {
+            $this->title .= ' '.MODULE_PAYMENT_BILLMATECARDPAY_LANG_TESTMODE;
+            $this->billmatecardpay_testmode = true;
+        }
 
-        $this->description = MODULE_PAYMENT_BILLMATEBANK_TEXT_DESCRIPTION . "<br />Version: ".BILLPLUGIN_VERSION;
-        $this->enabled = ((MODULE_PAYMENT_BILLMATEBANK_STATUS == 'True') ? true : false);
+        if (MODULE_PAYMENT_BILLMATECARDPAY_TESTMODE == 'True') {
+            $this->form_action_url = 'https://cardpay.billmate.se/pay/test';
+        } else {
+            $this->form_action_url = 'https://cardpay.billmate.se/pay';
+        }
+		
+		if( $order->billing == null ){
+			$billing = $_SESSION['billmate_billing'];
+		}else{
+			$billing = $_SESSION['billmate_billing'] = $order->billing;
+		}
 
-        $currencyValid = array('SEK');
-        $countryValid  = array('SE');
+
+        (MODULE_PAYMENT_BILLMATECARDPAY_TESTMODE != 'True') ? $this->billmatecardpay_livemode = true : $this->billmatecardpay_livemode = false;
+
+        $this->description = MODULE_PAYMENT_BILLMATECARDPAY_TEXT_DESCRIPTION . "<br />Version: ".BILLPLUGIN_VERSION;
+        $this->enabled = ((MODULE_PAYMENT_BILLMATECARDPAY_STATUS == 'True') ?
+                true : false);
+
+        $currencyValid = array('SEK','EUR','USD','DKK','NOK','GBP');
+        $countryValid  = array('SE', 'DK', 'GB', 'NO');
         $disabled_countries = explode(',',
-                                trim(
-                                    strtolower(MODULE_PAYMENT_BILLMATEBANK_DISABLED_COUNTRYIES),
+                                trim( 
+                                    strtolower(MODULE_PAYMENT_BILLMATECARDPAY_DISABLED_COUNTRYIES),
                                     ','
                                 ).','.
-                                trim(
-                                    strtoupper(MODULE_PAYMENT_BILLMATEBANK_DISABLED_COUNTRYIES),
+                                trim( 
+                                    strtoupper(MODULE_PAYMENT_BILLMATECARDPAY_DISABLED_COUNTRYIES),
                                     ','
                                  )
                               );
@@ -58,37 +95,29 @@ class billmatebank {
         if (!in_array(strtoupper($currency),$currencyValid)) {
             $this->enabled = false;
         }
-        else
-        {
-            if(is_array($billing))
-            {
-                if(!in_array(strtoupper($billing['country']['iso_code_2']),$countryValid)) {
-                    $this->enabled = false;
-                }
-                if(in_array(strtoupper($billing['country']['iso_code_2']),$disabled_countries)) {
+        else {
+            if(is_array($billing)) {
+                if(in_array($billing['country']['iso_code_2'],$disabled_countries)) {
                     $this->enabled = false;
                 }
             }
-            else
-            {
+            else {
                 $query = tep_db_query("SELECT countries_iso_code_2 FROM countries WHERE countries_id = " . (int)$_SESSION['customer_country_id']);
                 $result = tep_db_fetch_array($query);
-
+        
                 if(is_array($result)) {
-                    if(in_array(strtoupper($result['countries_iso_code_2']),$disabled_countries)) {
+                    if(in_array($result['countries_iso_code_2'],$disabled_countries)) {
                         $this->enabled = false;
                     }
-                    $this->enabled = $this->enabled && !in_array(strtoupper($result['countries_iso_code_2']),$disabled_countries);
-
+                    $this->enabled = $this->enabled && !in_array($result['countries_iso_code_2'],$disabled_countries);
                 }
-                else
-                {
+                else {
                     $this->enabled = false;
                 }
             }
         }
-
-
+        
+    
         if(is_object($currencies)) {
             $er = $currencies->get_value($currency);
         }
@@ -96,30 +125,31 @@ class billmatebank {
             $er = 1;
         }
 
-        if ($order->info['total']*$er > MODULE_PAYMENT_BILLMATEBANK_ORDER_LIMIT)
+        if ($order->info['total']*$er > MODULE_PAYMENT_BILLMATECARDPAY_ORDER_LIMIT)
             $this->enabled = false;
 
-        if ($order->info['total'] * $er < MODULE_PAYMENT_BILLMATEBANK_MIN_ORDER_LIMIT)
-            $this->enabled = false;
+	    if($order->info['total'] * $er < MODULE_PAYMENT_BILLMATECARDPAY_MIN_ORDER_LIMIT)
+		    $this->enabled = false;
 
+        $this->sort_order = MODULE_PAYMENT_BILLMATECARDPAY_SORT_ORDER;
+
+       
         $this->order_status = DEFAULT_ORDERS_STATUS_ID;
 
         if (is_object($order))
             $this->update_status();
-		//}
-		$this->sort_order = MODULE_PAYMENT_BILLMATEBANK_SORT_ORDER;
     }
 
     // class methods
     function update_status() {
         global $order;
 
-        if ($this->enabled == true && (int)MODULE_PAYMENT_BILLMATEBANK_ZONE > 0) {
+        if ($this->enabled == true && (int)MODULE_PAYMENT_BILLMATECARDPAY_ZONE > 0) {
             $check_flag = false;
             $check_query = tep_db_query("select zone_id from " .
                     TABLE_ZONES_TO_GEO_ZONES .
                     " where geo_zone_id = '" .
-                    MODULE_PAYMENT_BILLMATEBANK_ZONE .
+                    MODULE_PAYMENT_BILLMATECARDPAY_ZONE .
                     "' and zone_country_id = '" .
                     $order->billing['country']['id'] .
                     "' order by zone_id");
@@ -146,10 +176,12 @@ class billmatebank {
 
     function selection() {
 
-        global $order, $customer_id, $currencies, $currency, $user_billing, $cart_billmate_bank_ID,$order_id,$insert_id,$languages_id;
+        global $order, $customer_id, $currencies, $currency, $user_billing, $cart_billmate_card_ID, $languages_id;
 
-        if (tep_session_is_registered('cart_billmate_bank_ID')) {
-			$order_id = $insert_id = $cart_billmate_bank_ID;
+        require_once(DIR_FS_CATALOG . DIR_WS_CLASSES . 'billmate/billmateutils.php');
+		
+        if (tep_session_is_registered('cart_billmate_card_ID')) {
+			$order_id = $insert_id = $cart_billmate_card_ID;
 
 			$check_query = tep_db_query('select orders_id from ' . TABLE_ORDERS_STATUS_HISTORY . ' where orders_id = "' . (int)$order_id . '" limit 1');
 
@@ -161,11 +193,9 @@ class billmatebank {
 			  tep_db_query('delete from ' . TABLE_ORDERS_PRODUCTS_ATTRIBUTES . ' where orders_id = "' . (int)$order_id . '"');
 			  tep_db_query('delete from ' . TABLE_ORDERS_PRODUCTS_DOWNLOAD . ' where orders_id = "' . (int)$order_id . '"');
 
-			  tep_session_unregister('cart_billmate_bank_ID');
+			  tep_session_unregister('cart_billmate_card_ID');
 			}
 		}
-
-		require_once(DIR_FS_CATALOG . DIR_WS_CLASSES . 'billmate/billmateutils.php');
 
         $find_personnummer_field_query =
                 tep_db_query("show columns from " . TABLE_CUSTOMERS);
@@ -202,16 +232,23 @@ class billmatebank {
         $er = $currencies->get_value($currency);
         $user_billing = $_SESSION['user_billing'];
 
+        empty($user_billing['billmatecardpay_pnum']) ? $billmatecardpay_pnum = $personnummer : $billmatecardpay_pnum = $user_billing['billmatecardpay_pnum'];
+        empty($user_billing['billmatecardpay_phone']) ? $billmatecardpay_phone = $order->customer['telephone'] : $billmatecardpay_phone = $user_billing['billmatecardpay_phone'];
+
         //Fade in/fade out code for the module
         $js = ($this->jQuery) ? BillmateUtils::get_display_jQuery($this->code) : "";
         $popup = '';
+        if(!empty($_GET['error']) && $_GET['error'] == 'invalidaddress' && !empty( $_SESSION['WrongAddress'] ) ){
+            $popup = $_SESSION['WrongAddress'];
+        }
 
         $languageCode = tep_db_fetch_array(tep_db_query("select code from languages where languages_id = " . $languages_id));
         if(!in_array($languageCode['code'],array('sv','en','se')))
             $languageCode['code'] = 'en';
+
         $languageCode['code'] = $languageCode['code'] == 'se' ? 'sv' : $languageCode['code'];
 
-        $fields[] = array('title' => '<img src="'.HTTP_SERVER.DIR_WS_HTTP_CATALOG.'/images/billmate/'.$languageCode['code'].'/bankpay.png" />', 'field' => '<script type="text/javascript">
+        $fields[] = array('title' => '<img src="'.HTTP_SERVER.DIR_WS_HTTP_CATALOG.'/images/billmate/'.$languageCode['code'].'/cardpay.png" />', 'field' => '<script type="text/javascript">
                           if(!window.jQuery){
                           	var jq = document.createElement("script");
                           	jq.type = "text/javascript";
@@ -226,24 +263,23 @@ class billmatebank {
     }
 
     function pre_confirmation_check() {
-        global $billmatebank_testmode, $billmatebank_livemode, $order, $GA_OLD, $KRED_SE_PNO, $user_billing;
+        global $billmatecardpay_testmode, $billmatecardpay_livemode, $order, $GA_OLD, $KRED_SE_PNO, $user_billing;
         //Store values into Session
         tep_session_register('user_billing');
 
-        $eid = MODULE_PAYMENT_BILLMATEBANK_EID;
-        $secret = MODULE_PAYMENT_BILLMATEBANK_SECRET;
+        $eid = MODULE_PAYMENT_BILLMATECARDPAY_EID;
+        $secret = MODULE_PAYMENT_BILLMATECARDPAY_SECRET;
     }
 
     function confirmation() {
-		global $cartID,$cart, $cart_billmate_bank_ID, $customer_id, $languages_id, $order, $order_total_modules,$currencies;
+		global $cartID, $cart_billmate_card_ID, $customer_id, $languages_id, $order, $order_total_modules, $currencies;
+        if (tep_session_is_registered('cart_billmate_card_ID')) {
+          $order_id = $cart_billmate_card_ID;
 
-        if (tep_session_is_registered('cart_billmate_bank_ID')) {
-          $order_id = $cart_billmate_bank_ID;
-			error_log('cartID'.$cart->cartID);
           $curr_check = tep_db_query("select currency from " . TABLE_ORDERS . " where orders_id = '" . (int)$order_id . "'");
           $curr = tep_db_fetch_array($curr_check);
 
-          if ( ($curr['currency'] != $order->info['currency'])  ) {
+          if ( ($curr['currency'] != $order->info['currency']) ) {
             $check_query = tep_db_query('select orders_id from ' . TABLE_ORDERS_STATUS_HISTORY . ' where orders_id = "' . (int)$order_id . '" limit 1');
 
             if (tep_db_num_rows($check_query) < 1) {
@@ -413,20 +449,20 @@ class billmatebank {
             }
           }
 
-          $cart_billmate_bank_ID = $insert_id;
-          tep_session_register('cart_billmate_bank_ID');
+          $cart_billmate_card_ID =  $insert_id;
+          tep_session_register('cart_billmate_card_ID');
         }
-        return array('title' => MODULE_PAYMENT_BILLMATEBANK_TEXT_CONFIRM_DESCRIPTION);
+        return array('title' => MODULE_PAYMENT_BILLMATECARDPAY_TEXT_CONFIRM_DESCRIPTION);
     }
 
     function process_button() {
-        global $order, $cart,$order_total_modules, $billmatebank_ot, $shipping, $languages_id, $language_id, $language, $currency,$cart_billmate_bank_ID ;;
-		error_log('cart'.$cart->cartID);
+        global $order, $order_total_modules, $billmatecardpay_ot, $shipping, $languages_id, $language_id, $language, $currency,$cart_billmate_card_ID;
+
         $counter = 1;
         $process_button_string= '';
-    
-        $eid = MODULE_PAYMENT_BILLMATEBANK_EID;
-        $secret = substr( MODULE_PAYMENT_BILLMATEBANK_SECRET, 0, 12 );
+		
+        $eid = MODULE_PAYMENT_BILLMATECARDPAY_EID;
+        $secret = substr( MODULE_PAYMENT_BILLMATECARDPAY_SECRET ,0 ,12 );
 		$languages_query = tep_db_query("select code from " . TABLE_LANGUAGES . " where languages_id = '{$languages_id}'");
 		$languages = tep_db_fetch_array($languages_query);
 		
@@ -436,15 +472,15 @@ class billmatebank {
 		$languageCode = $languageCode == 'SV' ? 'SE' : $languageCode;
 		$languageCode = $languageCode == 'EN' ? 'GB' : $languageCode;
 
-		tep_session_unregister('billmatebank_called_api');
-		tep_session_unregister('billmatebank_api_result');
-        
+		tep_session_unregister('billmatecard_called_api');
+		tep_session_unregister('billmatecard_api_result');
+		
         $order_totals = $order_total_modules->modules;
 
         if (is_array($order_totals)) {
             reset($order_totals);
             $j = 0;
-            $table = preg_split("/[,]/", MODULE_PAYMENT_BILLMATEBANK_ORDER_TOTAL_IGNORE);
+            $table = preg_split("/[,]/", MODULE_PAYMENT_BILLMATECARDPAY_ORDER_TOTAL_IGNORE);
 
             while (list(, $value) = each($order_totals)) {
                 $class = substr($value, 0, strrpos($value, '.'));
@@ -457,26 +493,24 @@ class billmatebank {
 
 
                 for ($i=0 ; $i<sizeof($table) && $ignore == false ; $i++) {
-
                     if ($table[$i] == $code) {
                         $ignore = true;
                     }
                 }
 
                 $size = sizeof($GLOBALS[$class]->output);
-
                 if ($ignore == false && $size > 0) {
-                    $billmatebank_ot['code_size_'.$j] = $size;
+                    $billmatecardpay_ot['code_size_'.$j] = $size;
                     for ($i=0; $i<$size; $i++) {
-                        $billmatebank_ot['title_'.$j.'_'.$i] = html_entity_decode($GLOBALS[$class]->output[$i]['title']);
+                        $billmatecardpay_ot['title_'.$j.'_'.$i] = html_entity_decode($GLOBALS[$class]->output[$i]['title']);
 
-                        $billmatebank_ot['text_'.$j.'_'.$i] = $GLOBALS[$class]->output[$i]['text'];
+                        $billmatecardpay_ot['text_'.$j.'_'.$i] = $GLOBALS[$class]->output[$i]['text'];
                         if (is_numeric($GLOBALS[$class]->deduction) &&
                                 $GLOBALS[$class]->deduction > 0) {
-                            $billmatebank_ot['value_'.$j.'_'.$i] = -$GLOBALS[$class]->deduction;
+                            $billmatecardpay_ot['value_'.$j.'_'.$i] = -$GLOBALS[$class]->deduction;
                         }
                         else {
-                            $billmatebank_ot['value_'.$j.'_'.$i] = $GLOBALS[$class]->output[$i]['value'];
+                            $billmatecardpay_ot['value_'.$j.'_'.$i] = $GLOBALS[$class]->output[$i]['value'];
 
                             // Add tax rate for shipping address and invoice fee
                             if ($class == 'ot_shipping') {
@@ -487,23 +521,24 @@ class billmatebank {
                                 if($tax_class > 0) {
                                     $tax_rate = tep_get_tax_rate($tax_class, $order->billing['country']['id'], ($order->billing['zone_id'] > 0) ? $order->billing['zone_id'] : null);
                                 }
-                                $billmatebank_ot['tax_rate_'.$j.'_'.$i] = $tax_rate;
+                                $billmatecardpay_ot['tax_rate_'.$j.'_'.$i] = $tax_rate;
                             } else {
-                                $billmatebank_ot['tax_rate_'.$j.'_'.$i] = $GLOBALS[$class]->output[$i]['tax_rate'];
+                                $billmatecardpay_ot['tax_rate_'.$j.'_'.$i] = $GLOBALS[$class]->output[$i]['tax_rate'];
                             }
                         }
 
-                        $billmatebank_ot['code_'.$j.'_'.$i] = $GLOBALS[$class]->code;
+                        $billmatecardpay_ot['code_'.$j.'_'.$i] = $GLOBALS[$class]->code;
                     }
                     $j += 1;
                 }
             }
-            $billmatebank_ot['code_entries'] = $j;
+            $billmatecardpay_ot['code_entries'] = $j;
         }
 
-        tep_session_register('billmatebank_ot');
+        tep_session_register('billmatecardpay_ot');
 		$return = $this->doInvoice();
 		$redirect = $return->url;
+
 		$process_button_string .= '<script type="text/javascript">
                           if(!window.jQuery){
                           	var jq = document.createElement("script");
@@ -511,36 +546,36 @@ class billmatebank {
                           	jq.src = "'.HTTP_SERVER.DIR_WS_HTTP_CATALOG.'jquery.js";
 
                           	document.getElementsByTagName("head")[0].appendChild(jq);
-                          }
-                          setTimeout(function(){
-                                $(document).ready(function(){ $("input[name=\'comments\']").remove(); }); $(\'form[name="checkout_confirmation"]\').submit(function(e){e.preventDefault(); window.location = "'.$redirect.'";});
-                            },200);
+                          }setTimeout(function(){
+                                                      jQuery(document).ready(function(){ $("input[name=\'comments\']").remove(); }); $(\'form[name="checkout_confirmation"]\').submit(function(e){e.preventDefault(); window.location = "'.$redirect.'";});
 
+                          },200)
                           </script>';
-		return $process_button_string;
+        return $process_button_string;
     }
-
-	function doInvoice(){
-	
+	function doInvoice($add_order = false ){
 		 global $order, $customer_id, $currency, $currencies, $sendto, $billto,
-				   $billmatebank_ot, $billmatebank_livemode, $billmatebank_testmode,$insert_id,$cart_billmate_bank_ID,$languages_id;
+				   $billmatecardpay_ot, $billmatecardpay_livemode, $billmatecardpay_testmode,$insert_id,
+				   $languages_id, $language_id, $language, $currency, $cart_billmate_card_ID;
 
-		$billmatebank_ot = $_SESSION['billmatebank_ot'];
-        $livemode = $this->billmatebank_livemode;
+		$billmatecardpay_ot = $_SESSION['billmatecardpay_ot'];
+        $livemode = $this->billmatecardpay_livemode;
 		require(DIR_FS_CATALOG . DIR_WS_CLASSES . 'billmate/billmateutils.php');
 		if( empty($_POST ) ) $_POST = $_GET;
         //Set the right Host and Port
 
         $estoreUser = $customer_id;
         $goodsList = array();
-		$shippingPrice = 0; $shippingTaxRate = 0;
         $n = sizeof($order->products);
-
-        // First all the ordinary items
 		$totalValue = 0;
 		$taxValue = 0;
+    $codes = array();
 		$prepareDiscounts = array();
-        for ($i = 0 ; $i < $n ; $i++) {            
+        // First all the ordinary items
+        for ($i = 0 ; $i < $n ; $i++) {
+            //    $price_without_tax = ($order->products[$i]['final_price'] * 100/
+            //				  (1+$order->products[$i]['tax']/100));
+            
             //Rounding off error fix starts
             // Products price with tax
             $price_with_tax = $currencies->get_value($currency) *
@@ -559,8 +594,8 @@ class billmatebank {
                 }
             }
 
-            if (MODULE_PAYMENT_BILLMATEBANK_ARTNO == 'id' ||
-                    MODULE_PAYMENT_BILLMATEBANK_ARTNO == '') {
+            if (MODULE_PAYMENT_BILLMATECARDPAY_ARTNO == 'id' ||
+                    MODULE_PAYMENT_BILLMATECARDPAY_ARTNO == '') {
 	            $temp =
 		            mk_goods_flags($order->products[$i]['qty'],
 			            $order->products[$i]['id'],
@@ -605,31 +640,35 @@ class billmatebank {
         // Then the extra charnges like shipping and invoicefee and
         // discount.
 
-        $extra = $billmatebank_ot['code_entries'];
-        //end hack
+        $extra = $billmatecardpay_ot['code_entries'];
+
+        //end hack         
 
         for ($j=0 ; $j<$extra ; $j++) {
-            $size = $billmatebank_ot["code_size_".$j];
+            $size = $billmatecardpay_ot["code_size_".$j];
             for ($i=0 ; $i<$size ; $i++) {
-                $value = $billmatebank_ot["value_".$j."_".$i];
-                $name = $billmatebank_ot["title_".$j."_".$i];
-                $tax = $billmatebank_ot["tax_rate_".$j."_".$i];
+                $value = $billmatecardpay_ot["value_".$j."_".$i];
+                $name = $billmatecardpay_ot["title_".$j."_".$i];
+                $tax = $billmatecardpay_ot["tax_rate_".$j."_".$i];
                 $name = rtrim($name, ":");
-                $code = $billmatebank_ot["code_".$j."_".$i];
+                $code = $billmatecardpay_ot["code_".$j."_".$i];
 
 				$price_without_tax = $currencies->get_value($currency) * $value * 100;
                 if(DISPLAY_PRICE_WITH_TAX == 'true') {
 					$price_without_tax = $price_without_tax/(($tax+100)/100);
                 }
+
+                $codes[] = $code;
 				if( $code == 'ot_discount' ) { $price_without_tax = 0 - $price_without_tax; }
 				if( $code == 'ot_shipping' ){ $shippingPrice = $price_without_tax; $shippingTaxRate = $tax; continue; }
+
                 if ($value != "" && $value != 0) {
 	                $totals = $totalValue;
 	                foreach($prepareDiscounts as $tax => $value)
 	                {
 		                $percent = $value / $totals;
 		                $price_without_tax_out = $price_without_tax * $percent;
-		                $temp = mk_goods_flags(1, "", ($name).' '.(int)$tax.'% '.MODULE_PAYMENT_BILLMATEBANK_VAT, $price_without_tax_out, $tax, 0, 0);
+		                $temp = mk_goods_flags(1, "", ($name).' '.(int)$tax.'% '.MODULE_PAYMENT_BILLMATECARDPAY_VAT, $price_without_tax_out, $tax, 0, 0);
 		                $totalValue += $temp['withouttax'];
 		                $taxValue += $temp['tax'];
 		                $goodsList[] = $temp;
@@ -639,10 +678,11 @@ class billmatebank {
             }
         }
 
-        $secret = MODULE_PAYMENT_BILLMATEBANK_SECRET;
-        $eid = MODULE_PAYMENT_BILLMATEBANK_EID;
+        $secret = MODULE_PAYMENT_BILLMATECARDPAY_SECRET;
+        $eid = MODULE_PAYMENT_BILLMATECARDPAY_EID;
 
 		$ship_address = $bill_address = array();
+		$countryData = BillmateCountry::getSwedenData();
 		
         $ship_address = array(
 			"firstname" => $order->delivery['firstname'],
@@ -677,38 +717,38 @@ class billmatebank {
             if(is_numeric($col) ) continue;
             $bill_address[$key] = utf8_decode(Encoding::fixUTF8( $col ));
         }*/
-
+   
 		$ssl = true;
 		$debug = false;
 		$languageCode = tep_db_fetch_array(tep_db_query("select code from languages where languages_id = " . $languages_id));
 		if(!defined('BILLMATE_LANGUAGE')) define('BILLMATE_LANGUAGE',$languageCode['code']);
         if(!defined('BILLMATE_SERVER')) define('BILLMATE_SERVER','2.1.7');
 
-        $k = new BillMate($eid,$secret,$ssl,$this->billmatebank_testmode,$debug);
+        $k = new BillMate($eid,$secret,$ssl,$this->billmatecardpay_testmode,$debug,$codes);
 		$invoiceValues = array();
     $lang = $languageCode['code'] == 'se' ? 'sv' : $languageCode['code'];
-		$invoiceValues['PaymentData'] = array(	"method" => "16",		//1=Factoring, 2=Service, 4=PartPayment, 8=Card, 16=Bank, 24=Card/bank and 32=Cash.
-												"currency" => "SEK",
+		$invoiceValues['PaymentData'] = array(	"method" => "8",		//1=Factoring, 2=Service, 4=PartPayment, 8=Card, 16=Bank, 24=Card/bank and 32=Cash.
+												"currency" => $currency, //"SEK",
 												"language" => $lang,
 												"country" => "SE",
-												"autoactivate" => (MODULE_PAYMENT_BILLMATEBANK_AUTHENTICATION_MODE == 'sale')?1:0,
-												"orderid" => (string)$cart_billmate_bank_ID,
+												"autoactivate" => (MODULE_PAYMENT_BILLMATECARDPAY_AUTHENTICATION_MODE == 'sale')?1:0,
+												"orderid" => (string)$cart_billmate_card_ID,
 											);
 		$invoiceValues['PaymentInfo'] = array( 	"paymentdate" => date('Y-m-d'),
-											"paymentterms" => "14",
-											"yourreference" => "",
-											"ourreference" => "",
-											"projectname" => "",
-											"delivery" => "Post",
-											"deliveryterms" => "FOB",
-									);
-			$invoiceValues['Card'] = array(	"promptname" => "",
-											"3dsecure" => "",
+												"paymentterms" => "14",
+												"yourreference" => "",
+												"ourreference" => "",
+												"projectname" => "",
+												"delivery" => "Post",
+												"deliveryterms" => "FOB",
+										);
+			$invoiceValues['Card'] = array(	"promptname" => (MODULE_PAYMENT_BILLMATECARDPAY_PROMPT_NAME_ENTRY == "YES")?1:0,
+											"3dsecure" => (MODULE_PAYMENT_BILLMATECARDPAY_DO_3D_SECURE == "YES")?1:0,
 											"recurring" => "",
 											"recurringnr" => "",
 											"accepturl" => tep_href_link(FILENAME_CHECKOUT_PROCESS, '', 'SSL'),
 											"cancelurl" => tep_href_link(FILENAME_CHECKOUT_PAYMENT, '', 'SSL'),
-											"callbackurl" => tep_href_link('ext/modules/payment/billmate/bankpay_ipn.php', '', 'SSL'), //'http://api.billmate.se/callback.php',
+											"callbackurl" => tep_href_link('ext/modules/payment/billmate/cardpay_ipn.php', '', 'SSL'), //'http://api.billmate.se/callback.php',
 									);
 		$invoiceValues['Customer'] = array(	'customernr'=> (string)$customer_id,
 											'pno'=>'',
@@ -720,7 +760,6 @@ class billmatebank {
 		$taxValue += $shippingPrice * ($shippingTaxRate/100);
 		$totaltax = round($taxValue,0);
 		$totalwithtax = round($order->info['total']*100,0);
-
 		//$totalwithtax += $shippingPrice * ($shippingTaxRate/100);
 		$totalwithouttax = $totalValue;
 		$rounding = $totalwithtax - ($totalwithouttax+$totaltax);
@@ -748,43 +787,44 @@ class billmatebank {
 		}
 		else {
 			tep_redirect(BillmateUtils::error_link(FILENAME_CHECKOUT_PAYMENT,
-				'payment_error=billmatecardpay&error=' . ($result1->message),
-				'SSL', true, false));
+                    'payment_error=billmatecardpay&error=' . ($result1->message),
+                    'SSL', true, false));
 		}
 		return $result1;
-	}	
-	
-    function before_process() {
-		global $order, $customer_id, $currency, $currencies, $sendto, $billto,$already_completed,
-               $billmatebank_ot, $billmatebank_livemode, $billmatebank_testmode,$insert_id, $cart_billmate_bank_ID,$payment,$languages_id,$cartID, $cart;
-
-	
-		require(DIR_FS_CATALOG . DIR_WS_CLASSES . 'billmate/billmateutils.php');
-		$order_id =$cart_billmate_bank_ID;
 		
+	}
+    function before_process() {
+
+		global $order, $customer_id, $currency, $currencies, $sendto, $billto,
+			   $billmatecardpay_ot, $billmatecardpay_livemode, $billmatecardpay_testmode,$insert_id, $cart_billmate_card_ID,$payment;
+		global $payment,$cartID, $cart,$order_id, $languages_id, $language_id, $language, $currency;
+
+		require(DIR_FS_CATALOG . DIR_WS_CLASSES . 'billmate/billmateutils.php');
+		$order_id = $cart_billmate_card_ID;
+
 		//get response data
 		$_DATA = json_decode($_REQUEST['data'], true);
 		$_DATA['order_id'] = $_DATA['orderid'];
-		
+
         if(!isset($_DATA['status']) || $_DATA['status'] != 'Paid'){
             tep_redirect(BillmateUtils::error_link(FILENAME_CHECKOUT_PAYMENT,
-                    'payment_error=billmatebank&error=Please try again.',
+                    'payment_error=billmatecardpay&error=Please try again.',
                     'SSL', true, false));
             return;
         }
-		
-		$status = tep_db_query("select orders_status from ".TABLE_ORDERS." where orders_id = {$_DATA['order_id']}");
+        
+		$status = tep_db_query("select orders_status from ".TABLE_ORDERS." where orders_id = {$_DATA['orderid']}");
         $status_array = tep_db_fetch_array( $status );
 
 		$status_history = tep_db_query("select orders_status_history_id from ".TABLE_ORDERS_STATUS_HISTORY.
-					" where orders_id = {$_DATA['order_id']} and comments='Billmate_IPN'");
+					" where orders_id = {$_DATA['orderid']} and comments='Billmate_IPN'");
 		
 		$status_history_a = tep_db_fetch_array($status_history);
 
-		if( $status_history_a){
+		if( $status_history_a ){
 			$already_completed = true;
 			tep_session_register('already_completed');
-			tep_session_unregister('billmatebank_ot');
+			tep_session_unregister('billmatecardpay_ot');
 		}else {
 			$already_completed = false;
 			tep_session_register('already_completed');
@@ -862,6 +902,7 @@ class billmatebank {
 
             $products_ordered .= $order->products[$i]['qty'] . ' x ' . $order->products[$i]['name'] . ' (' . $order->products[$i]['model'] . ') = ' . $currencies->display_price($order->products[$i]['final_price'], $order->products[$i]['tax'], $order->products[$i]['qty']) . $products_ordered_attributes . "\n";
         }
+
 		$email_order = STORE_NAME . "\n" .
 					 EMAIL_SEPARATOR . "\n" .
 					 EMAIL_TEXT_ORDER_NUMBER . ' ' . $order_id . "\n" .
@@ -871,13 +912,12 @@ class billmatebank {
 			$email_order .= tep_db_output($order->info['comments']) . "\n\n";
 		}
 
-        $email_order .= EMAIL_TEXT_PRODUCTS . "\n" .
-            EMAIL_SEPARATOR . "\n" .
-            $products_ordered .
-            EMAIL_SEPARATOR . "\n";
+		$email_order .= EMAIL_TEXT_PRODUCTS . "\n" .
+                      EMAIL_SEPARATOR . "\n" .
+                      $products_ordered .
+                      EMAIL_SEPARATOR . "\n";
 
-
-        if ($order->content_type != 'virtual') {
+		if ($order->content_type != 'virtual') {
 			$email_order .= "\n" . EMAIL_TEXT_DELIVERY_ADDRESS . "\n" .
 						EMAIL_SEPARATOR . "\n" .
 						tep_address_label($customer_id, $sendto, 0, '', "\n") . "\n";
@@ -900,40 +940,32 @@ class billmatebank {
 		
  		require_once DIR_FS_CATALOG . DIR_WS_CLASSES.'/billmate/Billmate.php';
 		
-		$secret = MODULE_PAYMENT_BILLMATEBANK_SECRET;
-        $eid = MODULE_PAYMENT_BILLMATEBANK_EID;
+        $secret = MODULE_PAYMENT_BILLMATECARDPAY_SECRET;
+        $eid = MODULE_PAYMENT_BILLMATECARDPAY_EID;
 		$ssl = true;
 		$debug = false;
-		
-		if(!$already_completed )
-		{
-			if (MODULE_PAYMENT_BILLMATEBANK_AUTHENTICATION_MODE != 'sale')
-			{
+
+		if( (MODULE_PAYMENT_BILLMATECARDPAY_AUTHENTICATION_MODE != 'sale') ) {
+			if(!$already_completed ){
 				$languageCode = tep_db_fetch_array(tep_db_query("select code from languages where languages_id = " . $languages_id));
 				if(!defined('BILLMATE_LANGUAGE')) define('BILLMATE_LANGUAGE',$languageCode['code']);
                 if(!defined('BILLMATE_SERVER')) define('BILLMATE_SERVER','2.1.7');
 
-                $k       = new BillMate($eid, $secret, $ssl, $this->billmatebank_testmode, $debug);
-				$result1 = (object)($k->UpdatePayment(array('PaymentData' => array("number"  => $_DATA['number'],
-				                                                                   "orderid" => (string)$_DATA['order_id']
-				)
-				)));
-
-			} else {
-				$result1 = $_DATA;
+                $k = new BillMate($eid,$secret,$ssl, $this->billmatecardpay_testmode,$debug);
+				$result1 = (object)$k->UpdatePayment( array('PaymentData'=> array("number"=>$_DATA['number'], "orderid"=>(string)$_DATA['orderid'])));
 			}
+		} else {
+			$result1 = (object)$_DATA;
 		}
-	
         if(is_string($result1) || (isset($result1->message) && is_object($result1))){
             tep_redirect(BillmateUtils::error_link(FILENAME_CHECKOUT_PAYMENT,
-                    'payment_error=billmatebank&error='.$result1->message,
+                    'payment_error=billmatecardpay&error='.$result1->message,
                     'SSL', true, false));
 		} elseif($already_completed || is_object($result1)) {
+			$billmatecard_called_api = true;
+			tep_session_register('billmatecard_called_api');
+			tep_session_register('billmatecard_api_result');
 
-			$billmatebank_called_api = true;
-			tep_session_register('billmatebank_called_api');
-			tep_session_register('billmatebank_api_result');
-			
             // insert address in address book to get correct address in
             // confirmation mail (or fetch correct address from address book
             // if it exists)
@@ -972,13 +1004,14 @@ class billmatebank {
                 tep_db_perform(TABLE_ADDRESS_BOOK, $sql_data_array);
                 $sendto = $billto = tep_db_insert_id();
             }
-			
+
 			if(!$already_completed){
-				$order->billmateref = $result1->number;
-				$payment['tan'] = $result1->number;
+				$order->billmateref=$result1->number;
+				$payment['tan']=$result1->number;
 			}
+            tep_session_unregister('billmatecardpay_ot');
 			tep_mail($order->customer['firstname'] . ' ' . $order->customer['lastname'], $order->customer['email_address'], EMAIL_TEXT_SUBJECT, $email_order, STORE_OWNER, STORE_OWNER_EMAIL_ADDRESS);
-            tep_session_unregister('billmatebank_ot');
+            tep_session_unregister('billmatecardpay_ot');
 			// send emails to other people
 			if (SEND_EXTRA_ORDER_EMAILS_TO != '') {
 				tep_mail('', SEND_EXTRA_ORDER_EMAILS_TO, EMAIL_TEXT_SUBJECT, $email_order, STORE_OWNER, STORE_OWNER_EMAIL_ADDRESS);
@@ -996,56 +1029,55 @@ class billmatebank {
 			tep_session_unregister('payment');
 			tep_session_unregister('comments');
 
-			tep_session_unregister('cart_billmate_bank_ID');
+			tep_session_unregister('cart_billmate_card_ID');
 
 	        tep_redirect(tep_href_link(FILENAME_CHECKOUT_SUCCESS, '', 'SSL'));
  
+            return false;
         }
     }
 
     function after_process() {
-
-        global $insert_id, $order,$already_completed;
-
+        global $insert_id, $order;
+		
 		//get response data
 		$_DATA = json_decode($_REQUEST['data'], true);
 		$_DATA['order_id'] = substr($_DATA['orderid'], strpos($_DATA['orderid'], '-')+1);
 
-		if( $already_completed ){
-			return false;
-		}
         $find_st_optional_field_query =
                 tep_db_query("show columns from " . TABLE_ORDERS);
 
-        $has_billmatebank_ref = false;
+        $has_billmatecardpay_ref = false;
 
         while($fields = tep_db_fetch_array($find_st_optional_field_query)) {
             if ( $fields['Field'] == "billmateref" )
-                $has_billmatebank_ref = true;
+                $has_billmatecardpay_ref = true;
         }
 
-        if ($has_billmatebank_ref) {
+        if ($has_billmatecardpay_ref) {
             tep_db_query("update " . TABLE_ORDERS . " set billmateref='" .
                     $order->billmateref . "' " . " where orders_id = '" .
                     $_DATA['order_id'] . "'");
         }
 
         // Insert transaction # into history file
-        $sql_data_array = array('orders_id' => $_DATA['order_id'],
-                'orders_status_id' =>MODULE_PAYMENT_BILLMATEBANK_ORDER_STATUS_ID,
-                //($order->info['order_status']),
-                'date_added' => 'now()',
-                'customer_notified' => 0,
-                'comments' => ('Accepted by Billmate ' .
-                        date("Y-m-d G:i:s") .
-                        ' Invoice #: ' .              
-                        $order->billmateref));
-        tep_db_perform(TABLE_ORDERS_STATUS_HISTORY, $sql_data_array);
-		
-		tep_db_query("update " . TABLE_ORDERS . " set orders_status = '" . (MODULE_PAYMENT_BILLMATEBANK_ORDER_STATUS_ID ) . "', last_modified = now() where orders_id = '" . (int)$_DATA['order_id'] . "'");
+		if( !empty($order->billmateref) ) {
+			$sql_data_array = array('orders_id' => $_DATA['order_id'],
+					'orders_status_id' => MODULE_PAYMENT_BILLMATECARDPAY_ORDER_STATUS_ID,
+					'date_added' => 'now()',
+					'customer_notified' => 0,
+					'comments' => ('Accepted by Billmate ' .
+							date("Y-m-d G:i:s") .
+							' Invoice #: ' .
+							$order->billmateref));
+			tep_db_perform(TABLE_ORDERS_STATUS_HISTORY, $sql_data_array);
+			
+			tep_db_query("update " . TABLE_ORDERS . " set orders_status = '" . (MODULE_PAYMENT_BILLMATECARDPAY_ORDER_STATUS_ID ) . "', last_modified = now() where orders_id = '" . (int)$_DATA['order_id'] . "'");
+		}
 
         //Delete Session with user details
         tep_session_unregister('user_billing');
+
         return false;
     }
 
@@ -1067,42 +1099,43 @@ class billmatebank {
             $check_query = tep_db_query("select configuration_value from " .
                     TABLE_CONFIGURATION .
                     " where configuration_key = " .
-                    "'MODULE_PAYMENT_BILLMATEBANK_STATUS'");
+                    "'MODULE_PAYMENT_BILLMATECARDPAY_STATUS'");
             $this->_check = tep_db_num_rows($check_query);
         }
         return $this->_check;
     }
 
     function install() {
-        tep_db_query("insert into " . TABLE_CONFIGURATION . " (configuration_title, configuration_key, configuration_value, configuration_description, configuration_group_id, sort_order, set_function, date_added) values ('Enable Billmate Module', 'MODULE_PAYMENT_BILLMATEBANK_STATUS', 'True', 'Do you want to accept Billmate payments?', '6', '0', 'tep_cfg_select_option(array(\'True\', \'False\'), ', now())");
+        tep_db_query("insert into " . TABLE_CONFIGURATION . " (configuration_title, configuration_key, configuration_value, configuration_description, configuration_group_id, sort_order, set_function, date_added) values ('Enable Billmate Module', 'MODULE_PAYMENT_BILLMATECARDPAY_STATUS', 'True', 'Do you want to accept Billmate payments?', '6', '0', 'tep_cfg_select_option(array(\'True\', \'False\'), ', now())");
 
-        tep_db_query("insert into " . TABLE_CONFIGURATION . " (configuration_title, configuration_key, configuration_value, configuration_description, configuration_group_id, sort_order, use_function, set_function, date_added) values ('Payment Zone', 'MODULE_PAYMENT_BILLMATEBANK_ZONE', '0', 'If a zone is selected, only enable this payment method for that zone.', '6', '2', 'tep_get_zone_class_title', 'tep_cfg_pull_down_zone_classes(', now())");
+        tep_db_query("insert into " . TABLE_CONFIGURATION . " (configuration_title, configuration_key, configuration_value, configuration_description, configuration_group_id, sort_order, use_function, set_function, date_added) values ('Payment Zone', 'MODULE_PAYMENT_BILLMATECARDPAY_ZONE', '0', 'If a zone is selected, only enable this payment method for that zone.', '6', '2', 'tep_get_zone_class_title', 'tep_cfg_pull_down_zone_classes(', now())");
 
-        tep_db_query("insert into " . TABLE_CONFIGURATION . " (configuration_title, configuration_key, configuration_value, configuration_description, configuration_group_id, sort_order, date_added) values ('Merchant ID', 'MODULE_PAYMENT_BILLMATEBANK_EID', '0', 'Merchant ID (estore id) to use for the Billmate service (provided by Billmate)', '6', '0', now())");
+        tep_db_query("insert into " . TABLE_CONFIGURATION . " (configuration_title, configuration_key, configuration_value, configuration_description, configuration_group_id, sort_order, date_added) values ('Merchant ID', 'MODULE_PAYMENT_BILLMATECARDPAY_EID', '0', 'Merchant ID (estore id) to use for the Billmate service (provided by Billmate)', '6', '0', now())");
 
-        tep_db_query("insert into " . TABLE_CONFIGURATION . " (configuration_title, configuration_key, configuration_value, configuration_description, configuration_group_id, sort_order, date_added) values ('Shared secret', 'MODULE_PAYMENT_BILLMATEBANK_SECRET', '', 'Shared secret to use with the Billmate service (provided by Billmate)', '6', '0', now())");
-
-
-        tep_db_query("insert into " . TABLE_CONFIGURATION . " (configuration_title, configuration_key, configuration_value, configuration_description, configuration_group_id, sort_order, set_function, date_added) values ('Product artno attribute (id or model)', 'MODULE_PAYMENT_BILLMATEBANK_ARTNO', 'id', 'Use the following product attribute for ArtNo.', '6', '2', 'tep_cfg_select_option(array(\'id\', \'model\'),', now())");
-
-        tep_db_query("insert into " . TABLE_CONFIGURATION . " (configuration_title, configuration_key, configuration_value, configuration_description, configuration_group_id, sort_order, date_added) values ('Ignore table', 'MODULE_PAYMENT_BILLMATEBANK_ORDER_TOTAL_IGNORE', 'ot_tax,ot_total,ot_subtotal', 'Ignore these entries from order total list when compiling the invoice data', '6', '2', now())");
+        tep_db_query("insert into " . TABLE_CONFIGURATION . " (configuration_title, configuration_key, configuration_value, configuration_description, configuration_group_id, sort_order, date_added) values ('Shared secret', 'MODULE_PAYMENT_BILLMATECARDPAY_SECRET', '', 'Shared secret to use with the Billmate service (provided by Billmate)', '6', '0', now())");
 
 
-        tep_db_query("insert into " . TABLE_CONFIGURATION . " (configuration_title, configuration_key, configuration_value, configuration_description, configuration_group_id, sort_order, date_added) values ('Order value maximum limit', 'MODULE_PAYMENT_BILLMATEBANK_ORDER_LIMIT', '50000', 'Only show this payment alternative for orders less than the value below.', '6', '2', now())");
-        tep_db_query("insert into " . TABLE_CONFIGURATION . " (configuration_title, configuration_key, configuration_value, configuration_description, configuration_group_id, sort_order, date_added) values ('Order value minimum limit', 'MODULE_PAYMENT_BILLMATEBANK_MIN_ORDER_LIMIT', '0', 'Only show this payment alternative for orders greater than the value below.', '6', '2', now())");
+        tep_db_query("insert into " . TABLE_CONFIGURATION . " (configuration_title, configuration_key, configuration_value, configuration_description, configuration_group_id, sort_order, set_function, date_added) values ('Product artno attribute (id or model)', 'MODULE_PAYMENT_BILLMATECARDPAY_ARTNO', 'id', 'Use the following product attribute for ArtNo.', '6', '2', 'tep_cfg_select_option(array(\'id\', \'model\'),', now())");
 
-        tep_db_query("insert into " . TABLE_CONFIGURATION . " (configuration_title, configuration_key, configuration_value, configuration_description, configuration_group_id, sort_order, date_added) values ('Sort order of display.', 'MODULE_PAYMENT_BILLMATEBANK_SORT_ORDER', '0', 'Sort order of display. Lowest is displayed first.', '6', '0', now())");
-
+        tep_db_query("insert into " . TABLE_CONFIGURATION . " (configuration_title, configuration_key, configuration_value, configuration_description, configuration_group_id, sort_order, date_added) values ('Ignore table', 'MODULE_PAYMENT_BILLMATECARDPAY_ORDER_TOTAL_IGNORE', 'ot_tax,ot_total,ot_subtotal', 'Ignore these entries from order total list when compiling the invoice data', '6', '2', now())");
 
 
-        tep_db_query("insert into " . TABLE_CONFIGURATION . " (configuration_title, configuration_key, configuration_value, configuration_description, configuration_group_id, sort_order, set_function, use_function, date_added) values ('Set Order Status', 'MODULE_PAYMENT_BILLMATEBANK_ORDER_STATUS_ID', '0', 'Set the status of orders made with this payment module to this value', '6', '0', 'tep_cfg_pull_down_order_statuses(', 'tep_get_order_status_name', now())");
+        tep_db_query("insert into " . TABLE_CONFIGURATION . " (configuration_title, configuration_key, configuration_value, configuration_description, configuration_group_id, sort_order, date_added) values ('Order value maximum limit', 'MODULE_PAYMENT_BILLMATECARDPAY_ORDER_LIMIT', '50000', 'Only show this payment alternative for orders less than the value below.', '6', '2', now())");
+        tep_db_query("insert into " . TABLE_CONFIGURATION . " (configuration_title, configuration_key, configuration_value, configuration_description, configuration_group_id, sort_order, date_added) values ('Order value minimum limit', 'MODULE_PAYMENT_BILLMATECARDPAY_MIN_ORDER_LIMIT', '0', 'Only show this payment alternative for orders greater than the value below.', '6', '2', now())");
 
-        tep_db_query("insert into " . TABLE_CONFIGURATION . " (configuration_title, configuration_key, configuration_value, configuration_description, configuration_group_id, sort_order, set_function, date_added) values ('Testmode', 'MODULE_PAYMENT_BILLMATEBANK_TESTMODE', 'False', 'Do you want to activate the Testmode? We will not pay for the invoices created with the test persons nor companies and we will not collect any fees as well.', '6', '0', 'tep_cfg_select_option(array(\'True\', \'False\'), ', now())");
+        tep_db_query("insert into " . TABLE_CONFIGURATION . " (configuration_title, configuration_key, configuration_value, configuration_description, configuration_group_id, sort_order, date_added) values ('Sort order of display.', 'MODULE_PAYMENT_BILLMATECARDPAY_SORT_ORDER', '0', 'Sort order of display. Lowest is displayed first.', '6', '0', now())");
 
-	    tep_db_query("insert into " . TABLE_CONFIGURATION . " (configuration_title, configuration_key, configuration_value, configuration_description, configuration_group_id, sort_order, set_function, date_added) values ('Authentication Mode', 'MODULE_PAYMENT_BILLMATEBANK_AUTHENTICATION_MODE', 'sale', '', '6', '0', 'tep_cfg_select_option(array(\'sale\', \'authentication\'), ', now())");
+        tep_db_query("insert into " . TABLE_CONFIGURATION . " (configuration_title, configuration_key, configuration_value, configuration_description, configuration_group_id, sort_order, set_function, use_function, date_added) values ('Set Order Status', 'MODULE_PAYMENT_BILLMATECARDPAY_ORDER_STATUS_ID', '0', 'Set the status of orders made with this payment module to this value', '6', '0', 'tep_cfg_pull_down_order_statuses(', 'tep_get_order_status_name', now())");
 
+        tep_db_query("insert into " . TABLE_CONFIGURATION . " (configuration_title, configuration_key, configuration_value, configuration_description, configuration_group_id, sort_order, set_function, date_added) values ('Testmode', 'MODULE_PAYMENT_BILLMATECARDPAY_TESTMODE', 'False', 'Do you want to activate the Testmode? We will not pay for the invoices created with the test persons nor companies and we will not collect any fees as well.', '6', '0', 'tep_cfg_select_option(array(\'True\', \'False\'), ', now())");
 
-	    tep_db_query("insert into " . TABLE_CONFIGURATION . " (configuration_title, configuration_key, configuration_value, configuration_description, configuration_group_id, sort_order, date_added) values ('Disabled countries', 'MODULE_PAYMENT_BILLMATEBANK_DISABLED_COUNTRYIES', 'se,fi,dk,no', 'Disable in these countries<br/>Enter country ISO Code of two characters <br/>se = Sweden<br/>fi = Finland<br/>dk = Denmark<br/>no = Norway', '6', '0', now())");
+        tep_db_query("insert into " . TABLE_CONFIGURATION . " (configuration_title, configuration_key, configuration_value, configuration_description, configuration_group_id, sort_order, set_function, date_added) values ('Authentication Mode', 'MODULE_PAYMENT_BILLMATECARDPAY_AUTHENTICATION_MODE', 'sale', '', '6', '0', 'tep_cfg_select_option(array(\'sale\', \'authentication\'), ', now())");
+		
+       tep_db_query("insert into " . TABLE_CONFIGURATION . " (configuration_title, configuration_key, configuration_value, configuration_description, configuration_group_id, sort_order, set_function, date_added) values ('Enable 3d Secure', 'MODULE_PAYMENT_BILLMATECARDPAY_DO_3D_SECURE', 'YES', '', '6', '0', 'tep_cfg_select_option(array(\'YES\', \'NO\'), ', now())");
+		
+       tep_db_query("insert into " . TABLE_CONFIGURATION . " (configuration_title, configuration_key, configuration_value, configuration_description, configuration_group_id, sort_order, set_function, date_added) values ('Enable Display Name', 'MODULE_PAYMENT_BILLMATECARDPAY_PROMPT_NAME_ENTRY', 'NO', '', '6', '0', 'tep_cfg_select_option(array(\'YES\', \'NO\'), ', now())");
+
+        tep_db_query("insert into " . TABLE_CONFIGURATION . " (configuration_title, configuration_key, configuration_value, configuration_description, configuration_group_id, sort_order, date_added) values ('Disabled countries', 'MODULE_PAYMENT_BILLMATECARDPAY_DISABLED_COUNTRYIES', 'se,fi,dk,no', 'Disable in these countries<br/>Enter country ISO Code of two characters <br/>se = Sweden<br/>fi = Finland<br/>dk = Denmark<br/>no = Norway', '6', '0', now())");
 
     }
 
@@ -1111,20 +1144,21 @@ class billmatebank {
     }
 
     function keys() {
-        return array('MODULE_PAYMENT_BILLMATEBANK_STATUS',
-                'MODULE_PAYMENT_BILLMATEBANK_ORDER_STATUS_ID',
-                'MODULE_PAYMENT_BILLMATEBANK_EID',
-                'MODULE_PAYMENT_BILLMATEBANK_SECRET',
-				'MODULE_PAYMENT_BILLMATEBANK_ARTNO',
-                'MODULE_PAYMENT_BILLMATEBANK_DISABLED_COUNTRYIES',
-                'MODULE_PAYMENT_BILLMATEBANK_ORDER_LIMIT',
-                'MODULE_PAYMENT_BILLMATEBANK_MIN_ORDER_LIMIT',
-                'MODULE_PAYMENT_BILLMATEBANK_ORDER_TOTAL_IGNORE',
-                'MODULE_PAYMENT_BILLMATEBANK_TESTMODE',
-                'MODULE_PAYMENT_BILLMATEBANK_AUTHENTICATION_MODE',
-                'MODULE_PAYMENT_BILLMATEBANK_ZONE',
-                'MODULE_PAYMENT_BILLMATEBANK_SORT_ORDER');
+        return array('MODULE_PAYMENT_BILLMATECARDPAY_STATUS',
+                'MODULE_PAYMENT_BILLMATECARDPAY_ORDER_STATUS_ID',
+                'MODULE_PAYMENT_BILLMATECARDPAY_EID',
+                'MODULE_PAYMENT_BILLMATECARDPAY_SECRET',
+				'MODULE_PAYMENT_BILLMATECARDPAY_PROMPT_NAME_ENTRY',
+				'MODULE_PAYMENT_BILLMATECARDPAY_DO_3D_SECURE',
+                'MODULE_PAYMENT_BILLMATECARDPAY_ARTNO',
+                'MODULE_PAYMENT_BILLMATECARDPAY_AUTHENTICATION_MODE',
+                'MODULE_PAYMENT_BILLMATECARDPAY_DISABLED_COUNTRYIES',
+                'MODULE_PAYMENT_BILLMATECARDPAY_ORDER_LIMIT',
+                'MODULE_PAYMENT_BILLMATECARDPAY_MIN_ORDER_LIMIT',
+                'MODULE_PAYMENT_BILLMATECARDPAY_ORDER_TOTAL_IGNORE',
+                'MODULE_PAYMENT_BILLMATECARDPAY_TESTMODE',
+                'MODULE_PAYMENT_BILLMATECARDPAY_ZONE',
+                'MODULE_PAYMENT_BILLMATECARDPAY_SORT_ORDER');
     }
 
 }
-

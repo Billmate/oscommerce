@@ -13,9 +13,15 @@ Billmate Gateway is a plugin that extends osCommerce, allowing your customers to
 ## Known Issues
 
 * Some osCommerce installation uses Fileencoding ISO-8859-1 and some utilizes UTF-8, If there are some wierd characters, there is a solution to save files as the other format. If the sites fileencoding is ISO-8859-1 you need to make sure the files in /includes/languages/[language] has fileencoding ISO-8859-1
-* The folders in /includes/languages have to match your installed language folder name. For example if you have named your folder when added the language to svenska you have to rename /includes/languages/swedish to svenska
+* The folders in /includes/languages have to match your installed language folder name. For example if you have named your folder when added the language to svenska you have to rename /includes/languages/swedish to svenska.
+* You will need to set a order status for bank and card payment methods.
 
 ## Changelog
+
+### 2.0.1 (2015-10-13)
+
+* Fix - Utf8 encoding issues on order confirmation.
+
 ### 2.0 (2015-06-22)
 Upgrading to the new API
 36 commits and 30 issues closed
