@@ -21,6 +21,7 @@ Billmate Gateway is a plugin that extends osCommerce, allowing your customers to
 ### 2.0.1 (2015-10-13)
 
 * Fix - Utf8 encoding issues on order confirmation.
+* Fix - Products ordered on order mail for card and bankpayments. 
 
 ### 2.0 (2015-06-22)
 Upgrading to the new API
