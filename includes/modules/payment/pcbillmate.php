@@ -392,11 +392,11 @@ class pcbillmate {
                     'payment_error=pcbillmate&error='.strip_tags( utf8_encode($result->message) ),
                     'SSL', true, false));
         }
-		$result->firstname = utf8_encode($result->firstname);
-		$result->lastname = utf8_encode($result->lastname);
-		$result->street = utf8_encode($result->street);
-		$result->zip = utf8_encode($result->zip);
-		$result->city = utf8_encode($result->city);
+		$result->firstname = convertToUTF8($result->firstname);
+		$result->lastname = convertToUTF8($result->lastname);
+		$result->street = convertToUTF8($result->street);
+		$result->zip = convertToUTF8($result->zip);
+		$result->city = convertToUTF8($result->city);
 		$result->country = 209;
 
         $fullname = $order->billing['firstname'].' '.$order->billing['lastname'] .' '.$order->billing['company'];
@@ -556,13 +556,13 @@ class pcbillmate {
         
 		$process_button_string .=
 		tep_draw_hidden_field('addr_num', $counter, $checked, '').
-		tep_draw_hidden_field('pcbillmate_fname'.$counter, $order->billing['firstname']).
-		tep_draw_hidden_field('pcbillmate_lname'.$counter, $order->billing['lastname']).
-		tep_draw_hidden_field('pcbillmate_street'.$counter, $order->billing['street_address']).
+		tep_draw_hidden_field('pcbillmate_fname'.$counter, convertToUTF8($order->billing['firstname'])).
+		tep_draw_hidden_field('pcbillmate_lname'.$counter, convertToUTF8($order->billing['lastname'])).
+		tep_draw_hidden_field('pcbillmate_street'.$counter, convertToUTF8($order->billing['street_address'])).
 		tep_draw_hidden_field('pcbillmate_postno'.$counter, $order->billing['postcode']).
-		tep_draw_hidden_field('pcbillmate_company'.$counter, $order->billing['company']).
-		tep_draw_hidden_field('pcbillmate_city'.$counter, $order->billing['city']).
-		tep_draw_hidden_field('pcbillmate_country'.$counter,  $this->addrs->country).
+		tep_draw_hidden_field('pcbillmate_company'.$counter, convertToUTF8($order->billing['company'])).
+		tep_draw_hidden_field('pcbillmate_city'.$counter, convertToUTF8($order->billing['city'])).
+		tep_draw_hidden_field('pcbillmate_country'.$counter,  convertToUTF8($this->addrs->country)).
 		tep_draw_hidden_field('pcbillmate_pclass'.$counter,$this->pcbillmate_pclass).
 		tep_draw_hidden_field('pcbillmate_pnum'.$counter,$this->pcbillmate_pnum);
 
@@ -819,14 +819,14 @@ class pcbillmate {
 			"email" 	=> $order->customer['email_address'],
         );
 
-       /*foreach($ship_address as $key => $col ){
+       foreach($ship_address as $key => $col ){
             if(is_numeric($col) ) continue;
-            $ship_address[$key] = utf8_decode(Encoding::fixUTF8( $col ));
+            $ship_address[$key] = convertToUTF8( $col );
         }
        foreach($bill_address as $key => $col ){
             if(is_numeric($col) ) continue;
-            $bill_address[$key] = utf8_decode(Encoding::fixUTF8( $col ));
-        }*/
+            $bill_address[$key] = convertToUTF8( $col );
+        }
    
 		$ssl = true;
 		$debug = false;

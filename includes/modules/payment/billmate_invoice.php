@@ -367,12 +367,12 @@ class billmate_invoice {
                     'SSL', true, false));
         }
 				
-		$result->firstname = utf8_encode($result->firstname);
-		$result->lastname = utf8_encode($result->lastname);
-		$result->street = utf8_encode($result->street);
-		$result->zip = utf8_encode($result->zip);
-		$result->city = utf8_encode($result->city);
-		$result->country = utf8_encode($result->country);
+		$result->firstname = convertToUTF8($result->firstname);
+		$result->lastname = convertToUTF8($result->lastname);
+		$result->street = convertToUTF8($result->street);
+		$result->zip = convertToUTF8($result->zip);
+		$result->city = convertToUTF8($result->city);
+		$result->country = convertToUTF8($result->country);
 
         $fullname = $order->billing['firstname'].' '.$order->billing['lastname'] .' '.$order->billing['company'];
 		if( empty ( $result->firstname ) ){
@@ -460,19 +460,19 @@ class billmate_invoice {
                 $_SESSION['WrongAddress'] = $WrongAddress;
                 tep_redirect(BillmateUtils::error_link(FILENAME_CHECKOUT_PAYMENT, 'payment_error=billmate_invoice&error=invalidaddress', 'SSL'));
 	        }else{
-			   if($result->firstname == "") {
+			   if($result->company != "") {
 					$this->billmate_fname = $order->billing['firstname'];
 					$this->billmate_lname = $order->billing['lastname'];
-					$this->company_name   = $result->lastname;
+					$this->company_name   = convertToUTF8($result->company);
 				}else {
-					$this->billmate_fname = $result->firstname;
-					$this->billmate_lname = $result->lastname;
+					$this->billmate_fname = convertToUTF8($result->firstname);
+					$this->billmate_lname = convertToUTF8($result->lastname);
 					$this->company_name   = '';
 				}
 
-                $this->billmate_street = $result->street;
+                $this->billmate_street = convertToUTF8($result->street);
                 $this->billmate_postno = $result->zip;
-                $this->billmate_city = $result->city;
+                $this->billmate_city = convertToUTF8($result->city);
 				
                 $order->delivery['firstname'] = $this->billmate_fname;
                 $order->billing['firstname'] = $this->billmate_fname;
@@ -513,13 +513,13 @@ class billmate_invoice {
 		$process_button_string .=
 		tep_draw_hidden_field('addr_num', $counter, $checked, '').
 		tep_draw_hidden_field('billmate_pnum'.$counter,  $this->billmate_pnum).
-		tep_draw_hidden_field('billmate_company'.$counter,  $order->billing['company']).
-		tep_draw_hidden_field('billmate_fname'.$counter, $order->billing['firstname']).
-		tep_draw_hidden_field('billmate_lname'.$counter, $order->billing['lastname']).
-		tep_draw_hidden_field('billmate_street'.$counter, $order->billing['street_address']).
-		tep_draw_hidden_field('billmate_postno'.$counter, $order->billing['postcode']).
-		tep_draw_hidden_field('billmate_city'.$counter, $order->billing['city']).
-		tep_draw_hidden_field('billmate_country'.$counter,  $this->addrs->country);
+		tep_draw_hidden_field('billmate_company'.$counter,  convertToUTF8($order->billing['company'])).
+		tep_draw_hidden_field('billmate_fname'.$counter, convertToUTF8($order->billing['firstname'])).
+		tep_draw_hidden_field('billmate_lname'.$counter, convertToUTF8($order->billing['lastname'])).
+		tep_draw_hidden_field('billmate_street'.$counter, convertToUTF8($order->billing['street_address'])).
+		tep_draw_hidden_field('billmate_postno'.$counter, convertToUTF8($order->billing['postcode'])).
+		tep_draw_hidden_field('billmate_city'.$counter, convertToUTF8($order->billing['city'])).
+		tep_draw_hidden_field('billmate_country'.$counter,  convertToUTF8($this->addrs->country));
 
         $order_totals = $order_total_modules->modules;
 
@@ -773,14 +773,14 @@ class billmate_invoice {
 			"email" 	=> $order->customer['email_address'],
         );
 
-       /*foreach($ship_address as $key => $col ){
+       foreach($ship_address as $key => $col ){
             if(is_numeric($col) ) continue;
-            $ship_address[$key] = utf8_decode(Encoding::fixUTF8( $col ));
+            $ship_address[$key] = convertToUTF8( $col );
         }
        foreach($bill_address as $key => $col ){
             if(is_numeric($col) ) continue;
-            $bill_address[$key] = utf8_decode(Encoding::fixUTF8( $col ));
-        }*/
+            $bill_address[$key] = convertToUTF8( $col );
+        }
    
  		require_once DIR_FS_CATALOG . DIR_WS_CLASSES.'/billmate/Billmate.php';
 		
@@ -853,7 +853,7 @@ class billmate_invoice {
 		$result1 = (object)$k->AddPayment($invoiceValues);
         if(is_string($result1) || (isset($result1->message) && is_object($result1))){
             tep_redirect(BillmateUtils::error_link(FILENAME_CHECKOUT_PAYMENT,
-                    'payment_error=billmate_invoice&error=' . utf8_encode($result1->message),
+                    'payment_error=billmate_invoice&error=' . convertToUTF8($result1->message),
                     'SSL', true, false));
 		} else {
             // insert address in address book to get correct address in

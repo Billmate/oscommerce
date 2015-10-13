@@ -332,7 +332,7 @@ class BillmateUtils {
             //Create table, will not do anything if it exists.
             error_log(print_r($pclasses,true));
             error_log($language);
-            tep_db_query("DELETE FROM `".$table."` WHERE `language` = '".$language."'");
+            tep_db_query("DELETE IGNORE FROM `".$table."` WHERE `language` = '".$language."'");
 
 			$eid = $pclasses['eid'];
             foreach((array)$pclasses as $key=>$pclass) {
