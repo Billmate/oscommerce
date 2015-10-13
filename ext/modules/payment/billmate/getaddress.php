@@ -49,7 +49,7 @@ global $user_billing, $language, $languages_id;
 		die(json_encode(array('success' => false, 'content' => utf8_encode($address['message']),'popup' => false)));
 
 	foreach($address as $key => $value)
-		$address[$key] = utf8_encode($value);
+		$address[$key] = convertToUTF8($value);
 
 
 
@@ -92,9 +92,10 @@ global $user_billing, $language, $languages_id;
 
 	if( $addressNotMatched || $shippingAndBilling ){
 
+
 		if(empty($_POST['geturl'])){
 			$html = '<span style="line-height: 1.4em;">'.($address['firstname']).' '.$address['lastname'].'<br>'.$address['street'].'<br>'.$address['zip'].' '.$address['city'].'</span><div style="margin-top:1em;"><input type="button" value="'.MODULE_PAYMENT_BILLMATE_YES.'" onclick="updateAddress();" class="billmate_button"/> <a onclick="closefunc(this)" class="linktag"/>'.MODULE_PAYMENT_BILLMATE_NO.'</a></div> ';
-			die(json_encode(array('success' => false, 'content' => utf8_encode($html),'popup' => true)));
+			die(json_encode(array('success' => false, 'content' => convertToUTF8($html),'popup' => true)));
 		} else {
 			if($address->firstname == "") {
 				$billmate_fname = $order->billing['firstname'];
