@@ -469,7 +469,7 @@ class billmatecardpay {
 		$languageCode = strtoupper( $languages['code'] );
 		
 		$languageCode = $languageCode == 'DA' ? 'DK' : $languageCode;
-		$languageCode = $languageCode == 'SV' ? 'SE' : $languageCode;
+		$languageCode = $languageCode == 'SE' ? 'SV' : $languageCode;
 		$languageCode = $languageCode == 'EN' ? 'GB' : $languageCode;
 
 		tep_session_unregister('billmatecard_called_api');
@@ -721,12 +721,14 @@ class billmatecardpay {
 		$ssl = true;
 		$debug = false;
 		$languageCode = tep_db_fetch_array(tep_db_query("select code from languages where languages_id = " . $languages_id));
-		if(!defined('BILLMATE_LANGUAGE')) define('BILLMATE_LANGUAGE',$languageCode['code']);
+        $languageCode['code']  = (strtolower($languageCode['code']) == 'se') ? 'sv' : $languageCode['code'];
+
+        if(!defined('BILLMATE_LANGUAGE')) define('BILLMATE_LANGUAGE',$languageCode['code']);
         if(!defined('BILLMATE_SERVER')) define('BILLMATE_SERVER','2.1.7');
 
         $k = new BillMate($eid,$secret,$ssl,$this->billmatecardpay_testmode,$debug,$codes);
 		$invoiceValues = array();
-    $lang = $languageCode['code'] == 'se' ? 'sv' : $languageCode['code'];
+        $lang = $languageCode['code'] == 'se' ? 'sv' : $languageCode['code'];
 		$invoiceValues['PaymentData'] = array(	"method" => "8",		//1=Factoring, 2=Service, 4=PartPayment, 8=Card, 16=Bank, 24=Card/bank and 32=Cash.
 												"currency" => $currency, //"SEK",
 												"language" => $lang,
@@ -948,7 +950,9 @@ class billmatecardpay {
 		if( (MODULE_PAYMENT_BILLMATECARDPAY_AUTHENTICATION_MODE != 'sale') ) {
 			if(!$already_completed ){
 				$languageCode = tep_db_fetch_array(tep_db_query("select code from languages where languages_id = " . $languages_id));
-				if(!defined('BILLMATE_LANGUAGE')) define('BILLMATE_LANGUAGE',$languageCode['code']);
+                $languageCode['code']  = (strtolower($languageCode['code']) == 'se') ? 'sv' : $languageCode['code'];
+
+                if(!defined('BILLMATE_LANGUAGE')) define('BILLMATE_LANGUAGE',$languageCode['code']);
                 if(!defined('BILLMATE_SERVER')) define('BILLMATE_SERVER','2.1.7');
 
                 $k = new BillMate($eid,$secret,$ssl, $this->billmatecardpay_testmode,$debug);
