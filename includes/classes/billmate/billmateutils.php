@@ -329,6 +329,7 @@ class BillmateUtils {
      */
     public static function update_pclasses($table, $pclasses,$language) {
         if(strlen(trim($table)) > 0) {
+            self::create_db($table);
             //Create table, will not do anything if it exists.
             error_log(print_r($pclasses,true));
             error_log($language);

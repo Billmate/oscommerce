@@ -382,6 +382,7 @@ class pcbillmate {
 
         $type = $GA_OLD;
 	    $languageCode = tep_db_fetch_array(tep_db_query("select code from languages where languages_id = " . $languages_id));
+        $languageCode['code']  = (strtolower($languageCode['code']) == 'se') ? 'sv' : $languageCode['code'];
 	    if(!defined('BILLMATE_LANGUAGE')) define('BILLMATE_LANGUAGE',$languageCode['code']);
         if(!defined('BILLMATE_SERVER')) define('BILLMATE_SERVER','2.1.7');
 		$k = new BillMate($eid,$secret,true, $this->pcbillmate_testmode, false);
@@ -831,7 +832,9 @@ class pcbillmate {
 		$ssl = true;
 		$debug = false;
 	    $languageCode = tep_db_fetch_array(tep_db_query("select code from languages where languages_id = " . $languages_id));
-	    if(!defined('BILLMATE_LANGUAGE')) define('BILLMATE_LANGUAGE',$languageCode['code']);
+        $languageCode['code']  = (strtolower($languageCode['code']) == 'se') ? 'sv' : $languageCode['code'];
+
+        if(!defined('BILLMATE_LANGUAGE')) define('BILLMATE_LANGUAGE',$languageCode['code']);
         if(!defined('BILLMATE_SERVER')) define('BILLMATE_SERVER','2.1.7');
 
         $k = new BillMate($eid,$secret,$ssl,$this->pcbillmate_testmode,$debug);
@@ -978,7 +981,9 @@ class pcbillmate {
         $invno = $order->billmateref;
 
 	    $languageCode = tep_db_fetch_array(tep_db_query("select code from languages where languages_id = " . $languages_id));
-	    if(!defined('BILLMATE_LANGUAGE')) define('BILLMATE_LANGUAGE',$languageCode['code']);
+        $languageCode['code']  = (strtolower($languageCode['code']) == 'se') ? 'sv' : $languageCode['code'];
+
+        if(!defined('BILLMATE_LANGUAGE')) define('BILLMATE_LANGUAGE',$languageCode['code']);
 
 		$k = new BillMate($eid,$secret,true,$this->pcbillmate_testmode,false);
 		$k->UpdatePayment( array('PaymentData'=> array("number"=>$invno, "orderid"=>(string)$insert_id)) );
@@ -1063,6 +1068,7 @@ class pcbillmate {
                 $result = false;
             $langs = tep_db_query("select code from languages");
             while($lang = tep_db_fetch_array($langs)) {
+                $lang['code'] = ($lang['code'] == 'se') ? 'sv' : $lang['code'];
                 if (in_array($lang['code'], array('sv', 'en'))) {
                     $additionalinfo['PaymentData'] = array(
                         "currency" => 'SEK',//SEK
