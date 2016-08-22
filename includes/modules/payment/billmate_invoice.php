@@ -354,7 +354,7 @@ class billmate_invoice {
 
 	    $languageCode = tep_db_fetch_array(tep_db_query("select code from languages where languages_id = " . $languages_id));
 	    if(!defined('BILLMATE_LANGUAGE')) define('BILLMATE_LANGUAGE',$languageCode['code']);
-        if(!defined('BILLMATE_SERVER')) define('BILLMATE_SERVER','2.1.7');
+        if(!defined('BILLMATE_SERVER')) define('BILLMATE_SERVER','2.2');
 
 		$k = new BillMate($eid,$secret,$ssl,$this->billmate_testmode,$debug);
 		$result = (object)$k->GetAddress(array('pno'=>$pno));
@@ -788,7 +788,7 @@ class billmate_invoice {
 		$debug = false;
 	    $languageCode = tep_db_fetch_array(tep_db_query("select code from languages where languages_id = " . $languages_id));
 	    if(!defined('BILLMATE_LANGUAGE')) define('BILLMATE_LANGUAGE',$languageCode['code']);
-        if(!defined('BILLMATE_SERVER')) define('BILLMATE_SERVER','2.1.7');
+        if(!defined('BILLMATE_SERVER')) define('BILLMATE_SERVER','2.2');
 
 		$k = new BillMate($eid,$secret,$ssl,$this->billmate_testmode,$debug);
 		$invoiceValues = array();
@@ -799,7 +799,13 @@ class billmate_invoice {
 												"country" => "SE",
 												"autoactivate" => "0",
 												"orderid" => (string)time(),
-											);
+                                                "bankid" => true,
+                                                "returnmethod" => "GET",
+                                                "accepturl" => tep_href_link(FILENAME_CHECKOUT_PROCESS, '', 'SSL'),
+                                                "cancelurl" => tep_href_link(FILENAME_CHECKOUT_PAYMENT, '', 'SSL'),
+                                                "callbackurl" => tep_href_link('ext/modules/payment/billmate/invoice_ipn.php', '', 'SSL')
+        );
+       
 		$invoiceValues['PaymentInfo'] = array( 	"paymentdate" => date('Y-m-d'),
 											"paymentterms" => "14",
 											"yourreference" => "",
@@ -808,7 +814,7 @@ class billmate_invoice {
 											"delivery" => "Post",
 											"deliveryterms" => "FOB",
 									);
-		$invoiceValues['Card'] = array();
+
 		$invoiceValues['Customer'] = array(	'customernr'=> (string)$customer_id,
 											'pno'=>$pno, 
 											'Billing'=> $bill_address, 
@@ -851,6 +857,8 @@ class billmate_invoice {
 									)
 								);
 		$result1 = (object)$k->AddPayment($invoiceValues);
+        error_log('addPayment'.print_r($result1,true));
+
         if(is_string($result1) || (isset($result1->message) && is_object($result1))){
             tep_redirect(BillmateUtils::error_link(FILENAME_CHECKOUT_PAYMENT,
                     'payment_error=billmate_invoice&error=' . convertToUTF8($result1->message),
@@ -880,6 +888,7 @@ class billmate_invoice {
             $check_address = tep_db_fetch_array($check_address_query);
             if(is_array($check_address) && count($check_address) > 0) {
                 $sendto = $billto = $check_address['address_book_id'];
+
             }else {
                 $sql_data_array =
                         array('customers_id' => $customer_id,
@@ -893,11 +902,16 @@ class billmate_invoice {
 
                 tep_db_perform(TABLE_ADDRESS_BOOK, $sql_data_array);
                 $sendto = $billto = tep_db_insert_id();
+
             }
 
             $order->billmateref = $result1->number;
             $payment['tan'] = $result1->number;
             tep_session_unregister('billmate_ot');
+            if($result1->status == 'WaitingForBankIDIdentification') {
+                header('Location: ' . $result1->url);
+                exit;
+            }
             return false;
 		}
     }
