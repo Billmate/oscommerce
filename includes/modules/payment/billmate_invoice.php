@@ -801,7 +801,7 @@ class billmate_invoice {
 												"orderid" => (string)time(),
                                                 "bankid" => true,
                                                 "returnmethod" => "GET",
-                                                "accepturl" => tep_href_link(FILENAME_CHECKOUT_PROCESS, '', 'SSL'),
+                                                "accepturl" => tep_href_link('ext/modules/payment/billmate/invoice_ipn.php?accept=true','', 'SSL'),
                                                 "cancelurl" => tep_href_link(FILENAME_CHECKOUT_PAYMENT, '', 'SSL'),
                                                 "callbackurl" => tep_href_link('ext/modules/payment/billmate/invoice_ipn.php', '', 'SSL')
         );
@@ -909,7 +909,8 @@ class billmate_invoice {
             $payment['tan'] = $result1->number;
             tep_session_unregister('billmate_ot');
             if($result1->status == 'WaitingForBankIDIdentification') {
-                header('Location: ' . $result1->url);
+                tep_redirect($result1->url);
+                //header('Location: ' . $result1->url);
                 exit;
             }
             return false;

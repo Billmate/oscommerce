@@ -5,6 +5,7 @@
  * Date: 15-04-01
  * Time: 13:28
  */
+ini_set('display_errors',1);
 global $user_billing, $language, $languages_id;
 	chdir('../../../../');
 	require('includes/application_top.php');
@@ -137,5 +138,7 @@ global $user_billing, $language, $languages_id;
 			die(json_encode(array('success' => true)));
 		}
 
+	} else {
+		die(json_encode(array('success' => true)));
 	}
 
