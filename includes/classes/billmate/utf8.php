@@ -2052,7 +2052,7 @@ class BillmateCountry {
 		}
 		return array('country'=>$country,'language'=> $language, 'encoding' => $encoding,'currency' => $currency );
     }
-	function getSwedenData(){
+	public static function getSwedenData(){
 		$country = 209;
 		$language = 138;
 		$encoding = 2;

@@ -36,6 +36,7 @@ class BillMate{
 	var $TEST = false;
 	var $DEBUG = false;
 	var $REFERER = false;
+	public $raw_response = '';
 	function BillMate($id,$key,$ssl=true,$test=false,$debug=false,$referer=array()){
 		$this->ID = $id;
 		$this->KEY = $key;
@@ -73,6 +74,7 @@ class BillMate{
 				$response = $this->curl(json_encode($values));
 				break;
 		}
+		$this->raw_response = $response;
 		return $this->verify_hash($response);
 	}
 	function verify_hash($response) {

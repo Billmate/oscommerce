@@ -267,8 +267,6 @@ class billmatecardpay {
         //Store values into Session
         tep_session_register('user_billing');
 
-        $eid = MODULE_PAYMENT_BILLMATECARDPAY_EID;
-        $secret = MODULE_PAYMENT_BILLMATECARDPAY_SECRET;
     }
 
     function confirmation() {
@@ -798,8 +796,8 @@ class billmatecardpay {
     function before_process() {
 
 		global $order, $customer_id, $currency, $currencies, $sendto, $billto,
-			   $billmatecardpay_ot, $billmatecardpay_livemode, $billmatecardpay_testmode,$insert_id, $cart_billmate_card_ID,$payment;
-		global $payment,$cartID, $cart,$order_id, $languages_id, $language_id, $language, $currency;
+			   $billmatecardpay_ot, $billmatecardpay_livemode, $billmatecardpay_testmode,$insert_id, $cart_billmate_card_ID,$payment
+               ,$cartID, $cart,$order_id, $languages_id, $language_id, $language, $currency;
 
 		require(DIR_FS_CATALOG . DIR_WS_CLASSES . 'billmate/billmateutils.php');
 		$order_id = $cart_billmate_card_ID;
