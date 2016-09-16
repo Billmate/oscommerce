@@ -14,7 +14,7 @@ chdir('../../../../');
 require('includes/application_top.php');
 
 
-if (!defined('MODULE_PAYMENT_BILLMATE_STATUS') || (MODULE_PAYMENT_BILLMATE_STATUS  != 'True')) {
+if ((!defined('MODULE_PAYMENT_BILLMATE_STATUS') || (MODULE_PAYMENT_BILLMATE_STATUS  != 'True')) || (!defined('MODULE_PAYMENT_PCBILLMATE_STATUS') || (MODULE_PAYMENT_PCBILLMATE_STATUS  != 'True'))) {
 	exit;
 }
 
