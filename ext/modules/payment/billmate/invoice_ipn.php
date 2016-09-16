@@ -34,6 +34,12 @@ $shipping_modules = new shipping($shipping);
 require(DIR_WS_CLASSES . 'order.php');
 $order = new order;
 
+require(DIR_WS_CLASSES . 'order_total.php');
+global $customer_id;
+$order_total_modules = new order_total;
+
+$order_totals = $order_total_modules->process();
+
 	$response = isset($_GET['data']) ? $_GET : file_get_contents("php://input");
 
 	$secret = MODULE_PAYMENT_BILLMATE_SECRET;
@@ -54,6 +60,10 @@ $order = new order;
 
 
 			$customer_id = tep_session_is_registered('customer_id');
+			if(!$customer_id){
+				$customer_id = $_GET['customer_id'];
+				$order = new order;
+			}
 
 			$sql_data_array = array('customers_id' => $customer_id,
 				'customers_name' => $order->customer['firstname'] . ' ' . $order->customer['lastname'],
@@ -96,7 +106,7 @@ $order = new order;
 				'currency_value' => $order->info['currency_value']);
 			tep_db_perform(TABLE_ORDERS, $sql_data_array);
 			$insert_id = tep_db_insert_id();
-			
+
 			for ($i=0, $n=sizeof($order_totals); $i<$n; $i++) {
 				$sql_data_array = array('orders_id' => $insert_id,
 					'title' => $order_totals[$i]['title'],

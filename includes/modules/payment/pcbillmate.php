@@ -847,6 +847,11 @@ class pcbillmate {
 												"country" => "SE",
 												"autoactivate" => "0",
 												"orderid" => (string)time(),
+                                                "bankid" => true,
+                                                "accepturl" => tep_href_link('ext/modules/payment/billmate/invoice_ipn.php?accept=true&customer_id='.$customer_id,'', 'SSL'),
+                                                "cancelurl" => tep_href_link(FILENAME_CHECKOUT_PAYMENT, '', 'SSL'),
+                                                "callbackurl" => tep_href_link('ext/modules/payment/billmate/invoice_ipn.php?customer_id='.$customer_id, '', 'SSL')
+
 											);
 		$invoiceValues['PaymentInfo'] = array( 	"paymentdate" => date('Y-m-d'),
 											"paymentterms" => "14",
@@ -941,6 +946,11 @@ class pcbillmate {
             $order->billmateref=$result1->number;
             $payment['tan']=$result1->number;
             tep_session_unregister('pcbillmate_ot');
+            if($result1->status == 'WaitingForBankIDIdentification') {
+                tep_redirect($result1->url);
+                //header('Location: ' . $result1->url);
+                exit;
+            }
 
         }
     }
