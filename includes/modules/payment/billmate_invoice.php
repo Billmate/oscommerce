@@ -779,6 +779,7 @@ class billmate_invoice {
             }
             $billmate_ot['code_entries'] = $j;
         }
+        error_log('order_total'.print_r($billmate_ot,true));
 
         tep_session_register('billmate_ot');
 
@@ -805,10 +806,9 @@ class billmate_invoice {
 
     function doInvoice($add_order = false ){
         global $order, $customer_id, $currency, $currencies, $sendto, $billto,
-               $billmatecardpay_ot, $billmatecardpay_livemode, $billmatecardpay_testmode,$insert_id,
-               $languages_id, $language_id, $language, $currency, $cart_billmate_card_ID,$billmate_pno;
+               $billmate_ot,$insert_id, $languages_id, $language_id, $language, $currency, $cart_billmate_card_ID,$billmate_pno;
 
-        $billmatecardpay_ot = $_SESSION['billmatecardpay_ot'];
+        $billmate_ot = $_SESSION['billmate_ot'];
         
         require_once(DIR_FS_CATALOG . DIR_WS_CLASSES . 'billmate/billmateutils.php');
         if( empty($_POST ) ) $_POST = $_GET;
@@ -889,18 +889,18 @@ class billmate_invoice {
         // Then the extra charnges like shipping and invoicefee and
         // discount.
 
-        $extra = $billmatecardpay_ot['code_entries'];
+        $extra = $billmate_ot['code_entries'];
 
         //end hack
-
+        error_log('order_total_add'.print_r($billmate_ot,true));
         for ($j=0 ; $j<$extra ; $j++) {
-            $size = $billmatecardpay_ot["code_size_".$j];
+            $size = $billmate_ot["code_size_".$j];
             for ($i=0 ; $i<$size ; $i++) {
-                $value = $billmatecardpay_ot["value_".$j."_".$i];
-                $name = $billmatecardpay_ot["title_".$j."_".$i];
-                $tax = $billmatecardpay_ot["tax_rate_".$j."_".$i];
+                $value = $billmate_ot["value_".$j."_".$i];
+                $name = $billmate_ot["title_".$j."_".$i];
+                $tax = $billmate_ot["tax_rate_".$j."_".$i];
                 $name = rtrim($name, ":");
-                $code = $billmatecardpay_ot["code_".$j."_".$i];
+                $code = $billmate_ot["code_".$j."_".$i];
 
                 $price_without_tax = $currencies->get_value($currency) * $value * 100;
                 if(DISPLAY_PRICE_WITH_TAX == 'true') {

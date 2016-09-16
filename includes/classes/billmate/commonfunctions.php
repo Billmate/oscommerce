@@ -16,9 +16,10 @@ if(!function_exists('getCountryID')){
 			die($msg);
 		}
 	}
-	define('BILLPLUGIN_VERSION','2.0.2');
-	define('BILLMATE_VERSION',  "PHP:OsCommerce:".BILLPLUGIN_VERSION );
-
+	define('BILLPLUGIN_VERSION','2.1');
+	$version = function_exists('tep_get_version') ? tep_get_version() : 'to_old';
+	defined('BILLMATE_CLIENT') || define('BILLMATE_CLIENT',  'PHP:OsCommerce:'.$version.':PLUGIN:'.BILLPLUGIN_VERSION );
+	//define('SHOP_VERSION',array('oscVersion' => function_exists('tep_get_version') ? tep_get_version() : 'to_old'));
 	function getCountryID(){
 		return 209;
 		$country = strtoupper(shopp_setting('base_operations'));
