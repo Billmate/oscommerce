@@ -766,7 +766,7 @@ class billmatebank {
 		$_DATA = json_decode($_REQUEST['data'], true);
 		$_DATA['order_id'] = $_DATA['orderid'];
 		
-        if(!isset($_DATA['status']) || $_DATA['status'] != 'Paid'){
+        if(!isset($_DATA['status']) || $_DATA['status'] == 'Cancelled' || $_DATA['status'] == 'Failed'){
             tep_redirect(BillmateUtils::error_link(FILENAME_CHECKOUT_PAYMENT,
                     'payment_error=billmatebank&error=Please try again.',
                     'SSL', true, false));

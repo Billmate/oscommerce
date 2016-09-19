@@ -1040,7 +1040,6 @@ class billmate_invoice {
         );
         $result1 = (object)$k->AddPayment($invoiceValues);
         $result1->raw_response = $k->raw_response;
-        error_log('result1'.print_r($result1,true));
         if(!isset($result1->code)){
             error_log('not code');
             return $result1;

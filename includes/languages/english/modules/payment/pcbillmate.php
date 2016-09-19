@@ -80,11 +80,11 @@
   define('MODULE_PAYMENT_PCBILLMATE_TEXT_CONFIRM_DESCRIPTION', 'www.billmate.se');
 
 
-  define('MODULE_PAYMENT_PCBILLMATE_ADDRESS_WRONG', 'Your Billing address is wrong.');
-  define('MODULE_PAYMENT_PCBILLMATE_CORRECT_ADDRESS', 'Correct Address is :');
-  define('MODULE_PAYMENT_PCBILLMATE_CORRECT_ADDRESS_OPTION', 'Click Yes to continue with new address, No to choose other payment method');
-  define('MODULE_PAYMENT_PCBILLMATE_YES', 'Yes');
-  define('MODULE_PAYMENT_PCBILLMATE_NO', 'No');
+define('MODULE_PAYMENT_PCBILLMATE_ADDRESS_WRONG', 'Pay with invoice can only be made with a registered adress. Would you like to make the purchase with the following registered address:');
+define('MODULE_PAYMENT_PCBILLMATE_CORRECT_ADDRESS', 'Correct Address is :');
+define('MODULE_PAYMENT_PCBILLMATE_CORRECT_ADDRESS_OPTION', 'Click Yes to continue with new address, No to choose other payment method');
+define('MODULE_PAYMENT_PCBILLMATE_YES', 'Yes, make purchase with this address.');
+define('MODULE_PAYMENT_PCBILLMATE_NO', 'No, I want to specify another person / company or change payment method.');
   define('MODULE_PAYMENT_PCBILLMATE_CHOOSEALTERNATIVES', 'Choose alternative address below');
   define('MODULE_PAYMENT_PCBILLMATE_ERRORDIVIDE', 'Billmate Account - error');
 
