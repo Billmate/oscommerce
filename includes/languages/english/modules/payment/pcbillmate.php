@@ -67,6 +67,7 @@
   define('MODULE_PAYMENT_PCBILLMATE_MONTH_DESC', 'Semicolon separated list, with no spaces.');
   define('MODULE_PAYMENT_PCBILLMATE_MONTH_FEE_TITLE', 'Set Monthly Fee');
   define('MODULE_PAYMENT_PCBILLMATE_MONTH_FEE_DESC', 'Semicolon separated list, with no spaces.');
+  define('MODULE_PAYMENT_PCBILLMATE_MONTH','month');
   define('MODULE_PAYMENT_PCBILLMATE_RATE_TITLE', 'Set Rate');
   define('MODULE_PAYMENT_PCBILLMATE_RATE_DESC', 'Semicolon separated list, with no spaces.');
   define('MODULE_PAYMENT_PCBILLMATE_START_FEE_TITLE', 'Set Start Fee');
