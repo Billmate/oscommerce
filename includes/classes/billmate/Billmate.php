@@ -72,9 +72,9 @@ class BillMate{
 		switch ($this->MODE) {
 			case "CURL":
 				$response = $this->curl(json_encode($values));
+				$this->raw_response = json_decode($response,true);
 				break;
 		}
-		$this->raw_response = $response;
 		return $this->verify_hash($response);
 	}
 	function verify_hash($response) {

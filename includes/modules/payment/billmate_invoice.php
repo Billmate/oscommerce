@@ -786,9 +786,13 @@ class billmate_invoice {
         $process_button_string .= tep_draw_hidden_field(tep_session_name(),
                 tep_session_id());
         $return = $this->doInvoice();
-        $redirect = ($return->status == 'WaitingForBankIDIdentification') ? $return->url : tep_href_link(FILENAME_CHECKOUT_PROCESS.'&credentials='.json_encode($return->raw_response['credentials']).'&data='.json_encode($return->raw_response['data']),'', 'SSL');
+        $redirect = ($return->status == 'WaitingForBankIDIdentification') ? $return->url : tep_href_link(FILENAME_CHECKOUT_PROCESS,rawurlencode('credentials='.json_encode($return->raw_response['credentials']).'&data='.json_encode($return->raw_response['data'])), 'SSL');
         if($redirect) {
             $process_button_string .= '<script type="text/javascript">
+                            String.prototype.replaceAll = function(search, replacement) {
+                                var target = this;
+                                return target.replace(new RegExp(search, \'g\'), replacement);
+                            };
                           if(!window.jQuery){
                           	var jq = document.createElement("script");
                           	jq.type = "text/javascript";
@@ -796,7 +800,7 @@ class billmate_invoice {
 
                           	document.getElementsByTagName("head")[0].appendChild(jq);
                           }setTimeout(function(){
-                                                      jQuery(document).ready(function(){ $("input[name=\'comments\']").remove(); }); $(\'form[name="checkout_confirmation"]\').submit(function(e){e.preventDefault(); window.location = "' . $redirect . '";});
+                                                      jQuery(document).ready(function(){ $("input[name=\'comments\']").remove(); }); $(\'form[name="checkout_confirmation"]\').submit(function(e){e.preventDefault(); window.location = decodeURI("' . $redirect . '").replaceAll("%26","&").replaceAll("%3D","=").replaceAll("%3A",":").replaceAll("%2C",",");});
 
                           },200)
                           </script>';
@@ -892,7 +896,6 @@ class billmate_invoice {
         $extra = $billmate_ot['code_entries'];
 
         //end hack
-        error_log('order_total_add'.print_r($billmate_ot,true));
         for ($j=0 ; $j<$extra ; $j++) {
             $size = $billmate_ot["code_size_".$j];
             for ($i=0 ; $i<$size ; $i++) {
@@ -1041,7 +1044,6 @@ class billmate_invoice {
         $result1 = (object)$k->AddPayment($invoiceValues);
         $result1->raw_response = $k->raw_response;
         if(!isset($result1->code)){
-            error_log('not code');
             return $result1;
         }
         else {
@@ -1073,6 +1075,7 @@ class billmate_invoice {
         foreach($_REQUEST as $key => $value){
             $_REQUEST[$key] = stripslashes($value);
         }
+
         $_DATA = $k->verify_hash($_REQUEST);
         if(!isset($_DATA['status']) || ($_DATA['status'] == 'Cancelled' || $_DATA['status'] == 'Failed')) {
             tep_redirect(BillmateUtils::error_link(FILENAME_CHECKOUT_PAYMENT,
