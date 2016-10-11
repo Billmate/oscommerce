@@ -835,7 +835,12 @@ class pcbillmate {
         $process_button_string .= tep_draw_hidden_field(tep_session_name(),
             tep_session_id());
         $return = $this->doInvoice();
-        $redirect = ($return->status == 'WaitingForBankIDIdentification') ? $return->url : tep_href_link(FILENAME_CHECKOUT_PROCESS,rawurlencode('credentials='.json_encode($return->raw_response['credentials']).'&data='.json_encode($return->raw_response['data'])), 'SSL');
+        $redirect = false;
+        if(!isset($return->code)) {
+
+            $redirect = ($return->status == 'WaitingForBankIDIdentification') ? $return->url : tep_href_link(FILENAME_CHECKOUT_PROCESS, rawurlencode('credentials=' . json_encode($return->raw_response['credentials']) . '&data=' . json_encode($return->raw_response['data'])), 'SSL');
+        }
+
         if($redirect) {
             $process_button_string .= '<script type="text/javascript">
                             String.prototype.replaceAll = function(search, replacement) {
@@ -850,6 +855,26 @@ class pcbillmate {
                           	document.getElementsByTagName("head")[0].appendChild(jq);
                           }setTimeout(function(){
                                                       jQuery(document).ready(function(){ $("input[name=\'comments\']").remove(); }); $(\'form[name="checkout_confirmation"]\').submit(function(e){e.preventDefault(); window.location = decodeURI("' . $redirect . '").replaceAll("%26","&").replaceAll("%3D","=").replaceAll("%3A",":").replaceAll("%2C",",");});
+
+                          },200)
+                          </script>';
+        } else {
+            $process_button_string .= '<script type="text/javascript">
+                            String.prototype.replaceAll = function(search, replacement) {
+                                var target = this;
+                                return target.replace(new RegExp(search, \'g\'), replacement);
+                            };
+                          if(!window.jQuery){
+                          	var jq = document.createElement("script");
+                          	jq.type = "text/javascript";
+                          	jq.src = "' . HTTP_SERVER . DIR_WS_HTTP_CATALOG . 'jquery.js";
+
+                          	document.getElementsByTagName("head")[0].appendChild(jq);
+                          }
+                          setTimeout(function(){
+                                                      jQuery(document).ready(function(){ window.location = decodeURI("'.BillmateUtils::error_link(FILENAME_CHECKOUT_PAYMENT,
+                    'payment_error=pcbillmate&error=' . utf8_encode($return->message),
+                    'SSL', true, false).'").replace("%26","&")});
 
                           },200)
                           </script>';
@@ -1094,15 +1119,17 @@ class pcbillmate {
         );
         $result1 = (object)$k->AddPayment($invoiceValues);
         $result1->raw_response = $k->raw_response;
-        if(!isset($result1->code)){
+        /*if(!isset($result1->code)){
             return $result1;
         }
         else {
+            ob_start();
             tep_redirect(BillmateUtils::error_link(FILENAME_CHECKOUT_PAYMENT,
                 'payment_error=billmateinvoice&error=' . utf8_encode($result1->message),
                 'SSL', true, false));
+            ob_end_flush();
             exit;
-        }
+        }*/
         return $result1;
 
     }
