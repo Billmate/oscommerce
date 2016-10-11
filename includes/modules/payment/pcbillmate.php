@@ -1119,18 +1119,15 @@ class pcbillmate {
         );
         $result1 = (object)$k->AddPayment($invoiceValues);
         $result1->raw_response = $k->raw_response;
-        /*if(!isset($result1->code)){
+        if(!isset($result1->code)){
             return $result1;
         }
         else {
-            ob_start();
-            tep_redirect(BillmateUtils::error_link(FILENAME_CHECKOUT_PAYMENT,
-                'payment_error=billmateinvoice&error=' . utf8_encode($result1->message),
-                'SSL', true, false));
-            ob_end_flush();
-            exit;
-        }*/
-        return $result1;
+            billmate_remove_order($cart_billmate_card_ID,true);
+            tep_session_unregister('cart_Billmate_card_ID');
+            return $result1;
+
+        }
 
     }
 
