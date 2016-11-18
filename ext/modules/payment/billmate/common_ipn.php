@@ -30,7 +30,7 @@ $input = json_decode($response, true);
 $_DATA = $input['data'];
 $_DATA['order_id']= $_DATA['orderid'];
 
-if(isset($_DATA['status']) || $_DATA['status'] == 'Paid'){
+if(isset($_DATA['status']) || ($_DATA['status'] == 'Paid' || $_DATA['status'] == 'Created')){
 	if (isset($_DATA['orderid']) && ($_DATA['orderid'] > 0)) {
 
 		$secret = MODULE_PAYMENT_BILLMATE_SECRET;
@@ -84,12 +84,10 @@ if(isset($_DATA['status']) || $_DATA['status'] == 'Paid'){
 
 		}
 	}
-} else {
-	$email_body = '$_DATA:' . "\n\n";
-	reset($_DATA);
-	while (list($key, $value) = each($_DATA)) {
-		$email_body .= $key . '=' . $value . "\n";
-	}
+} 
+if(isset($_DATA['status']) && ($_DATA['status'] == 'Failed' || $_DATA['status'] == 'Cancelled')){
+	billmate_remove_order($_DATA['orderid'],true);
+
 }
 exit;
 

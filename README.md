@@ -1,5 +1,5 @@
-#Billmate Payment Gateway for osCommerce
-------
+# Billmate Payment Gateway for osCommerce
+-----------------------------------------
 
 By Billmate AB - [https://billmate.se](https://billmate.se/ "billmate.se")
 

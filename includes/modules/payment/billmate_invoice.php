@@ -266,8 +266,8 @@ class billmate_invoice {
 
         if($billmate_fee > 0) {
             $tax_rate =tep_get_tax_rate(MODULE_BILLMATE_FEE_TAX_CLASS);
-            $billmate_fee = $billmate_fee *( 1+($tax_rate/100));
-            $billmate_fee = number_format($billmate_fee,2);
+            /*$billmate_fee = $billmate_fee *( 1+($tax_rate/100));
+            $billmate_fee = number_format($billmate_fee,2);*/
             $billmate_fee = $currencies->format($billmate_fee);
 
             $this->title .= sprintf(MODULE_PAYMENT_BILLMATE_EXTRA_FEE, $billmate_fee);
@@ -626,9 +626,9 @@ class billmate_invoice {
 
             $customer_notification = (SEND_EMAILS == 'true') ? '1' : '0';
             $sql_data_array = array('orders_id' => $insert_id,
-                'orders_status_id' => $order->info['order_status'],
+                'orders_status_id' => 1,
                 'date_added' => 'now()',
-                'customer_notified' => $customer_notification,
+                'customer_notified' => 0,
                 'comments' => $order->info['comments']);
             tep_db_perform(TABLE_ORDERS_STATUS_HISTORY, $sql_data_array);
 
@@ -945,7 +945,13 @@ class billmate_invoice {
                     {
                         $percent = $value / $totals;
                         $price_without_tax_out = $price_without_tax * $percent;
-                        $temp = mk_goods_flags(1, "", ($name).' '.(int)$tax.'% '.MODULE_PAYMENT_BILLMATE_VAT, $price_without_tax_out, $tax, 0, 0);
+
+                        if($code = 'ot_billmate_fee'){
+                            $temp = mk_goods_flags(1, "", ($name).' '.(int)$tax.'% '.MODULE_PAYMENT_BILLMATE_VAT, $price_without_tax_out, $tax, 0, true);
+                        } else {
+                            $temp = mk_goods_flags(1, "", ($name).' '.(int)$tax.'% '.MODULE_PAYMENT_BILLMATE_VAT, $price_without_tax_out, $tax, 0, false);
+
+                        }
                         $totalValue += $temp['withouttax'];
                         $taxValue += $temp['tax'];
                         $goodsList[] = $temp;
@@ -1027,14 +1033,7 @@ class billmate_invoice {
             "delivery" => "Post",
             "deliveryterms" => "FOB",
         );
-        $invoiceValues['Card'] = array(	"promptname" => (MODULE_PAYMENT_BILLMATECARDPAY_PROMPT_NAME_ENTRY == "YES")?1:0,
-            "3dsecure" => (MODULE_PAYMENT_BILLMATECARDPAY_DO_3D_SECURE == "YES")?1:0,
-            "recurring" => "",
-            "recurringnr" => "",
-            "accepturl" => tep_href_link(FILENAME_CHECKOUT_PROCESS, '', 'SSL'),
-            "cancelurl" => tep_href_link(FILENAME_CHECKOUT_PAYMENT, '', 'SSL'),
-            "callbackurl" => tep_href_link('ext/modules/payment/billmate/cardpay_ipn.php', '', 'SSL'), //'http://api.billmate.se/callback.php',
-        );
+
         $invoiceValues['Customer'] = array(	
             'customernr'=> (string)$customer_id,
             'pno'=>$pno,
@@ -1104,9 +1103,13 @@ class billmate_invoice {
 
         $_DATA = $k->verify_hash($_REQUEST);
         if(!isset($_DATA['status']) || ($_DATA['status'] == 'Cancelled' || $_DATA['status'] == 'Failed')) {
+            billmate_remove_order($_DATA['orderid'],true);
+            tep_session_unregister('cart_Billmate_card_ID');
             tep_redirect(BillmateUtils::error_link(FILENAME_CHECKOUT_PAYMENT,
                 'payment_error=billmateinvoice&error=Please try again.',
                 'SSL', true, false));
+
+
             return;
         }
         $status = tep_db_query("select orders_status from ".TABLE_ORDERS." where orders_id = {$_DATA['orderid']}");

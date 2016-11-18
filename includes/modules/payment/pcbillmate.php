@@ -681,9 +681,9 @@ class pcbillmate {
 
             $customer_notification = (SEND_EMAILS == 'true') ? '1' : '0';
             $sql_data_array = array('orders_id' => $insert_id,
-                'orders_status_id' => $order->info['order_status'],
+                'orders_status_id' => 1,
                 'date_added' => 'now()',
-                'customer_notified' => $customer_notification,
+                'customer_notified' => 0,
                 'comments' => $order->info['comments']);
             tep_db_perform(TABLE_ORDERS_STATUS_HISTORY, $sql_data_array);
 
@@ -1078,14 +1078,7 @@ class pcbillmate {
             "delivery" => "Post",
             "deliveryterms" => "FOB",
         );
-        $invoiceValues['Card'] = array(	"promptname" => (MODULE_PAYMENT_BILLMATECARDPAY_PROMPT_NAME_ENTRY == "YES")?1:0,
-            "3dsecure" => (MODULE_PAYMENT_BILLMATECARDPAY_DO_3D_SECURE == "YES")?1:0,
-            "recurring" => "",
-            "recurringnr" => "",
-            "accepturl" => tep_href_link(FILENAME_CHECKOUT_PROCESS, '', 'SSL'),
-            "cancelurl" => tep_href_link(FILENAME_CHECKOUT_PAYMENT, '', 'SSL'),
-            "callbackurl" => tep_href_link('ext/modules/payment/billmate/cardpay_ipn.php', '', 'SSL'), //'http://api.billmate.se/callback.php',
-        );
+        
         $invoiceValues['Customer'] = array(
             'customernr'=> (string)$customer_id,
             'pno'=>$pno,
@@ -1153,6 +1146,9 @@ class pcbillmate {
         }
         $_DATA = $k->verify_hash($_REQUEST);
         if(!isset($_DATA['status']) || ($_DATA['status'] == 'Cancelled' || $_DATA['status'] == 'Failed')) {
+
+            billmate_remove_order($_DATA['orderid'],true);
+            tep_session_unregister('cart_Billmate_card_ID');
             tep_redirect(BillmateUtils::error_link(FILENAME_CHECKOUT_PAYMENT,
                 'payment_error=billmateinvoice&error=Please try again.',
                 'SSL', true, false));

@@ -33,19 +33,21 @@ require_once dirname(__FILE__) . DIRECTORY_SEPARATOR . 'commonfunctions.php';
 
 require_once(DIR_FS_CATALOG . DIR_WS_CLASSES . 'billmate/billmatecalc.php');
 
-function mk_goods_flags($qty, $artno, $title, $price, $vat, $discount, $flags){
+function mk_goods_flags($qty, $artno, $title, $price, $vat, $discount, $includeTax = false){
 
 	$price_without_tax = $price * $qty;
-	$goods_tax = ($price_without_tax/100)*$vat;
+
+    $goods_tax = ($price_without_tax / 100) * $vat;
+
 	
 	return array(	"artnr" => $artno,
 					"title" => $title,
 					"quantity" => $qty,
-					"aprice" => $price,
+					"aprice" => round($price),
 					"taxrate" => $vat,
 					"discount" => $discount,
-					"withouttax" => $price_without_tax,
-					"tax" => $goods_tax,
+					"withouttax" => round($price_without_tax),
+					"tax" => round($goods_tax),
 				);
 
 }
