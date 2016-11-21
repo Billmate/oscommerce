@@ -239,7 +239,6 @@ class billmatebank {
 
         if (tep_session_is_registered('cart_billmate_bank_ID')) {
           $order_id = $cart_billmate_bank_ID;
-			error_log('cartID'.$cart->cartID);
           $curr_check = tep_db_query("select currency from " . TABLE_ORDERS . " where orders_id = '" . (int)$order_id . "'");
           $curr = tep_db_fetch_array($curr_check);
 
@@ -421,7 +420,6 @@ class billmatebank {
 
     function process_button() {
         global $order, $cart,$order_total_modules, $billmatebank_ot, $shipping, $languages_id, $language_id, $language, $currency,$cart_billmate_bank_ID ;;
-		error_log('cart'.$cart->cartID);
         $counter = 1;
         $process_button_string= '';
     
@@ -743,7 +741,6 @@ class billmatebank {
 								);
 		$result1 = (object)$k->AddPayment($invoiceValues);
 		if(!isset($result1->code)){
-			error_log('not code');
 			return $result1;
 		}
 		else {
@@ -888,7 +885,7 @@ class billmatebank {
                       tep_address_label($customer_id, $billto, 0, '', "\n") . "\n\n";
 
 
-		if (is_object($$payment)) {
+		if (is_object($payment)) {
 			$email_order .= EMAIL_TEXT_PAYMENT_METHOD . "\n" .
 						EMAIL_SEPARATOR . "\n";
 			$payment_class = $$payment;

@@ -970,7 +970,6 @@ class pcbillmate {
         $extra = $pcbillmate['code_entries'];
 
         //end hack
-        error_log('order_total_add'.print_r($pcbillmate,true));
         for ($j=0 ; $j<$extra ; $j++) {
             $size = $pcbillmate["code_size_".$j];
             for ($i=0 ; $i<$size ; $i++) {
@@ -1125,7 +1124,7 @@ class pcbillmate {
     }
 
     function before_process() {
-        global $order, $customer_id, $currency, $currencies, $sendto, $billto, $pcbillmate_ot, $pcbillmate_testmode,$languages_id, $cart_billmate_card_ID, $cart, $order_id;
+        global $order, $customer_id, $currency, $currencies, $sendto, $billto, $pcbillmate_ot, $pcbillmate_testmode,$languages_id, $cart_billmate_card_ID, $cart, $order_id,$payment;
 
 		//Assigning billing session
 		$pcbillmate = $_SESSION['pcbillmate_ot'];
@@ -1269,7 +1268,7 @@ class pcbillmate {
             tep_address_label($customer_id, $billto, 0, '', "\n") . "\n\n";
 
 
-        if (is_object($$payment)) {
+        if (is_object($payment)) {
             $email_order .= EMAIL_TEXT_PAYMENT_METHOD . "\n" .
                 EMAIL_SEPARATOR . "\n";
             $payment_class = $$payment;
@@ -1365,6 +1364,8 @@ class pcbillmate {
                 'comments' => ('Accepted by Billmate ' . date("Y-m-d G:i:s") .' Invoice #: ' . $_DATA['number'])
             );
             tep_db_perform(TABLE_ORDERS_STATUS_HISTORY, $sql_data_array);
+            tep_db_query("update " . TABLE_ORDERS . " set orders_status = '" . (MODULE_PAYMENT_PCBILLMATE_ORDER_STATUS_ID ) . "', last_modified = now() where orders_id = '" . (int)$_DATA['order_id'] . "'");
+
 
             // load the after_process function from the payment modules
             $this->after_process();
@@ -1522,7 +1523,7 @@ class pcbillmate {
                     BillmateUtils::update_pclasses(MODULE_PAYMENT_PCBILLMATE_PCLASS_TABLE, $result,$lang['code']);
                 }
             }
-                error_log($KRED_ISO3166_SE);
+                
                 BillmateUtils::display_pclasses(MODULE_PAYMENT_PCBILLMATE_PCLASS_TABLE, $KRED_ISO3166_SE);
 
         }

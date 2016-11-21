@@ -779,7 +779,6 @@ class billmate_invoice {
             }
             $billmate_ot['code_entries'] = $j;
         }
-        error_log('order_total'.print_r($billmate_ot,true));
 
         tep_session_register('billmate_ot');
 
@@ -1102,6 +1101,7 @@ class billmate_invoice {
         }
 
         $_DATA = $k->verify_hash($_REQUEST);
+
         if(!isset($_DATA['status']) || ($_DATA['status'] == 'Cancelled' || $_DATA['status'] == 'Failed')) {
             billmate_remove_order($_DATA['orderid'],true);
             tep_session_unregister('cart_Billmate_card_ID');
@@ -1227,7 +1227,7 @@ class billmate_invoice {
             tep_address_label($customer_id, $billto, 0, '', "\n") . "\n\n";
 
 
-        if (is_object($$payment)) {
+        if (is_object($payment)) {
             $email_order .= EMAIL_TEXT_PAYMENT_METHOD . "\n" .
                 EMAIL_SEPARATOR . "\n";
             $payment_class = $$payment;
@@ -1323,6 +1323,7 @@ class billmate_invoice {
                 'comments' => ('Accepted by Billmate ' . date("Y-m-d G:i:s") .' Invoice #: ' . $_DATA['number'])
             );
             tep_db_perform(TABLE_ORDERS_STATUS_HISTORY, $sql_data_array);
+            tep_db_query("update " . TABLE_ORDERS . " set orders_status = '" . (MODULE_PAYMENT_BILLMATE_ORDER_STATUS_ID ) . "', last_modified = now() where orders_id = '" . (int)$_DATA['orderid'] . "'");
 
             // load the after_process function from the payment modules
             $this->after_process();
@@ -1381,7 +1382,6 @@ class billmate_invoice {
                     $order->billmateref));
             tep_db_perform(TABLE_ORDERS_STATUS_HISTORY, $sql_data_array);
 
-            tep_db_query("update " . TABLE_ORDERS . " set orders_status = '" . (MODULE_PAYMENT_BILLMATE_ORDER_STATUS_ID ) . "', last_modified = now() where orders_id = '" . (int)$_DATA['order_id'] . "'");
         }
 
 

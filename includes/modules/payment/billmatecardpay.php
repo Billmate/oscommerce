@@ -782,7 +782,6 @@ class billmatecardpay {
 								);
 		$result1 = (object)$k->AddPayment($invoiceValues);
 		if(!isset($result1->code)){
-			error_log('not code');
 			return $result1;
 		}
 		else {
@@ -928,7 +927,7 @@ class billmatecardpay {
                       tep_address_label($customer_id, $billto, 0, '', "\n") . "\n\n";
 
 
-		if (is_object($$payment)) {
+		if (is_object($payment)) {
 			$email_order .= EMAIL_TEXT_PAYMENT_METHOD . "\n" .
 						EMAIL_SEPARATOR . "\n";
 			$payment_class = $$payment;
