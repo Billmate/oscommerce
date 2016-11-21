@@ -1284,7 +1284,7 @@ class pcbillmate {
             if(!defined('BILLMATE_LANGUAGE')) define('BILLMATE_LANGUAGE',$languageCode['code']);
             if(!defined('BILLMATE_SERVER')) define('BILLMATE_SERVER','2.1.7');
 
-            $k = new BillMate($eid,$secret,$ssl, $this->billmate_testmode,$debug);
+            $k = new BillMate($eid,$secret,$ssl, $this->pcbillmate_testmode,$debug);
             $result1 = (object)$k->UpdatePayment( array('PaymentData'=> array("number"=>$_DATA['number'], "orderid"=>(string)$_DATA['orderid'])));
         }
 
