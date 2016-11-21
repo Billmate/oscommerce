@@ -28,6 +28,7 @@ if(!class_exists('Encoding',false)){
 	$response = file_get_contents("php://input");
 	$input = json_decode($response, true);
 	$_DATA = $input['data'];
+
 	$_DATA['order_id'] = $_DATA['orderid'];
 
 	if(isset($_DATA['status']) || $_DATA['status'] == 'Paid'){
@@ -70,7 +71,7 @@ if(!class_exists('Encoding',false)){
 										'orders_status_id' => MODULE_PAYMENT_BILLMATEBANK_ORDER_STATUS_ID,
 										'date_added' => 'now()',
 										'customer_notified' => 0,
-										'comments' => ('Billmate_IPN')
+										'comments' => ('Billmate_CALLBACK')
 									);
 				tep_db_perform(TABLE_ORDERS_STATUS_HISTORY, $sql_data_array);
 

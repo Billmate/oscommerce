@@ -774,7 +774,7 @@ class billmatebank {
         $status_array = tep_db_fetch_array( $status );
 
 		$status_history = tep_db_query("select orders_status_history_id from ".TABLE_ORDERS_STATUS_HISTORY.
-					" where orders_id = {$_DATA['order_id']} and comments='Billmate_IPN'");
+					" where orders_id = {$_DATA['order_id']} and comments='Billmate_CALLBACK'");
 		
 		$status_history_a = tep_db_fetch_array($status_history);
 
@@ -782,7 +782,10 @@ class billmatebank {
 			$already_completed = true;
 			tep_session_register('already_completed');
 			tep_session_unregister('billmatebank_ot');
-		}else {
+
+
+
+        }else {
 			$already_completed = false;
 			tep_session_register('already_completed');
 		}
@@ -901,31 +904,15 @@ class billmatebank {
         $eid = MODULE_PAYMENT_BILLMATEBANK_EID;
 		$ssl = true;
 		$debug = false;
-		
-		if(!$already_completed )
-		{
-			if (MODULE_PAYMENT_BILLMATEBANK_AUTHENTICATION_MODE != 'sale')
-			{
-				$languageCode = tep_db_fetch_array(tep_db_query("select code from languages where languages_id = " . $languages_id));
-				if(!defined('BILLMATE_LANGUAGE')) define('BILLMATE_LANGUAGE',$languageCode['code']);
-                if(!defined('BILLMATE_SERVER')) define('BILLMATE_SERVER','2.1.7');
+        $result1 = $_DATA;
 
-                $k       = new BillMate($eid, $secret, $ssl, $this->billmatebank_testmode, $debug);
-				$result1 = (object)($k->UpdatePayment(array('PaymentData' => array("number"  => $_DATA['number'],
-				                                                                   "orderid" => (string)$_DATA['order_id']
-				)
-				)));
-
-			} else {
-				$result1 = $_DATA;
-			}
-		}
+       
 	
         if(is_string($result1) || (isset($result1->message) && is_object($result1))){
             tep_redirect(BillmateUtils::error_link(FILENAME_CHECKOUT_PAYMENT,
                     'payment_error=billmatebank&error='.$result1->message,
                     'SSL', true, false));
-		} elseif($already_completed || is_object($result1)) {
+		} else {
 
 			$billmatebank_called_api = true;
 			tep_session_register('billmatebank_called_api');
@@ -982,9 +969,9 @@ class billmatebank {
 			}
 
 			// load the after_process function from the payment modules
-			$this->after_process();
 
-			$cart->reset(true);
+
+
 
 			// unregister session variables used during checkout
 			tep_session_unregister('sendto');
@@ -994,8 +981,10 @@ class billmatebank {
 			tep_session_unregister('comments');
 
 			tep_session_unregister('cart_billmate_bank_ID');
-
+            $this->after_process();
+            $cart->reset(true);
 	        tep_redirect(tep_href_link(FILENAME_CHECKOUT_SUCCESS, '', 'SSL'));
+            die();
  
         }
     }
@@ -1006,7 +995,7 @@ class billmatebank {
 
 		//get response data
 		$_DATA = json_decode($_REQUEST['data'], true);
-		$_DATA['order_id'] = substr($_DATA['orderid'], strpos($_DATA['orderid'], '-')+1);
+
 
 		if( $already_completed ){
 			return false;
@@ -1024,22 +1013,22 @@ class billmatebank {
         if ($has_billmatebank_ref) {
             tep_db_query("update " . TABLE_ORDERS . " set billmateref='" .
                     $order->billmateref . "' " . " where orders_id = '" .
-                    $_DATA['order_id'] . "'");
+                    $_DATA['orderid'] . "'");
         }
 
         // Insert transaction # into history file
-        $sql_data_array = array('orders_id' => $_DATA['order_id'],
+        $sql_data_array = array('orders_id' => $_DATA['orderid'],
                 'orders_status_id' =>MODULE_PAYMENT_BILLMATEBANK_ORDER_STATUS_ID,
                 //($order->info['order_status']),
                 'date_added' => 'now()',
                 'customer_notified' => 0,
-                'comments' => ('Accepted by Billmate ' .
+                'comments' => ('Accept by Billmate ' .
                         date("Y-m-d G:i:s") .
                         ' Invoice #: ' .              
-                        $order->billmateref));
+                        $_DATA['number']));
         tep_db_perform(TABLE_ORDERS_STATUS_HISTORY, $sql_data_array);
 		
-		tep_db_query("update " . TABLE_ORDERS . " set orders_status = '" . (MODULE_PAYMENT_BILLMATEBANK_ORDER_STATUS_ID ) . "', last_modified = now() where orders_id = '" . (int)$_DATA['order_id'] . "'");
+		tep_db_query("update " . TABLE_ORDERS . " set orders_status = '" . (MODULE_PAYMENT_BILLMATEBANK_ORDER_STATUS_ID ) . "', last_modified = now() where orders_id = '" . (int)$_DATA['orderid'] . "'");
 
         //Delete Session with user details
         tep_session_unregister('user_billing');

@@ -824,7 +824,8 @@ class billmatecardpay {
 			$already_completed = true;
 			tep_session_register('already_completed');
 			tep_session_unregister('billmatecardpay_ot');
-		}else {
+            
+        }else {
 			$already_completed = false;
 			tep_session_register('already_completed');
 		}
@@ -1043,7 +1044,7 @@ class billmatecardpay {
 		
 		//get response data
 		$_DATA = json_decode($_REQUEST['data'], true);
-		$_DATA['order_id'] = substr($_DATA['orderid'], strpos($_DATA['orderid'], '-')+1);
+		
 
         $find_st_optional_field_query =
                 tep_db_query("show columns from " . TABLE_ORDERS);
@@ -1058,22 +1059,22 @@ class billmatecardpay {
         if ($has_billmatecardpay_ref) {
             tep_db_query("update " . TABLE_ORDERS . " set billmateref='" .
                     $order->billmateref . "' " . " where orders_id = '" .
-                    $_DATA['order_id'] . "'");
+                    $_DATA['orderid'] . "'");
         }
 
         // Insert transaction # into history file
 		if( !empty($order->billmateref) ) {
-			$sql_data_array = array('orders_id' => $_DATA['order_id'],
+			$sql_data_array = array('orders_id' => $_DATA['orderid'],
 					'orders_status_id' => MODULE_PAYMENT_BILLMATECARDPAY_ORDER_STATUS_ID,
 					'date_added' => 'now()',
 					'customer_notified' => 0,
 					'comments' => ('Accepted by Billmate ' .
 							date("Y-m-d G:i:s") .
 							' Invoice #: ' .
-							$order->billmateref));
+							$_DATA['number']));
 			tep_db_perform(TABLE_ORDERS_STATUS_HISTORY, $sql_data_array);
 			
-			tep_db_query("update " . TABLE_ORDERS . " set orders_status = '" . (MODULE_PAYMENT_BILLMATECARDPAY_ORDER_STATUS_ID ) . "', last_modified = now() where orders_id = '" . (int)$_DATA['order_id'] . "'");
+			tep_db_query("update " . TABLE_ORDERS . " set orders_status = '" . (MODULE_PAYMENT_BILLMATECARDPAY_ORDER_STATUS_ID ) . "', last_modified = now() where orders_id = '" . (int)$_DATA['orderid'] . "'");
 		}
 
         //Delete Session with user details
