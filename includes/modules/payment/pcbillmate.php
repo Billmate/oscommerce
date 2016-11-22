@@ -1004,8 +1004,8 @@ class pcbillmate {
             }
         }
 
-        $secret = MODULE_PAYMENT_BILLMATE_SECRET;
-        $eid = MODULE_PAYMENT_BILLMATE_EID;
+        $secret = MODULE_PAYMENT_PCBILLMATE_SECRET;
+        $eid = MODULE_PAYMENT_PCBILLMATE_EID;
 
         $ship_address = $bill_address = array();
         $countryData = BillmateCountry::getSwedenData();
@@ -1364,7 +1364,7 @@ class pcbillmate {
                 'comments' => ('Accepted by Billmate ' . date("Y-m-d G:i:s") .' Invoice #: ' . $_DATA['number'])
             );
             tep_db_perform(TABLE_ORDERS_STATUS_HISTORY, $sql_data_array);
-            tep_db_query("update " . TABLE_ORDERS . " set orders_status = '" . (MODULE_PAYMENT_PCBILLMATE_ORDER_STATUS_ID ) . "', last_modified = now() where orders_id = '" . (int)$_DATA['order_id'] . "'");
+            tep_db_query("update " . TABLE_ORDERS . " set orders_status = '" . (MODULE_PAYMENT_PCBILLMATE_ORDER_STATUS_ID ) . "', last_modified = now() where orders_id = '" . (int)$_DATA['orderid'] . "'");
 
 
             // load the after_process function from the payment modules
