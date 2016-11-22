@@ -455,7 +455,7 @@ class pcbillmate {
 
         if( $addressNotMatched || $shippingAndBilling ){
             if( empty($_POST['geturl'])){
-	            $html = '<p><b>'.MODULE_PAYMENT_PCBILLMATE_CORRECT_ADDRESS.' </b></p>'.($result->firstname).' '.$result->lastname.'<br>'.$result->street.'<br>'.$result->zip.' '.$result->city.'<div style="padding: 17px 0px;"> <i>'.MODULE_PAYMENT_PCBILLMATE_CORRECT_ADDRESS_OPTION.'</i></div> <input type="button" value="'.MODULE_PAYMENT_PCBILLMATE_YES.'" onclick="updateAddresspart();" class="button"/> <input type="button" value="'.MODULE_PAYMENT_PCBILLMATE_NO.'" onclick="closefunc(this)" class="button" style="float:right" />';
+	            $html = '<b>'.MODULE_PAYMENT_PCBILLMATE_CORRECT_ADDRESS.' </b><br/><span style="line-height: 1.4em;">'.($result->firstname).' '.$result->lastname.'<br>'.$result->street.'<br>'.$result->zip.' '.$result->city.'</span><div style="margin-top:1em;"><input type="button" value="'.MODULE_PAYMENT_PCBILLMATE_YES.'" onclick="updateAddress();" class="billmate_button"/> <a onclick="closefunc(this)" class="linktag"/>'.MODULE_PAYMENT_PCBILLMATE_NO.'</a></div> ';
 
 	            $code = '<style type="text/css">
 .checkout-heading {
