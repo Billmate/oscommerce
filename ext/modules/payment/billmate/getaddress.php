@@ -112,6 +112,25 @@ global $user_billing, $language, $languages_id;
 			$billmate_postno = $address['zip'];
 			$billmate_city = $address['city'];
 
+			/*
+			 * 'entry_firstname' => $sendto['firstname'],
+                                  'entry_lastname' => $sendto['lastname'],
+                                  'entry_company' => $sendto['company'],
+                                  'entry_street_address' => $sendto['street_address'],
+                                  'entry_suburb' => $sendto['suburb'],
+                                  'entry_postcode' => $sendto['postcode'],
+                                  'entry_city' => $sendto['city'],
+                                  'entry_zone_id' => $sendto['zone_id'],
+                                  'zone_name' => $sendto['zone_name'],
+                                  'entry_country_id' => $sendto['country_id'],
+                                  'countries_id' => $sendto['country_id'],
+                                  'countries_name' => $sendto['country_name'],
+                                  'countries_iso_code_2' => $sendto['country_iso_code_2'],
+                                  'countries_iso_code_3' => $sendto['country_iso_code_3'],
+                                  'address_format_id' => $sendto['address_format_id'],
+                                  'entry_state' => $sendto['zone_name']
+			 */
+
 			$order->delivery['firstname'] = $billmate_fname;
 			$order->billing['firstname'] = $billmate_fname;
 			$order->delivery['lastname'] = $billmate_lname;

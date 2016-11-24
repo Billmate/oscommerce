@@ -697,7 +697,7 @@ class billmate_invoice {
     }
 
     function process_button() {
-        global $order, $order_total_modules, $billmate_ot, $shipping, $languages_id;
+        global $order, $order_total_modules, $billmate_ot, $shipping, $languages_id,$cart_billmate_card_ID,$sendto,$billto;
 
         $counter = 1;
         $process_button_string = '';
@@ -784,13 +784,12 @@ class billmate_invoice {
 
         $process_button_string .= tep_draw_hidden_field(tep_session_name(),
                 tep_session_id());
-        $return = $this->doInvoice();
-        $redirect = false;
-        if(!isset($return->code)) {
-
-            $redirect = ($return->status == 'WaitingForBankIDIdentification') ? $return->url : tep_href_link(FILENAME_CHECKOUT_PROCESS, rawurlencode('credentials=' . json_encode($return->raw_response['credentials']) . '&data=' . json_encode($return->raw_response['data'])), 'SSL');
-        }
-
+        //$return = $this->doInvoice();
+        $redirect = tep_href_link('ext/modules/payment/billmate/payment.php', 'method=invoice%26order_id='.$cart_billmate_card_ID, 'SSL');
+        error_log('sendto'.print_r($sendto,true));
+        error_log('billto'.print_r($billto,true));
+        $billmate_billing = $order->billing;
+        tep_session_register('billmate_billing');
         if($redirect) {
             $process_button_string .= '<script type="text/javascript">
                             String.prototype.replaceAll = function(search, replacement) {
@@ -808,27 +807,7 @@ class billmate_invoice {
 
                           },200)
                           </script>';
-        } else {
-            $process_button_string .= '<script type="text/javascript">
-                            String.prototype.replaceAll = function(search, replacement) {
-                                var target = this;
-                                return target.replace(new RegExp(search, \'g\'), replacement);
-                            };
-                          if(!window.jQuery){
-                          	var jq = document.createElement("script");
-                          	jq.type = "text/javascript";
-                          	jq.src = "' . HTTP_SERVER . DIR_WS_HTTP_CATALOG . 'jquery.js";
-
-                          	document.getElementsByTagName("head")[0].appendChild(jq);
-                          }
-                          setTimeout(function(){
-                                                      jQuery(document).ready(function(){ window.location = decodeURI("'.BillmateUtils::error_link(FILENAME_CHECKOUT_PAYMENT,
-                    'payment_error=billmate_invoice&error=' . utf8_encode($return->message),
-                    'SSL', true, false).'").replace("%26","&")});
-
-                          },200)
-                          </script>';
-        }
+        } 
         return $process_button_string;
     }
 
@@ -1096,12 +1075,12 @@ class billmate_invoice {
         $debug = false;
         $ssl = true;
         $k = new BillMate($eid, $secret,$ssl,$this->billmate_testmode,$debug);
-        foreach($_REQUEST as $key => $value){
+        /*foreach($_REQUEST as $key => $value){
             $_REQUEST[$key] = stripslashes($value);
-        }
+        }*/
 
         $_DATA = $k->verify_hash($_REQUEST);
-
+        error_log('accept.invoice'.print_r($_DATA,true));
         if(!isset($_DATA['status']) || ($_DATA['status'] == 'Cancelled' || $_DATA['status'] == 'Failed')) {
             billmate_remove_order($_DATA['orderid'],true);
             tep_session_unregister('cart_Billmate_card_ID');
