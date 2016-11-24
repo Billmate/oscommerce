@@ -12,7 +12,7 @@ require_once('includes/application_top.php');
 require_once(DIR_FS_CATALOG . DIR_WS_CLASSES . 'billmate/Billmate.php');
 require_once(DIR_FS_CATALOG . DIR_WS_CLASSES . 'billmate/utf8.php');
 
-function partpay($id){
+function partpay($order_id){
     global $customer_id, $currency, $currencies, $sendto, $billto,
            $pcbillmate,$insert_id, $languages_id, $language_id, $language, $currency, $cart_billmate_card_ID,$billmate_pno,$pclass;
 
@@ -21,8 +21,12 @@ function partpay($id){
     require_once(DIR_FS_CATALOG . DIR_WS_CLASSES . 'billmate/billmateutils.php');
     include_once(DIR_WS_LANGUAGES . $language . '/modules/payment/pcbillmate.php');
 
+    require(DIR_WS_CLASSES . 'order.php');
 
-    $order = getOrder($id);
+
+
+
+    $order = new Order($order_id);
 
     if( empty($_POST ) ) $_POST = $_GET;
     //Set the right Host and Port
@@ -278,13 +282,12 @@ function invoice($order_id){
 
     require_once(DIR_FS_CATALOG . DIR_WS_CLASSES . 'billmate/billmateutils.php');
     include_once(DIR_WS_LANGUAGES . $language . '/modules/payment/billmate_invoice.php');
-    //require(DIR_WS_CLASSES . 'order.php');
+    require(DIR_WS_CLASSES . 'order.php');
 
 
 
 
-    $order = getOrder($order_id);
-    //$order = $order->query($id);
+    $order = new Order($order_id);
     error_log('order.after'.print_r($order->delivery,true));
     error_log('order.after.cart_billmate..'.print_r($cart_billmate_card_ID,true));
     error_log('order.after.order_id.'.print_r($order_id,true));
@@ -417,7 +420,7 @@ function invoice($order_id){
     $ship_address = $bill_address = array();
     $countryData = BillmateCountry::getSwedenData();
     error_log('sendto'.print_r($sendto,true));
-    $order->delivery = $order->billing = $billmate_billing;
+    //$order->delivery = $order->billing = $billmate_billing;
     $ship_address = array(
         "firstname" => $order->delivery['firstname'],
         "lastname" 	=> $order->delivery['lastname'],
