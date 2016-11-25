@@ -1075,9 +1075,9 @@ class billmate_invoice {
         $debug = false;
         $ssl = true;
         $k = new BillMate($eid, $secret,$ssl,$this->billmate_testmode,$debug);
-        /*foreach($_REQUEST as $key => $value){
+        foreach($_REQUEST as $key => $value){
             $_REQUEST[$key] = stripslashes($value);
-        }*/
+        }
 
         $_DATA = $k->verify_hash($_REQUEST);
         error_log('accept.invoice'.print_r($_DATA,true));

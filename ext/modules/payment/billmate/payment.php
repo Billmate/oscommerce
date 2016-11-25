@@ -149,27 +149,35 @@ function partpay($order_id){
     $ship_address = $bill_address = array();
     $countryData = BillmateCountry::getSwedenData();
     error_log('sendto'.print_r($sendto,true));
+    $names = explode(' ',$order->delivery['name']);
+    $firstname = array_shift($names);
+    $lastname = implode(' ',$names);
     $ship_address = array(
-        "firstname" => $order->delivery['firstname'],
-        "lastname" 	=> $order->delivery['lastname'],
+        "firstname" => $firstname,
+        "lastname" 	=> $lastname,
         "company" 	=> $order->delivery['company'],
         "street" 	=> $order->delivery['street_address'],
         "street2" 	=> "",
         "zip" 		=> $order->delivery['postcode'],
         "city" 		=> $order->delivery['city'],
-        "country" 	=> $order->delivery['country']['iso_code_2'],
+        "country" 	=> getCountryIsoFromName($order->delivery['country']['title']),
         "phone" 	=> $order->customer['telephone'],
     );
 
+
+    $names = explode(' ',$order->billing['name']);
+    $firstname = array_shift($names);
+
+    $lastname = implode(' ',$names);
     $bill_address = array(
-        "firstname" => $order->billing['firstname'],
-        "lastname" 	=> $order->billing['lastname'],
+        "firstname" => $firstname,
+        "lastname" 	=> $lastname,
         "company" 	=> $order->billing['company'],
         "street" 	=> $order->billing['street_address'],
         "street2" 	=> "",
         "zip" 		=> $order->billing['postcode'],
         "city" 		=> $order->billing['city'],
-        "country" 	=> $order->billing['country']['iso_code_2'],
+        "country" 	=> getCountryIsoFromName($order->billing['country']['title']),
         "phone" 	=> $order->customer['telephone'],
         "email" 	=> $order->customer['email_address'],
     );
@@ -267,7 +275,7 @@ function partpay($order_id){
             tep_redirect($result1->url);
             exit;
         } else {
-            tep_redirect(tep_href_link(FILENAME_CHECKOUT_PROCESS, rawurlencode('credentials=' . json_encode($result1->raw_response['credentials']) . '&data=' . json_encode($result1->raw_response['data'])), 'SSL'));
+            tep_redirect(tep_href_link(FILENAME_CHECKOUT_PROCESS, 'credentials=' . urlencode(json_encode($result1->raw_response['credentials'])) . '&data=' . urlencode(json_encode($result1->raw_response['data'])), 'SSL'));
             exit;
         }
     }
@@ -288,7 +296,8 @@ function invoice($order_id){
 
 
     $order = new Order($order_id);
-    error_log('order.after'.print_r($order->delivery,true));
+
+    error_log('order.after'.print_r($order,true));
     error_log('order.after.cart_billmate..'.print_r($cart_billmate_card_ID,true));
     error_log('order.after.order_id.'.print_r($order_id,true));
     error_log('order.after'.print_r($order->billing,true));
@@ -421,27 +430,38 @@ function invoice($order_id){
     $countryData = BillmateCountry::getSwedenData();
     error_log('sendto'.print_r($sendto,true));
     //$order->delivery = $order->billing = $billmate_billing;
+
+    $names = explode(' ',$order->delivery['name']);
+    error_log('names'.print_r($names,true));
+
+
+    $firstname = array_shift($names);
+    error_log('names'.print_r($names,true));
+    $lastname = implode(' ',$names);
     $ship_address = array(
-        "firstname" => $order->delivery['firstname'],
-        "lastname" 	=> $order->delivery['lastname'],
+        "firstname" => $firstname,
+        "lastname" 	=> $lastname,
         "company" 	=> $order->delivery['company'],
         "street" 	=> $order->delivery['street_address'],
         "street2" 	=> "",
         "zip" 		=> $order->delivery['postcode'],
         "city" 		=> $order->delivery['city'],
-        "country" 	=> $order->delivery['country']['iso_code_2'],
+        "country" 	=> getCountryIsoFromName($order->delivery['country']['title']),
         "phone" 	=> $order->customer['telephone'],
     );
+    $names = explode(' ',$order->billing['name']);
 
+    $firstname = array_shift($names);
+    $lastname = implode(' ',$names);
     $bill_address = array(
-        "firstname" => $order->billing['firstname'],
-        "lastname" 	=> $order->billing['lastname'],
+        "firstname" => $firstname,
+        "lastname" 	=> $lastname,
         "company" 	=> $order->billing['company'],
         "street" 	=> $order->billing['street_address'],
         "street2" 	=> "",
         "zip" 		=> $order->billing['postcode'],
         "city" 		=> $order->billing['city'],
-        "country" 	=> $order->billing['country']['iso_code_2'],
+        "country" 	=> getCountryIsoFromName($order->billing['country']['title']),
         "phone" 	=> $order->customer['telephone'],
         "email" 	=> $order->customer['email_address'],
     );
@@ -535,7 +555,7 @@ function invoice($order_id){
             tep_redirect($result1->url);
             exit;
         } else {
-            tep_redirect(tep_href_link(FILENAME_CHECKOUT_PROCESS, rawurlencode('credentials=' . json_encode($result1->raw_response['credentials']) . '&data=' . json_encode($result1->raw_response['data'])), 'SSL'));
+            tep_redirect(tep_href_link(FILENAME_CHECKOUT_PROCESS, 'credentials=' . urlencode(json_encode($result1->raw_response['credentials'])) . '&data=' . urlencode(json_encode($result1->raw_response['data'])), 'SSL'));
             exit;
         }
     }
@@ -625,4 +645,11 @@ function getOrder($order_id){
         'country' => array('title' => $order['billing_country']),
         'format_id' => $order['billing_address_format_id']);
     return $toReturn;
+}
+
+function getCountryIsoFromName($name){
+    $country_query = tep_db_query("select * from " . TABLE_COUNTRIES . " where countries_name = '" . $name . "'");
+    $country = tep_db_fetch_array($country_query);
+
+    return $country['countries_iso_code_2'];
 }

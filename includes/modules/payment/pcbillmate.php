@@ -1112,16 +1112,16 @@ class pcbillmate {
         require(DIR_FS_CATALOG . DIR_WS_CLASSES . 'billmate/billmateutils.php');
         require_once DIR_FS_CATALOG . DIR_WS_CLASSES.'/billmate/Billmate.php';
 
-        $secret = MODULE_PAYMENT_BILLMATE_SECRET;
-        $eid = MODULE_PAYMENT_BILLMATE_EID;
+        $secret = MODULE_PAYMENT_PCBILLMATE_SECRET;
+        $eid = MODULE_PAYMENT_PCBILLMATE_EID;
         $debug = false;
         $ssl = true;
-        $k = new BillMate($eid, $secret,$ssl,$this->billmate_testmode,$debug);
+        $k = new BillMate($eid, $secret,$ssl,$this->pcbillmate_testmode,$debug);
         error_log('accept.REQUEST.partpay'.print_r($_REQUEST,true));
 
-        /*foreach($_REQUEST as $key => $value){
+        foreach($_REQUEST as $key => $value){
             $_REQUEST[$key] = stripslashes($value);
-        }*/
+        }
         $_DATA = $k->verify_hash($_REQUEST);
         error_log('accept.partpay'.print_r($_DATA,true));
 
