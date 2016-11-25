@@ -148,12 +148,13 @@ class billmatebank {
 
         global $order, $customer_id, $currencies, $currency, $user_billing, $cart_billmate_bank_ID,$order_id,$insert_id,$languages_id;
 
+        error_log('post'.print_r($_REQUEST,true));
         if (tep_session_is_registered('cart_billmate_bank_ID')) {
 			$order_id = $insert_id = $cart_billmate_bank_ID;
 
 			$check_query = tep_db_query('select orders_id from ' . TABLE_ORDERS_STATUS_HISTORY . ' where orders_id = "' . (int)$order_id . '" limit 1');
 
-			if (tep_db_num_rows($check_query) < 1) {
+			if (tep_db_num_rows($check_query) < 1 || $_REQUEST['cancel'] == true) {
 			  tep_db_query('delete from ' . TABLE_ORDERS . ' where orders_id = "' . (int)$order_id . '"');
 			  tep_db_query('delete from ' . TABLE_ORDERS_TOTAL . ' where orders_id = "' . (int)$order_id . '"');
 			  tep_db_query('delete from ' . TABLE_ORDERS_STATUS_HISTORY . ' where orders_id = "' . (int)$order_id . '"');
@@ -705,7 +706,7 @@ class billmatebank {
 											"recurring" => "",
 											"recurringnr" => "",
 											"accepturl" => tep_href_link(FILENAME_CHECKOUT_PROCESS, '', 'SSL'),
-											"cancelurl" => tep_href_link(FILENAME_CHECKOUT_PAYMENT, '', 'SSL'),
+											"cancelurl" => tep_href_link(FILENAME_CHECKOUT_PAYMENT, 'cancel=true', 'SSL'),
 											"callbackurl" => tep_href_link('ext/modules/payment/billmate/bankpay_ipn.php', '', 'SSL'), //'http://api.billmate.se/callback.php',
 									);
 		$invoiceValues['Customer'] = array(	'customernr'=> (string)$customer_id,

@@ -294,6 +294,7 @@ function invoice($order_id){
 
 
 
+    $orderTemp = new Order;
 
     $order = new Order($order_id);
 
