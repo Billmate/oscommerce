@@ -185,7 +185,7 @@ class billmatecardpay {
 
 			$check_query = tep_db_query('select orders_id from ' . TABLE_ORDERS_STATUS_HISTORY . ' where orders_id = "' . (int)$order_id . '" limit 1');
 
-			if (tep_db_num_rows($check_query) < 1) {
+			if (tep_db_num_rows($check_query) < 1 || $_REQUEST['cancel'] == true) {
 			  tep_db_query('delete from ' . TABLE_ORDERS . ' where orders_id = "' . (int)$order_id . '"');
 			  tep_db_query('delete from ' . TABLE_ORDERS_TOTAL . ' where orders_id = "' . (int)$order_id . '"');
 			  tep_db_query('delete from ' . TABLE_ORDERS_STATUS_HISTORY . ' where orders_id = "' . (int)$order_id . '"');
@@ -280,7 +280,7 @@ class billmatecardpay {
           if ( ($curr['currency'] != $order->info['currency']) ) {
             $check_query = tep_db_query('select orders_id from ' . TABLE_ORDERS_STATUS_HISTORY . ' where orders_id = "' . (int)$order_id . '" limit 1');
 
-            if (tep_db_num_rows($check_query) < 1 || $_REQUEST['cancel'] = true) {
+            if (tep_db_num_rows($check_query) < 1 || ($_REQUEST['method'] == 'card' && $_REQUEST['cancel'] == true)) {
               tep_db_query('delete from ' . TABLE_ORDERS . ' where orders_id = "' . (int)$order_id . '"');
               tep_db_query('delete from ' . TABLE_ORDERS_TOTAL . ' where orders_id = "' . (int)$order_id . '"');
               tep_db_query('delete from ' . TABLE_ORDERS_STATUS_HISTORY . ' where orders_id = "' . (int)$order_id . '"');

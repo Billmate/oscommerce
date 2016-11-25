@@ -148,7 +148,6 @@ class billmatebank {
 
         global $order, $customer_id, $currencies, $currency, $user_billing, $cart_billmate_bank_ID,$order_id,$insert_id,$languages_id;
 
-        error_log('post'.print_r($_REQUEST,true));
         if (tep_session_is_registered('cart_billmate_bank_ID')) {
 			$order_id = $insert_id = $cart_billmate_bank_ID;
 
