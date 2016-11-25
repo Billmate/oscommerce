@@ -786,8 +786,7 @@ class billmate_invoice {
                 tep_session_id());
         //$return = $this->doInvoice();
         $redirect = tep_href_link('ext/modules/payment/billmate/payment.php', 'method=invoice%26order_id='.$cart_billmate_card_ID, 'SSL');
-        error_log('sendto'.print_r($sendto,true));
-        error_log('billto'.print_r($billto,true));
+        
         $billmate_billing = $order->billing;
         tep_session_register('billmate_billing');
         if($redirect) {
@@ -1080,7 +1079,6 @@ class billmate_invoice {
         }
 
         $_DATA = $k->verify_hash($_REQUEST);
-        error_log('accept.invoice'.print_r($_DATA,true));
         if(!isset($_DATA['status']) || ($_DATA['status'] == 'Cancelled' || $_DATA['status'] == 'Failed')) {
             billmate_remove_order($_DATA['orderid'],true);
             tep_session_unregister('cart_Billmate_card_ID');

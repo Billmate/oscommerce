@@ -1117,13 +1117,11 @@ class pcbillmate {
         $debug = false;
         $ssl = true;
         $k = new BillMate($eid, $secret,$ssl,$this->pcbillmate_testmode,$debug);
-        error_log('accept.REQUEST.partpay'.print_r($_REQUEST,true));
 
         foreach($_REQUEST as $key => $value){
             $_REQUEST[$key] = stripslashes($value);
         }
         $_DATA = $k->verify_hash($_REQUEST);
-        error_log('accept.partpay'.print_r($_DATA,true));
 
         if(!isset($_DATA['status']) || ($_DATA['status'] == 'Cancelled' || $_DATA['status'] == 'Failed')) {
 
