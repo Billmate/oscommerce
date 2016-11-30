@@ -747,7 +747,7 @@ class billmatecardpay {
 											"recurring" => "",
 											"recurringnr" => "",
 											"accepturl" => tep_href_link(FILENAME_CHECKOUT_PROCESS, '', 'SSL'),
-											"cancelurl" => tep_href_link(FILENAME_CHECKOUT_PAYMENT, 'cancel=true&payment_error=billmatebank&error=Canceled%20by%20customer', 'SSL'),
+											"cancelurl" => tep_href_link(FILENAME_CHECKOUT_PAYMENT, 'cancel=true&payment_error=billmatecardpay&error=Canceled%20by%20customer', 'SSL'),
 											"callbackurl" => tep_href_link('ext/modules/payment/billmate/cardpay_ipn.php', '', 'SSL'), //'http://api.billmate.se/callback.php',
 									);
 		$invoiceValues['Customer'] = array(	'customernr'=> (string)$customer_id,
