@@ -705,7 +705,7 @@ class billmatebank {
 											"recurring" => "",
 											"recurringnr" => "",
 											"accepturl" => tep_href_link(FILENAME_CHECKOUT_PROCESS, '', 'SSL'),
-											"cancelurl" => tep_href_link(FILENAME_CHECKOUT_PAYMENT, 'cancel=true&payment_error=billmatebank&error='.urlencode(MODULE_PAYMENT_BILLMATEBANK_CANCEL), 'SSL'),
+											"cancelurl" => tep_href_link(FILENAME_CHECKOUT_PAYMENT, '', 'SSL').'?cancel=true&payment_error=billmatebank&error='.rawurlencode(MODULE_PAYMENT_BILLMATEBANK_CANCEL),
 											"callbackurl" => tep_href_link('ext/modules/payment/billmate/bankpay_ipn.php', '', 'SSL'), //'http://api.billmate.se/callback.php',
 									);
 		$invoiceValues['Customer'] = array(	'customernr'=> (string)$customer_id,
@@ -764,9 +764,9 @@ class billmatebank {
 		$_DATA['order_id'] = $_DATA['orderid'];
 		
         if(!isset($_DATA['status']) || $_DATA['status'] == 'Cancelled' || $_DATA['status'] == 'Failed'){
-            tep_redirect(BillmateUtils::error_link(FILENAME_CHECKOUT_PAYMENT,
-                    'payment_error=billmatebank&error='.urlencode(MODULE_PAYMENT_BILLMATEBANK_FAILED),
-                    'SSL', true, false));
+            tep_redirect(BillmateUtils::error_link(FILENAME_CHECKOUT_PAYMENT,'',
+                    'SSL', true, false).
+                '?payment_error=billmatebank&error='.rawurlencode(MODULE_PAYMENT_BILLMATEBANK_FAILED));
             return;
         }
 		
