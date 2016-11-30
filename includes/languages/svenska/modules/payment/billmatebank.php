@@ -34,4 +34,7 @@ define('MODULE_PAYMENT_BILLMATEBANK_VAT','Moms');
   define('MODULE_PAYMENT_BILLMATEBANK_LANG_TESTMODE', '(TESTLÄGE)');
   define('MODULE_PAYMENT_BILLMATEBANK_TEXT_DESCRIPTION', 'Bankköp från Billmate Bank');
   define('MODULE_PAYMENT_BILLMATEBANK_TEXT_CONFIRM_DESCRIPTION', 'www.billmate.se');
-  
+define('MODULE_PAYMENT_BILLMATEBANK_CANCEL', 'Bankbetalningen avbröts innan det fullföljdes. Var vänlig prova igen eller välj ett annat betalalternativ.');
+define('MODULE_PAYMENT_BILLMATEBANK_FAILED', 'Dessvärre gick det inte att genomföra köpet med de uppgifter ni tillhandahållit. Var vänlig försök igen eller välj ett annat betalsätt.');
+
+

@@ -62,4 +62,8 @@
   define('MODULE_PAYMENT_BILLMATECARDPAY_LANG_TESTMODE', '(TESTMODE)');
   define('MODULE_PAYMENT_BILLMATECARDPAY_TEXT_DESCRIPTION', 'Credit Card Purchase from Billmate Card');
   define('MODULE_PAYMENT_BILLMATECARDPAY_TEXT_CONFIRM_DESCRIPTION', 'www.billmate.se');
+  define('MODULE_PAYMENT_BILLMATECARDPAY_CANCEL', 'The card payment has been canceled before it was processed. Please try again or choose a different payment method.');
+  define('MODULE_PAYMENT_BILLMATECARDPAY_FAILED', 'Unfortunately your card payment was not processed with the provided card details. Please try again or choose another payment method.');
+
+
 

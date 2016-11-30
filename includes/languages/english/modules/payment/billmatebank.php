@@ -34,4 +34,6 @@
   define('MODULE_PAYMENT_BILLMATEBANK_LANG_TESTMODE', '(TESTMODE)');
   define('MODULE_PAYMENT_BILLMATEBANK_TEXT_DESCRIPTION', 'Purchase from Billmate Bank');
   define('MODULE_PAYMENT_BILLMATEBANK_TEXT_CONFIRM_DESCRIPTION', 'www.billmate.se');
-  
+  define('MODULE_PAYMENT_BILLMATEBANK_CANCEL', 'The bank payment has been canceled before it was processed. Please try again or choose a different payment method.');
+  define('MODULE_PAYMENT_BILLMATEBANK_FAILED', 'Unfortunately your bank payment was not processed with the provided bank details. Please try again or choose another payment method.');
+
