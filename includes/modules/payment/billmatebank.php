@@ -507,12 +507,13 @@ class billmatebank {
                           	var jq = document.createElement("script");
                           	jq.type = "text/javascript";
                           	jq.src = "'.HTTP_SERVER.DIR_WS_HTTP_CATALOG.'jquery.js";
-
+                            jq.onload = redirectLink;
                           	document.getElementsByTagName("head")[0].appendChild(jq);
                           }
-                          setTimeout(function(){
-                                $(document).ready(function(){ $("input[name=\'comments\']").remove(); }); $(\'form[name="checkout_confirmation"]\').submit(function(e){e.preventDefault(); window.location = "'.$redirect.'";});
-                            },200);
+                          function redirectLink(){
+                                                      jQuery(document).ready(function(){ $("input[name=\'comments\']").remove(); }); $(\'form[name="checkout_confirmation"]\').submit(function(e){e.preventDefault(); window.location = "'.$redirect.'";});
+
+                          };
 
                           </script>';
 		return $process_button_string;

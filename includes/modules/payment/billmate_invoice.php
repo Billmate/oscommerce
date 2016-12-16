@@ -799,12 +799,13 @@ class billmate_invoice {
                           	var jq = document.createElement("script");
                           	jq.type = "text/javascript";
                           	jq.src = "' . HTTP_SERVER . DIR_WS_HTTP_CATALOG . 'jquery.js";
-
+                            jq.onload = redirectLink;
                           	document.getElementsByTagName("head")[0].appendChild(jq);
-                          }setTimeout(function(){
+                          }
+                          function redirectLink(){
                                                       jQuery(document).ready(function(){ $("input[name=\'comments\']").remove(); }); $(\'form[name="checkout_confirmation"]\').submit(function(e){e.preventDefault(); window.location = decodeURI("' . $redirect . '").replaceAll("%26","&").replaceAll("%3D","=").replaceAll("%3A",":").replaceAll("%2C",",");});
 
-                          },200)
+                          }
                           </script>';
         } 
         return $process_button_string;
