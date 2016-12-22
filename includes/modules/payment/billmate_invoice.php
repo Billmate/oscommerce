@@ -1084,7 +1084,7 @@ class billmate_invoice {
             billmate_remove_order($_DATA['orderid'],true);
             tep_session_unregister('cart_Billmate_card_ID');
             tep_redirect(BillmateUtils::error_link(FILENAME_CHECKOUT_PAYMENT,
-                'payment_error=billmateinvoice&error=Please try again.',
+                'payment_error=billmate_invoice&error=Please try again.',
                 'SSL', true, false));
 
 

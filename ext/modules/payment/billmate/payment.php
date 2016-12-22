@@ -267,7 +267,7 @@ function partpay($order_id){
         billmate_remove_order($cart_billmate_card_ID,true);
         tep_session_unregister('cart_Billmate_card_ID');
         tep_redirect(BillmateUtils::error_link(FILENAME_CHECKOUT_PAYMENT,
-            'payment_error=billmate_partpay&error=' . utf8_encode($result1->message)));
+            'payment_error=pcbillmate&error=' . utf8_encode($result1->message)));
         exit;
     } else {
         if($result1->status == 'WaitingForBankIDIdentification' || $result1->status == 'WaitingForBankIDIdentificationForAddressCheck'){
@@ -541,7 +541,7 @@ function invoice($order_id){
     if(isset($result1->code)){
 
         tep_redirect(BillmateUtils::error_link(FILENAME_CHECKOUT_PAYMENT,
-            'payment_error=billmate_partpay&error=' . utf8_encode($result1->message)));
+            'payment_error=billmate_invoice&error=' . utf8_encode($result1->message)));
         exit;
     } else {
         if($result1->status == 'WaitingForBankIDIdentification' || $result1->status == 'WaitingForBankIDIdentificationForAddressCheck'){
