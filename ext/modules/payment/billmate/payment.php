@@ -405,7 +405,8 @@ function invoice($order_id){
                     $percent = $value / $totals;
                     $price_without_tax_out = $price_without_tax * $percent;
 
-                    if($code = 'ot_billmate_fee'){
+
+                    if($code == 'ot_billmate_fee'){
                         $temp = mk_goods_flags(1, "", ($name).' '.(int)$tax.'% '.MODULE_PAYMENT_BILLMATE_VAT, $price_without_tax_out, $tax, 0, true);
                     } else {
                         $temp = mk_goods_flags(1, "", ($name).' '.(int)$tax.'% '.MODULE_PAYMENT_BILLMATE_VAT, $price_without_tax_out, $tax, 0, false);
