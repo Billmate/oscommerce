@@ -397,6 +397,7 @@ function invoice($order_id){
             $codes[] = $code;
             if( $code == 'ot_discount' ) { $price_without_tax = 0 - $price_without_tax; }
             if( $code == 'ot_shipping' ){ $shippingPrice = $price_without_tax; $shippingTaxRate = $tax; continue; }
+            if( $code == 'ot_billmate_fee' ){ $handlingPrice = $price_without_tax; $handlingTaxRate = $tax; continue; }
 
             if ($value != "" && $value != 0) {
                 $totals = $totalValue;
@@ -404,14 +405,7 @@ function invoice($order_id){
                 {
                     $percent = $value / $totals;
                     $price_without_tax_out = $price_without_tax * $percent;
-
-
-                    if($code == 'ot_billmate_fee'){
-                        $temp = mk_goods_flags(1, "", ($name).' '.(int)$tax.'% '.MODULE_PAYMENT_BILLMATE_VAT, $price_without_tax_out, $tax, 0, true);
-                    } else {
-                        $temp = mk_goods_flags(1, "", ($name).' '.(int)$tax.'% '.MODULE_PAYMENT_BILLMATE_VAT, $price_without_tax_out, $tax, 0, false);
-
-                    }
+                    $temp = mk_goods_flags(1, "", ($name).' '.(int)$tax.'% '.MODULE_PAYMENT_BILLMATE_VAT, $price_without_tax_out, $tax, 0, 0);
                     $totalValue += $temp['withouttax'];
                     $taxValue += $temp['tax'];
                     $goodsList[] = $temp;
@@ -523,8 +517,8 @@ function invoice($order_id){
 
     $invoiceValues['Cart'] = array(
         "Handling" => array(
-            "withouttax" => 0,
-            "taxrate" => 0
+            "withouttax" => ($handlingPrice)?round($handlingPrice,0):0,
+            "taxrate" => ($handlingTaxRate)?$handlingTaxRate:0
         ),
         "Shipping" => array(
             "withouttax" => ($shippingPrice)?round($shippingPrice,0):0,
