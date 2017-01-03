@@ -327,6 +327,16 @@ class BillmateUtils {
 		  `activated` int(10) NOT NULL,
 		  UNIQUE KEY `id` (`id`)
 		)");
+
+        /* If module is updated and is missing the column language */
+        $table_columns_query = tep_db_query("select column_name from information_schema.columns where table_name='".$table."'");
+        while ($row = tep_db_fetch_array($table_columns_query)) {
+            $table_columns[] = $row['column_name'];
+        }
+        if(!in_array("language", $table_columns)) {
+            /* Language column is missing, add language column */
+            tep_db_query("ALTER TABLE `".$table."` ADD `language` varchar(5) NOT NULL");
+        }
     }
 
     /**
