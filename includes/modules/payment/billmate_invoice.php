@@ -626,7 +626,7 @@ class billmate_invoice {
 
             $customer_notification = (SEND_EMAILS == 'true') ? '1' : '0';
             $sql_data_array = array('orders_id' => $insert_id,
-                'orders_status_id' => 1,
+                'orders_status_id' => 0,
                 'date_added' => 'now()',
                 'customer_notified' => 0,
                 'comments' => $order->info['comments']);
