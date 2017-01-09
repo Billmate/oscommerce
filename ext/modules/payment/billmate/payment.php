@@ -509,6 +509,8 @@ function invoice($order_id){
     $invoiceValues['Articles'] = $goodsList;
     $totalValue += $shippingPrice;
     $taxValue += $shippingPrice * ($shippingTaxRate/100);
+    $taxValue += $handlingPrice * ($handlingTaxRate/100);
+    $totalValue += $handlingPrice;
     $totaltax = round($taxValue,0);
     $totalwithtax = round(str_replace(',','.',$order->info['total'])*100,0);
     //$totalwithtax += $shippingPrice * ($shippingTaxRate/100);
