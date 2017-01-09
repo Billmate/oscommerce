@@ -760,7 +760,7 @@ class billmatecardpay {
 		$totalValue += $shippingPrice;
 		$taxValue += $shippingPrice * ($shippingTaxRate/100);
 		$totaltax = round($taxValue,0);
-		$totalwithtax = round($order->info['total']*100,0);
+		$totalwithtax = round(str_replace(',','.',$order->info['total'])*100,0);
 		//$totalwithtax += $shippingPrice * ($shippingTaxRate/100);
 		$totalwithouttax = $totalValue;
 		$rounding = $totalwithtax - ($totalwithouttax+$totaltax);
