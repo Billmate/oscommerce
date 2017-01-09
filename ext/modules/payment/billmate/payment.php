@@ -435,7 +435,7 @@ function invoice($order_id){
         "street2" 	=> "",
         "zip" 		=> $order->delivery['postcode'],
         "city" 		=> $order->delivery['city'],
-        "country" 	=> getCountryIsoFromName($order->delivery['country']['title']),
+        "country" 	=> is_array($order->delivery['country']) ? getCountryIsoFromName($order->delivery['country']['title']) : $order->delivery['country'],
         "phone" 	=> $order->customer['telephone'],
     );
     $names = explode(' ',$order->billing['name']);
@@ -450,7 +450,7 @@ function invoice($order_id){
         "street2" 	=> "",
         "zip" 		=> $order->billing['postcode'],
         "city" 		=> $order->billing['city'],
-        "country" 	=> getCountryIsoFromName($order->billing['country']['title']),
+        "country" 	=> is_array($order->billing['country']) ? getCountryIsoFromName($order->billing['country']['title']) : $order->billing['country'],
         "phone" 	=> $order->customer['telephone'],
         "email" 	=> $order->customer['email_address'],
     );
