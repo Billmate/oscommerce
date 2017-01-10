@@ -238,7 +238,7 @@ function partpay($order_id){
     $totalValue += $shippingPrice;
     $taxValue += $shippingPrice * ($shippingTaxRate/100);
     $totaltax = round($taxValue,0);
-    $totalwithtax = round(str_replace(',','.',$order->info['total'])*100,0);
+    $totalwithtax = round(getTotal($order_id)*100,0);
     //$totalwithtax += $shippingPrice * ($shippingTaxRate/100);
     $totalwithouttax = $totalValue;
     $rounding = $totalwithtax - ($totalwithouttax+$totaltax);
@@ -512,7 +512,7 @@ function invoice($order_id){
     $taxValue += $handlingPrice * ($handlingTaxRate/100);
     $totalValue += $handlingPrice;
     $totaltax = round($taxValue,0);
-    $totalwithtax = round(str_replace(',','.',$order->info['total'])*100,0);
+    $totalwithtax = round(getTotal($order_id)*100,0);
     //$totalwithtax += $shippingPrice * ($shippingTaxRate/100);
     $totalwithouttax = $totalValue;
     $rounding = $totalwithtax - ($totalwithouttax+$totaltax);
@@ -640,4 +640,11 @@ function getCountryIsoFromName($name){
     $country = tep_db_fetch_array($country_query);
 
     return $country['countries_iso_code_2'];
+}
+
+function getTotal($id){
+
+    $total_query = tep_db_query("select * from " . TABLE_ORDERS_TOTAL . " where class = 'ot_total'  AND orders_id = '" . $id . "'");
+    $total = tep_db_fetch_array($total_query);
+    return $total['value'];
 }
