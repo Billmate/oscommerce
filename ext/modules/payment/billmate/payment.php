@@ -536,7 +536,8 @@ function invoice($order_id){
     $result1 = (object)$k->AddPayment($invoiceValues);
     $result1->raw_response = $k->raw_response;
     if(isset($result1->code)){
-
+        billmate_remove_order($order_id,true);
+        tep_session_unregister('cart_Billmate_card_ID');
         tep_redirect(BillmateUtils::error_link(FILENAME_CHECKOUT_PAYMENT,
             'payment_error=billmate_invoice&error=' . utf8_encode($result1->message)));
         exit;
