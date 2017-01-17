@@ -396,8 +396,21 @@ function invoice($order_id){
 
             $codes[] = $code;
             if( $code == 'ot_discount' ) { $price_without_tax = 0 - $price_without_tax; }
-            if( $code == 'ot_shipping' ){ $shippingPrice = $price_without_tax; $shippingTaxRate = $tax; continue; }
-            if( $code == 'ot_billmate_fee' ){ $handlingPrice = $price_without_tax; $handlingTaxRate = $tax; continue; }
+            if( $code == 'ot_shipping' ){
+                $shippingPrice = $price_without_tax;
+                $shippingTaxRate = $tax;
+                $totalValue += $shippingPrice;
+                $taxValue += $shippingPrice * ($shippingTaxRate/100);
+
+                continue;
+            }
+            if( $code == 'ot_billmate_fee' ){
+                $handlingPrice = $price_without_tax;
+                $handlingTaxRate = $tax;
+                $taxValue += $handlingPrice * ($handlingTaxRate/100);
+                $totalValue += $handlingPrice;
+                continue;
+            }
 
             if ($value != "" && $value != 0) {
                 $totals = $totalValue;
@@ -507,10 +520,7 @@ function invoice($order_id){
         'Shipping'=> $ship_address
     );
     $invoiceValues['Articles'] = $goodsList;
-    $totalValue += $shippingPrice;
-    $taxValue += $shippingPrice * ($shippingTaxRate/100);
-    $taxValue += $handlingPrice * ($handlingTaxRate/100);
-    $totalValue += $handlingPrice;
+
     $totaltax = round($taxValue,0);
     $totalwithtax = round(getTotal($order_id)*100,0);
     //$totalwithtax += $shippingPrice * ($shippingTaxRate/100);
