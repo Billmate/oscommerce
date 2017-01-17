@@ -605,7 +605,7 @@ class billmate_invoice {
                 'cc_number' => $order->info['cc_number'],
                 'cc_expires' => $order->info['cc_expires'],
                 'date_purchased' => 'now()',
-                'orders_status' => 1,
+                'orders_status' => 0,
                 'currency' => $order->info['currency'],
                 'currency_value' => $order->info['currency_value']);
 
@@ -1351,7 +1351,7 @@ class billmate_invoice {
         // Insert transaction # into history file
         if( !empty($order->billmateref) ) {
             $sql_data_array = array('orders_id' => $_DATA['order_id'],
-                'orders_status_id' => MODULE_PAYMENT_BILLMATECARDPAY_ORDER_STATUS_ID,
+                'orders_status_id' => MODULE_PAYMENT_BILLMATE_ORDER_STATUS_ID,
                 'date_added' => 'now()',
                 'customer_notified' => 0,
                 'comments' => ('Accepted by Billmate ' .

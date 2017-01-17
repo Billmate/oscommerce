@@ -660,7 +660,7 @@ class pcbillmate {
                 'cc_number' => $order->info['cc_number'],
                 'cc_expires' => $order->info['cc_expires'],
                 'date_purchased' => 'now()',
-                'orders_status' => 1,
+                'orders_status' => 0,
                 'currency' => $order->info['currency'],
                 'currency_value' => $order->info['currency_value']);
 
