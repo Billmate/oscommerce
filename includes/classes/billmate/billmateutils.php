@@ -329,6 +329,7 @@ class BillmateUtils {
 		)");
 
         /* If module is updated and is missing the column language */
+        $table_columns = array();
         $table_columns_query = tep_db_query("select column_name from information_schema.columns where table_name='".$table."'");
         while ($row = tep_db_fetch_array($table_columns_query)) {
             $table_columns[] = $row['column_name'];
