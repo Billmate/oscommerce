@@ -335,7 +335,8 @@ class BillmateUtils {
         }
         if(!in_array("language", $table_columns)) {
             /* Language column is missing, add language column */
-            tep_db_query("ALTER TABLE `".$table."` ADD `language` varchar(5) NOT NULL");
+            self::remove_db($table);
+            self::create_db($table);
         }
     }
 
